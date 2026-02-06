@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Knowledge Hunt Computer Academy">
+    <link rel="canonical" href="https://exampaper.khca.info/terms.html">
+
+
+    <title>Terms & Conditions - Knowledge Hunt</title>
+    <!-- CSS Files -->
+    <link href="css/header.css" rel="stylesheet">
+    <link href="css/footer.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <style>
+        /* Page Specific Styles */
+        .static-page .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #eaeaea;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #0d47a1;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .tagline {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .static-page .page-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
+        }
+
+
+        .section-title {
+            color: #1a73e8;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eaeaea;
+            font-size: 1.5rem;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .highlight {
+            background-color: #f0f7ff;
+            border-left: 4px solid #1a73e8;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .ad-container {
+            background-color: #f8f9fa;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            color: #666;
+        }
+
+        .ad-container h3 {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .terms-list {
+            margin: 2rem 0;
+        }
+
+        .term-item {
+            background: #f8f9fa;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            border-left: 3px solid #1a73e8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-content {
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="static-page">
+    <!-- Header will be loaded here -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-header">
+            <h1>Terms & Conditions</h1>
+            <p class="tagline">By using the Knowledge Hunt website, you agree to the following terms and conditions.</p>
+        </div>
+
+        <!-- Ad Placeholder -->
+        <div class="ad-container">
+            <h3>Advertisement Space</h3>
+            <p>This space is reserved for Google AdSense or other advertisements.</p>
+            <p>Ad dimensions: 728x90 or 300x250</p>
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            <h2 class="section-title">Terms and Conditions</h2>
+            <p>By using the Knowledge Hunt website, you agree to the following terms and conditions:</p>
+
+            <div class="terms-list">
+                <div class="term-item">
+                    All content on this website is provided for educational and practice purposes only.
+                </div>
+
+                <div class="term-item">
+                    Exam papers and study materials are shared for reference and learning support.
+                </div>
+
+                <div class="term-item">
+                    Users are not allowed to copy, sell, or misuse the content without permission.
+                </div>
+
+                <div class="term-item">
+                    We try to keep all information accurate, but Knowledge Hunt is not responsible for any errors.
+                </div>
+
+                <div class="term-item">
+                    Misuse of the website or content may result in restricted access.
+                </div>
+            </div>
+
+            <div class="highlight">
+                <p>If you do not agree with these terms, please do not use this website.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded here -->
+    <div id="footer-container"></div>
+
+    <!-- JavaScript Files -->
+    <script src="js/main.js"></script>
+    <script src="js/load-components.js"></script>
+
+    <!-- Page Specific Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set active navigation
+            setTimeout(function () {
+                const navLinks = document.querySelectorAll('nav a');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === 'terms.html' ||
+                        link.textContent.includes('Terms')) {
+                        link.classList.add('active');
+                    }
+                });
+            }, 100);
+
+            // Simulate ad loading
+            setTimeout(() => {
+                const adContainer = document.querySelector('.ad-container');
+                if (adContainer) {
+                    adContainer.innerHTML = `
+                        <h3>Advertisement</h3>
+                        <p>This is a simulated advertisement. In production, Google AdSense code would be placed here.</p>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                            <p style="margin: 0; color: #666; font-size: 0.9rem;">Ad: Educational Resources - Learn more</p>
+                        </div>
+                    `;
+                }
+            }, 1500);
+        });
+    </script>
+
+</body>
+
+</html>

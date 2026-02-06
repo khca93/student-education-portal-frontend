@@ -1,0 +1,78 @@
+/* ================= STUDENT DASHBOARD ================= */
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+/* Section heading */
+section h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+/* Grid for saved papers */
+#savedPapers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Paper card */
+.paper-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.paper-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+}
+
+/* Title */
+.paper-card h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+/* Meta info */
+.paper-card p {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.paper-card a {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 6px 14px;
+  font-size: 13px;
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  transition: all 0.2s ease;
+}
+
+.paper-card a:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Divider */
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Empty message */
+#savedPapers p {
+  color: #6b7280;
+}

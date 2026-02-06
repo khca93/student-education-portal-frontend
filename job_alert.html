@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Knowledge Hunt Computer Academy">
+  <link rel="canonical" href="https://exampaper.khca.info/job_alert.html">
+
+
+  <title>Job Alerts for Students | Government, Private & Internship Jobs – Knowledge Hunt</title>
+
+  <meta name="description"
+    content="Knowledge Hunt provides latest Government Jobs, Private Job Openings and Internship opportunities for students. Apply online and build your career.">
+
+  <meta name="keywords"
+    content="Knowledge Hunt jobs, government jobs for students, private jobs, internship apply online">
+
+  <link rel="stylesheet" href="css/job_alert.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+  <!-- ✅ HEADER MUST BE FIRST -->
+  <div id="header-container"></div>
+
+  <main class="container">
+
+    <h1 class="main-heading">
+      Latest Job Updates for Students – Knowledge Hunt
+    </h1>
+
+    <!-- SEO CONTENT -->
+    <section class="seo-content">
+      <h2>Knowledge Hunt – Career Support for Students</h2>
+      <p>
+        Knowledge Hunt helps students find verified government job notifications,
+        private job openings and internship opportunities. Our goal is to guide
+        students towards the right career path with trusted job information.
+      </p>
+    </section>
+
+    <!-- FILTER CARDS -->
+    <section class="job-filters">
+
+      <div class="filter-card active" id="card-government" onclick="filterJobs('government')">
+        <i class="fas fa-landmark"></i>
+        <h3>Government Jobs</h3>
+        <p>Sarkari Bharti & Notifications</p>
+      </div>
+
+      <div class="filter-card" id="card-information" onclick="filterJobs('information')">
+        <i class="fas fa-building"></i>
+        <h3>Private Jobs</h3>
+        <p>Company & Walk-in Jobs</p>
+      </div>
+
+      <div class="filter-card" id="card-apply" onclick="filterJobs('apply')">
+        <i class="fas fa-user-graduate"></i>
+        <h3>Internship / Local Jobs</h3>
+        <p>Apply Online</p>
+      </div>
+
+    </section>
+
+    <!-- JOB LIST -->
+    <section id="jobList"></section>
+
+  </main>
+
+  <!-- APPLY MODAL -->
+  <div id="applyModal" class="modal">
+    <div class="modal-box">
+      <span class="close-btn" onclick="closeApplyModal()">×</span>
+
+      <h3>Apply for Job</h3>
+
+      <form id="applyForm" enctype="multipart/form-data">
+        <input type="hidden" id="applyJobId" name="jobId">
+
+        <input type="text" name="applicantName" placeholder="Full Name" required>
+        <input type="text" name="qualification" placeholder="Qualification" required>
+        <input type="text" name="mobile" placeholder="Mobile Number" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+
+        <input type="file" name="resume" accept=".pdf" required>
+
+        <button type="submit">Submit Application</button>
+      </form>
+
+
+    </div>
+  </div>
+
+  <!-- ✅ FOOTER MUST BE LAST -->
+  <div id="footer-container"></div>
+
+  <!-- SCRIPTS AT END -->
+   <script src="js/main.js"></script>
+  <script src="js/job_alert.js"></script>
+  <script src="js/load-components.js"></script>
+
+</body>
+
+</html>

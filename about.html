@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Knowledge Hunt Computer Academy">
+    <link rel="canonical" href="https://exampaper.khca.info/about.html">
+
+    <title>About Us - Knowledge Hunt</title>
+    <!-- CSS Files -->
+    <link href="css/header.css" rel="stylesheet">
+    <link href="css/footer.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <style>
+        /* Page Specific Styles */
+        .static-page .page-header {
+            text-align: center;
+            margin: 3rem 0;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #eaeaea;
+        }
+
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #0d47a1;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header .tagline {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .static-page .page-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
+        }
+
+
+        .section-title {
+            color: #1a73e8;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eaeaea;
+            font-size: 1.5rem;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .highlight {
+            background-color: #f0f7ff;
+            border-left: 4px solid #1a73e8;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .ad-container {
+            background-color: #f8f9fa;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            color: #666;
+        }
+
+        .ad-container h3 {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-content {
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="static-page">
+    <!-- Header will be loaded here -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-header">
+            <h1>About Knowledge Hunt</h1>
+            <p class="tagline">An educational platform created to help students get the right guidance, better practice,
+                and a strong foundation for their future.</p>
+        </div>
+
+        <!-- Ad Placeholder -->
+        <div class="ad-container">
+            <h3>Advertisement Space</h3>
+            <p>This space is reserved for Google AdSense or other advertisements.</p>
+            <p>Ad dimensions: 728x90 or 300x250</p>
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            <h2 class="section-title">About Our Platform</h2>
+            <p>Knowledge Hunt is an educational platform created to help students get the right guidance, better
+                practice, and a strong foundation for their future.</p>
+            <p>Our main aim is to support students in their studies and career journey by providing useful learning
+                resources. We believe that with proper guidance, regular practice, and skill development, every student
+                can achieve success.</p>
+
+            <div class="highlight">
+                <h2 class="section-title">Our Purpose</h2>
+                <p>The purpose of Knowledge Hunt is:</p>
+                <ul>
+                    <li>To guide students in the right direction</li>
+                    <li>To help students prepare well for exams</li>
+                    <li>To support skill development for better career growth</li>
+                </ul>
+            </div>
+
+            <h2 class="section-title">What We Offer</h2>
+            <ul>
+                <li><strong>Previous Year Exam Papers</strong> for practice</li>
+                <li><strong>Typing Practice</strong> to improve speed and accuracy</li>
+                <li><strong>Study tips</strong> and exam preparation guidance</li>
+                <li><strong>Information</strong> related to computer education and job-oriented skills</li>
+            </ul>
+
+            <p>Knowledge Hunt works as a learning support system for students who want to improve their performance and
+                build a better future.</p>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded here -->
+    <div id="footer-container"></div>
+
+    <!-- JavaScript Files -->
+    <script src="js/main.js"></script>
+    <script src="js/load-components.js"></script>
+
+    <!-- Page Specific Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set active navigation
+            setTimeout(function () {
+                const navLinks = document.querySelectorAll('nav a');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === 'about.html' ||
+                        link.textContent.includes('About')) {
+                        link.classList.add('active');
+                    }
+                });
+            }, 100);
+
+            // Simulate ad loading
+            setTimeout(() => {
+                const adContainer = document.querySelector('.ad-container');
+                if (adContainer) {
+                    adContainer.innerHTML = `
+                        <h3>Advertisement</h3>
+                        <p>This is a simulated advertisement. In production, Google AdSense code would be placed here.</p>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                            <p style="margin: 0; color: #666; font-size: 0.9rem;">Ad: Educational Resources - Learn more</p>
+                        </div>
+                    `;
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+
+</html>

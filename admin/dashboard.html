@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard - Student Education Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Scroll Indicator -->
+    <button class="scroll-indicator" id="scrollIndicator" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i> Scroll to Top
+    </button>
+
+    <div class="admin-wrapper">
+        <!-- SIDEBAR -->
+        <div class="admin-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-cogs"></i> Admin Panel</h2>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <div class="sidebar-nav">
+                <a href="javascript:void(0)" onclick="showSection('dashboard')" class="active">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+
+                <a href="javascript:void(0)" onclick="showSection('papers')">
+                    <i class="fas fa-file-alt"></i> Exam Papers
+                </a>
+
+                <a href="javascript:void(0)" onclick="showSection('jobs')">
+                    <i class="fas fa-briefcase"></i> Jobs
+                </a>
+
+                <a href="javascript:void(0)" onclick="showSection('applications')">
+                    <i class="fas fa-users"></i> Applications
+                </a>
+            </div>
+
+            <!-- Quick Access -->
+            <div class="sidebar-quick-actions">
+                <h3>Quick Access</h3>
+                <div class="action-buttons">
+                    <a href="../students/dashboard.html" target="_blank" class="btn btn-sidebar">
+                        <i class="fas fa-user-graduate"></i> Students Portal
+                    </a>
+
+                    <a href="../index.html" target="_blank" class="btn btn-sidebar">
+                        <i class="fas fa-globe"></i> View Website
+                    </a>
+
+                    <button class="btn btn-sidebar" onclick="logoutAdmin()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="admin-content" id="mainContent">
+
+            <!-- DASHBOARD SECTION -->
+            <div id="dashboard-section" class="section active">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card papers">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Exam Papers</h4>
+                            <p id="totalPapers">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card jobs">
+                        <div class="stat-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Total Jobs</h4>
+                            <p id="totalJobs">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card students">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Total Students</h4>
+                            <p id="totalStudents">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card applications">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Applications</h4>
+                            <p id="totalApplications">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="showModal('addPaperModal')">
+                            <i class="fas fa-plus"></i> Add New Paper
+                        </button>
+                        <button class="btn btn-outline" onclick="loadExamPapers()">
+                            <i class="fas fa-redo"></i> Refresh Papers
+                        </button>
+                        <button class="btn btn-outline" onclick="showSection('papers')">
+                            <i class="fas fa-list"></i> View All Papers
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JOBS SECTION -->
+            <div id="jobs-section" class="section">
+                <div class="papers-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-briefcase"></i> Job Management</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="jobSearch" placeholder="Search jobs..." onkeyup="searchJobs()">
+                            </div>
+                            <button class="btn btn-primary" onclick="showModal('addJobModal')">
+                                <i class="fas fa-plus"></i> Add Job
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FILTERS -->
+                    <div class="filter-bar">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>Job Type</label>
+                                <select class="form-control" id="filterJobType">
+                                    <option value="">All Types</option>
+                                    <option value="government">Government</option>
+                                    <option value="information">Information</option>
+                                    <option value="apply">Apply Now</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label>Last Date</label>
+                                <input type="date" class="form-control" id="filterLastDate">
+                            </div>
+
+                            <div class="filter-group">
+                                <button class="btn btn-outline" onclick="applyJobFilters()">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+
+                            <div class="filter-group">
+                                <button class="btn btn-outline" onclick="clearJobFilters()">
+                                    <i class="fas fa-times"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JOBS TABLE -->
+                    <div id="jobsList">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading jobs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXAM PAPERS SECTION -->
+            <div id="papers-section" class="section">
+                <div class="papers-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-file-alt"></i> Exam Paper Management</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="paperSearch" placeholder="Search papers..."
+                                    onkeyup="searchPapers()">
+                            </div>
+                            <button class="btn btn-primary" onclick="showModal('addPaperModal')">
+                                <i class="fas fa-plus"></i> Add Paper
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FILTERS -->
+                    <div class="filter-bar">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>Category</label>
+                                <select class="form-control" id="filterCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="10th SSC">10th SSC</option>
+                                    <option value="10th CBSE">10th CBSE</option>
+                                    <option value="12th HSC">12th HSC</option>
+                                    <option value="12th CBSE">12th CBSE</option>
+                                    <option value="Graduation">Graduation</option>
+                                    <option value="Competitive">Competitive</option>
+
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label>Year</label>
+                                <input type="text" class="form-control" id="filterYear" placeholder="e.g., 2023">
+                            </div>
+
+                            <div class="filter-group">
+                                <label>Subject</label>
+                                <input type="text" class="form-control" id="filterSubject" placeholder="e.g., Maths">
+                            </div>
+
+                            <div class="filter-group">
+                                <label>Paper Type</label>
+                                <select class="form-control" id="filterPaperType">
+                                    <option value="">All Types</option>
+                                    <option value="Final Exam Paper">Final Exam</option>
+                                    <option value="Practice Paper">Practice Paper</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <button class="btn btn-outline" onclick="applyFilters()">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+
+                            <div class="filter-group">
+                                <button class="btn btn-outline" onclick="clearFilters()">
+                                    <i class="fas fa-times"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAPERS TABLE -->
+                    <div id="papersList">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading exam papers...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APPLICATIONS SECTION -->
+            <div id="applications-section" class="section">
+                <div class="papers-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users"></i> Job Applications</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="applicationSearch" placeholder="Search applications..."
+                                    onkeyup="searchApplications()">
+                            </div>
+                            <div class="filter-group" style="min-width: 200px;">
+                                <select class="form-control" id="filterApplicationStatus"
+                                    onchange="filterApplications()">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="reviewed">Reviewed</option>
+                                    <option value="shortlisted">Shortlisted</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="hired">Hired</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FILTERS -->
+                    <div class="filter-bar">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label>Job Title</label>
+                                <select class="form-control" id="filterApplicationJob">
+                                    <option value="">All Jobs</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label>From Date</label>
+                                <input type="date" class="form-control" id="filterApplicationFromDate">
+                            </div>
+
+                            <div class="filter-group">
+                                <label>To Date</label>
+                                <input type="date" class="form-control" id="filterApplicationToDate">
+                            </div>
+
+                            <div class="filter-group">
+                                <button class="btn btn-outline" onclick="applyApplicationFilters()">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+
+                            <div class="filter-group">
+                                <button class="btn btn-outline" onclick="clearApplicationFilters()">
+                                    <i class="fas fa-times"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- APPLICATIONS TABLE -->
+                    <div id="applicationsList">
+
+                        <table class="applications-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Job</th>
+                                    <th>Resume</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="applicationsTable">
+                                <!-- JS will inject rows here -->
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- ADD PAPER MODAL -->
+    <div id="addPaperModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Add Exam Paper</h3>
+                <button class="close-modal" onclick="hideModal('addPaperModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addPaperForm">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select class="form-control" id="paperCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="10th SSC">10th SSC</option>
+                            <option value="10th CBSE">10th CBSE</option>
+                            <option value="12th HSC">12th HSC</option>
+                            <option value="Graduation">Graduation</option>
+                            <option value="Competitive">Competitive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Class *</label>
+                        <input type="text" class="form-control" id="paperClass" placeholder="e.g., Class 10" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subject *</label>
+                        <input type="text" class="form-control" id="paperSubject" placeholder="e.g., Mathematics"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Year *</label>
+                        <input type="text" class="form-control" id="paperYear" placeholder="e.g., 2023" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Paper Type *</label>
+                        <select class="form-control" id="paperType" required>
+                            <option value="">Select Type</option>
+                            <option value="Final Exam Paper">Final Exam Paper</option>
+                            <option value="Practice Paper">Practice Paper</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>PDF File *</label>
+                        <div class="file-upload">
+                            <input type="file" class="form-control" id="paperPdf" name="pdf" accept=".pdf" required>
+
+                            <button type="button" class="btn btn-outline"
+                                onclick="document.getElementById('paperPdf').click()" style="width: 100%;">
+                                <i class="fas fa-upload"></i> Choose PDF File
+                            </button>
+                        </div>
+                        <div class="file-info" id="pdfFileInfo">No file selected</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline"
+                            onclick="hideModal('addPaperModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Paper
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT PAPER MODAL -->
+    <div id="editPaperModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Exam Paper</h3>
+                <button class="close-modal" onclick="hideModal('editPaperModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editPaperForm">
+                    <input type="hidden" id="editPaperId">
+
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select class="form-control" id="editPaperCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="10th SSC">10th SSC</option>
+                            <option value="10th CBSE">10th CBSE</option>
+                            <option value="12th HSC">12th HSC</option>
+                            <option value="Graduation">Graduation</option>
+                            <option value="Competitive">Competitive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Class *</label>
+                        <input type="text" class="form-control" id="editPaperClass" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subject *</label>
+                        <input type="text" class="form-control" id="editPaperSubject" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Year *</label>
+                        <input type="text" class="form-control" id="editPaperYear" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Paper Type *</label>
+                        <select class="form-control" id="editPaperType" required>
+                            <option value="">Select Type</option>
+                            <option value="Final Exam Paper">Final Exam Paper</option>
+                            <option value="Practice Paper">Practice Paper</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>PDF File (Leave empty to keep current)</label>
+                        <div class="file-upload">
+                            <input type="file" class="form-control" id="editPaperPdf" name="pdf" accept=".pdf">
+
+                            <button type="button" class="btn btn-outline"
+                                onclick="document.getElementById('editPaperPdf').click()" style="width: 100%;">
+                                <i class="fas fa-upload"></i> Choose New PDF
+                            </button>
+                        </div>
+                        <div class="file-info" id="editPdfFileInfo">Current file will be kept</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline"
+                            onclick="hideModal('editPaperModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Paper
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD JOB MODAL -->
+    <div id="addJobModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-briefcase"></i> Add New Job</h3>
+                <button class="close-modal" onclick="hideModal('addJobModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addJobForm">
+                    <div class="form-group">
+                        <label>Job Title *</label>
+                        <input type="text" class="form-control" id="jobTitle" placeholder="e.g., Software Engineer"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job Type *</label>
+                        <select class="form-control" id="jobType" required>
+                            <option value="">Select Type</option>
+                            <option value="government">Government Job</option>
+                            <option value="information">Job Information</option>
+                            <option value="apply">Apply Now</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Qualification *</label>
+                        <input type="text" class="form-control" id="qualification" placeholder="e.g., B.Tech, BCA, etc."
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Company/Department Name</label>
+                        <input type="text" class="form-control" id="companyName"
+                            placeholder="e.g., Google, Maharashtra Government">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Date (Optional)</label>
+                        <input type="date" class="form-control" id="lastDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job Description</label>
+                        <textarea class="form-control" id="jobDescription" rows="3"
+                            placeholder="Enter job description..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job PDF (Optional)</label>
+                        <div class="file-upload">
+                            <input type="file" class="form-control" id="jobPdf" accept=".pdf">
+                            <button type="button" class="btn btn-outline"
+                                onclick="document.getElementById('jobPdf').click()" style="width: 100%;">
+                                <i class="fas fa-upload"></i> Choose PDF File
+                            </button>
+                        </div>
+                        <div class="file-info" id="jobPdfFileInfo">No file selected</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="hideModal('addJobModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Job
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT JOB MODAL -->
+    <div id="editJobModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Job</h3>
+                <button class="close-modal" onclick="hideModal('editJobModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editJobForm">
+                    <input type="hidden" id="editJobId">
+
+                    <div class="form-group">
+                        <label>Job Title *</label>
+                        <input type="text" class="form-control" id="editJobTitle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job Type *</label>
+                        <select class="form-control" id="editJobType" required>
+                            <option value="">Select Type</option>
+                            <option value="government">Government Job</option>
+                            <option value="information">Job Information</option>
+                            <option value="apply">Apply Now</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Qualification *</label>
+                        <input type="text" class="form-control" id="editQualification" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Company/Department Name</label>
+                        <input type="text" class="form-control" id="editCompanyName">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Date (Optional)</label>
+                        <input type="date" class="form-control" id="editLastDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job Description</label>
+                        <textarea class="form-control" id="editJobDescription" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Job PDF (Optional)</label>
+                        <div class="file-upload">
+                            <input type="file" class="form-control" id="editJobPdf" accept=".pdf">
+                            <button type="button" class="btn btn-outline"
+                                onclick="document.getElementById('editJobPdf').click()" style="width: 100%;">
+                                <i class="fas fa-upload"></i> Choose New PDF
+                            </button>
+                        </div>
+                        <div class="file-info" id="editJobPdfFileInfo">Current file will be kept</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline"
+                            onclick="hideModal('editJobModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Job
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+
+
+</body>
+
+</html>

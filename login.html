@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login | Knowledge Hunt</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- COMMON + FOOTER CSS -->
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+
+
+  <style>
+    /* ================= RESET ================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    /* ================= BASE ================= */
+    body {
+      font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit
+    }
+
+    /* ================= CONTAINER ================= */
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 0 24px;
+    }
+
+
+    /* ================= BUTTONS ================= */
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline {
+      border: 1px solid #4f46e5;
+      color: #4f46e5;
+      background: #fff;
+    }
+
+    .btn-primary {
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-full {
+      width: 100%
+    }
+
+    /* ================= AUTH PAGE ================= */
+    .auth-page {
+      padding: 70px 0;
+    }
+
+    .auth-container {
+      max-width: 980px;
+      margin: auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, .1);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    /* LEFT INFO */
+    .auth-info {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #fff;
+      padding: 50px;
+    }
+
+    .auth-info h2 {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+    }
+
+    .auth-info p {
+      font-size: 15px;
+      line-height: 1.6;
+      opacity: .95;
+    }
+
+    .auth-info ul {
+      list-style: none;
+      margin-top: 28px;
+    }
+
+    .auth-info li {
+      margin-bottom: 14px;
+      font-size: 15px;
+    }
+
+    .auth-info i {
+      color: #a5b4fc;
+      margin-right: 8px;
+    }
+
+    /* RIGHT CARD */
+    .auth-card {
+      padding: 50px;
+    }
+
+    .auth-card h3 {
+      font-size: 1.8rem;
+    }
+
+    .auth-subtitle {
+      color: #6b7280;
+      font-size: 14px;
+      margin: 6px 0 26px;
+    }
+
+    /* INPUTS */
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .input-group i {
+      color: #9ca3af;
+    }
+
+    .input-group input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    /* LINKS */
+    .auth-links {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .auth-links a {
+      color: #4f46e5;
+      font-weight: 500;
+    }
+
+
+    /* ================= RESPONSIVE ================= */
+    @media(max-width:900px) {
+      .auth-container {
+        grid-template-columns: 1fr
+      }
+
+      .auth-info {
+        text-align: center
+      }
+
+      .nav-menu {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('form');
+  if (!form) return;
+
+  // Force clear autofilled values
+  const inputs = form.querySelectorAll('input');
+  inputs.forEach(input => {
+    input.value = '';
+  });
+});
+</script>
+
+
+<body>
+
+
+
+  <!-- LOGIN -->
+  <section class="auth-page">
+    <div class="auth-container">
+
+      <!-- LEFT -->
+      <div class="auth-info">
+        <h2>Welcome Back!</h2>
+        <p>
+          Login to access exam papers, job alerts, typing practice
+          and your personalized student dashboard.
+        </p>
+        <ul>
+          <li><i class="fas fa-check-circle"></i> Latest Exam Papers</li>
+          <li><i class="fas fa-check-circle"></i> Government Job Alerts</li>
+          <li><i class="fas fa-check-circle"></i> Typing Practice Tests</li>
+          <li><i class="fas fa-check-circle"></i> Student Dashboard</li>
+        </ul>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="auth-card">
+        <h3>Student Login</h3>
+        <p class="auth-subtitle">Enter your credentials to continue</p>
+
+        <form autocomplete="off" onsubmit="EducationPortal.studentLogin(event)">
+
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" name="loginId" placeholder="Email or Mobile Number" autocomplete="off" autocorrect="off"
+              autocapitalize="off" spellcheck="false" required>
+
+          </div>
+
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" placeholder="Password" autocomplete="new-password" required>
+
+          </div>
+
+          <button class="btn btn-primary btn-full">Login</button>
+        </form>
+
+        <div class="auth-links">
+          <p>Don’t have an account? <a href="register.html">Register</a></p>
+          <p><a href="admin-login.html">Admin Login</a></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HEADER -->
+  <div id="header-container"></div>
+  <!-- FOOTER -->
+  <div id="footer-container"></div>
+
+  <script src="js/load-components.js"></script>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>

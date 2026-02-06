@@ -1,0 +1,12 @@
+# ignore uploads and pdfs
+uploads/
+uploads/**
+*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# node / logs (safe)
+node_modules/
+*.log
