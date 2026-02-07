@@ -419,9 +419,11 @@ function renderPapersTable(papers) {
     `;
 
     papers.forEach(function (paper) {
-        const fileName = paper.pdfPath ? paper.pdfPath.split('/').pop() : 'paper.pdf';
+        const fileName = paper.pdfPath || 'paper.pdf';
         const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
-        const pdfUrl = paper.pdfPath || '#';
+        const pdfUrl = paper.pdfPath
+            ? `${API_BASE}/api/exam-papers/download/pdf/${paper.pdfPath}`
+            : '#';
 
 
         html += `
@@ -485,7 +487,7 @@ async function openEditPaper(paperId) {
 
         if (paper.pdfPath) {
             const fileName = paper.pdfPath.split('/').pop();
-            const pdfUrl = paper.pdfPath;
+            const pdfUrl = `${API_BASE}/api/exam-papers/download/pdf/${paper.pdfPath}`;
             const fileInfo = document.getElementById('editPdfFileInfo');
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');
@@ -503,6 +505,7 @@ async function submitAddPaper(e) {
     const category = document.getElementById('paperCategory').value.trim();
     const paperClass = document.getElementById('paperClass').value.trim();
     const subject = document.getElementById('paperSubject').value.trim();
+    const fileName = document.getElementById('paperFileName').value.trim();
     const year = document.getElementById('paperYear').value.trim();
     const paperType = document.getElementById('paperType').value;
     const pdfFile = document.getElementById('paperPdf').files[0];
@@ -521,6 +524,7 @@ async function submitAddPaper(e) {
     formData.append('category', category);
     formData.append('class', paperClass);
     formData.append('subject', subject);
+    formData.append('fileName', fileName);
     formData.append('year', year);
     formData.append('paperType', paperType);
     formData.append('pdf', pdfFile);
@@ -833,7 +837,10 @@ async function openEditJob(jobId) {
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');
         }
-
+        if (!fileName) {
+            showAlert('File name is required', 'error');
+            return;
+        }
         showModal('editJobModal');
     } catch (error) {
         showAlert('Failed to load job details', 'error');

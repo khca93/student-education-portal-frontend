@@ -405,7 +405,7 @@ function isDateExpired(dateString) {
 // Get job type badge class
 function getJobTypeClass(jobType) {
     const classes = {
-        'government': 'badge-final',
+        'government': 'badge-government',
         'information': 'badge-practice',
         'apply': 'badge-final'
     };
@@ -510,7 +510,10 @@ function openExamPaperPDF(pdfPath) {
     }
 
     // ✅ Direct Cloudinary URL
-    window.open(pdfPath, "_blank");
+    window.open(
+        `${API_URL}/api/exam-papers/download/pdf/${pdfPath}`,
+        "_blank"
+    );
 }
 
 
