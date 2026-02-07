@@ -213,7 +213,7 @@
 </head>
 
 <body>
-
+<!-- TEST UPDATE 123 -->
   <!-- ✅ HEADER ADDED -->
   <div id="header-container"></div>
 
@@ -285,10 +285,11 @@
     }
     let allPapers = [];
 
-    /* ================= FETCH ================= */
-    loadExamPapers()
+
+    fetch(apiUrl)
+      .then(res => res.json())
       .then(data => {
-        allPapers = data.papers || [];
+        allPapers = data.examPapers || data.papers || [];
         populateFilters(allPapers);
         renderPapers(allPapers);
       })
@@ -324,23 +325,23 @@
       <!-- ✅ ALL BUTTONS INSIDE paper-actions -->
       <div class="paper-actions">
 
-  <!-- VIEW -->
-    <a class="btn-outline"
-     href="${p.pdfPath}"
-     target="_blank"
+        <!-- VIEW -->
+      <a class="btn-outline"
+      href="${p.pdfPath}"
+      target="_blank"
      title="View Paper">
-      <i class="fas fa-eye"></i>
-    </a>
+        <i class="fas fa-eye"></i>
+       </a>
 
         <!-- DOWNLOAD -->
       <a class="btn-primary"
-     href="${p.pdfPath}"
+         href="${p.pdfPath}"
      download
-     title="Download Paper">
-      <i class="fas fa-download"></i>
-    </a>
+        title="Download Paper">
+        <i class="fas fa-download"></i>
+        </a>
 
-    <!-- SAVE -->
+        <!-- SAVE -->
       <button class="btn-save"
           title="Save Paper"
           onclick="savePaper('${p._id}')">
