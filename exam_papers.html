@@ -281,16 +281,14 @@
     let apiUrl = API_BASE + "/api/exam-papers";
 
     if (category) {
-      apiUrl += `?category=${encodeURIComponent(category)}`;
+      apiUrl += `?category=${encodeURIComponent(category.trim())}`;
     }
-
     let allPapers = [];
 
     /* ================= FETCH ================= */
-    fetch(apiUrl)
-      .then(res => res.json())
+    loadExamPapers()
       .then(data => {
-        allPapers = data.examPapers || [];
+        allPapers = data.papers || [];
         populateFilters(allPapers);
         renderPapers(allPapers);
       })
