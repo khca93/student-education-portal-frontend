@@ -510,11 +510,9 @@ function openExamPaperPDF(pdfPath) {
     }
 
     // ✅ Direct Cloudinary URL
-    window.open(
-        `${API_URL}/api/exam-papers/download/pdf/${pdfPath}`,
-        "_blank"
-    );
+    window.open(pdfPath, "_blank");
 }
+
 
 
 function openCategory(categorySlug) {

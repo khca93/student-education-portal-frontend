@@ -80,7 +80,9 @@ function jobCard(job, type) {
         ${job.jobPdf ? `
           <a
             class="btn btn-outline"
-            href="${API_URL}/api/exam-papers/download/pdf/${encodeURIComponent(job.jobPdf)}"
+            <a href="${job.jobPdf}" target="_blank">
+              Download PDF
+            </a>
             target="_blank">
             View / Download PDF
           </a>

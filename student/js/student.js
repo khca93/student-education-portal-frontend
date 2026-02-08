@@ -45,13 +45,13 @@ fetch(API_URL + "/api/student/auth/saved-papers", {
         <p>${p.category} | ${p["class"]}</p>
 
         <a
-          href="${API_URL}/api/exam-papers/download/pdf/${safePdfPath}"
+          href="${p.pdfPath}"
           target="_blank">
           View
         </a>
 
         <a
-          href="${API_URL}/api/exam-papers/download/pdf/${safePdfPath}"
+          href="${p.pdfPath}"
           download>
           Download
         </a>
