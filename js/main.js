@@ -509,8 +509,12 @@ function openExamPaperPDF(pdfPath) {
         return;
     }
 
-    // ✅ Direct Cloudinary URL
-    window.open(pdfPath, "_blank");
+    // ✅ ALWAYS open from backend server
+    const fullUrl = pdfPath.startsWith("http")
+        ? pdfPath
+        : API_URL + pdfPath;
+
+    window.open(fullUrl, "_blank");
 }
 
 
