@@ -422,7 +422,7 @@ function renderPapersTable(papers) {
         const fileName = paper.pdfPath || 'paper.pdf';
         const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
         const pdfUrl = paper.pdfPath
-            ? `${API_BASE}/api/exam-papers/download/pdf/${paper.pdfPath}`
+            ? API_BASE + paper.pdfPath
             : '#';
 
 
@@ -487,7 +487,7 @@ async function openEditPaper(paperId) {
 
         if (paper.pdfPath) {
             const fileName = paper.pdfPath.split('/').pop();
-            const pdfUrl = `${API_BASE}/api/exam-papers/download/pdf/${paper.pdfPath}`;
+            const pdfUrl = API_BASE + paper.pdfPath;
             const fileInfo = document.getElementById('editPdfFileInfo');
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');
@@ -505,10 +505,11 @@ async function submitAddPaper(e) {
     const category = document.getElementById('paperCategory').value.trim();
     const paperClass = document.getElementById('paperClass').value.trim();
     const subject = document.getElementById('paperSubject').value.trim();
-    const fileName = pdfFile.name;
     const year = document.getElementById('paperYear').value.trim();
     const paperType = document.getElementById('paperType').value;
+
     const pdfFile = document.getElementById('paperPdf').files[0];
+    const fileName = pdfFile ? pdfFile.name : '';
 
     if (!category || !paperClass || !subject || !year || !paperType) {
         showAlert('All fields are required', 'error');
