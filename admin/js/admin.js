@@ -505,14 +505,10 @@ async function submitAddPaper(e) {
     const category = document.getElementById('paperCategory').value.trim();
     const paperClass = document.getElementById('paperClass').value.trim();
     const subject = document.getElementById('paperSubject').value.trim();
+    const fileName = pdfFile.name;
     const year = document.getElementById('paperYear').value.trim();
     const paperType = document.getElementById('paperType').value;
-
-    // ✅ FIRST declare pdfFile
     const pdfFile = document.getElementById('paperPdf').files[0];
-
-    // ✅ derive filename AFTER pdfFile exists
-    const fileName = pdfFile ? pdfFile.name : '';
 
     if (!category || !paperClass || !subject || !year || !paperType) {
         showAlert('All fields are required', 'error');
@@ -535,6 +531,10 @@ async function submitAddPaper(e) {
 
     try {
         const token = getToken('admin');
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        submitBtn.disabled = true;
 
         const response = await fetch(API_BASE + '/api/exam-papers', {
             method: 'POST',
@@ -546,17 +546,25 @@ async function submitAddPaper(e) {
 
         const data = await response.json();
 
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+
         if (data.success) {
             showAlert('Exam paper added successfully!', 'success');
             hideModal('addPaperModal');
-            loadExamPapers();
-            loadDashboardStats();
+            await Promise.all([
+                loadExamPapers(),
+                loadDashboardStats()
+            ]);
         } else {
             showAlert(data.message || 'Failed to add paper', 'error');
         }
 
     } catch (error) {
-        showAlert('Failed to add paper', 'error');
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Paper';
+        submitBtn.disabled = false;
+        showAlert('Failed to add paper: ' + error.message, 'error');
     }
 }
 
@@ -653,7 +661,7 @@ function deletePaperPrompt(paperId, paperTitle) {
     );
 }
 
-// ===== JOB FUNCTIONS js =====
+// ===== JOB FUNCTIONS =====
 async function loadJobs() {
     try {
         const jobsList = document.getElementById('jobsList');
