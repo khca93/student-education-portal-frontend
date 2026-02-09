@@ -505,7 +505,7 @@ async function submitAddPaper(e) {
     const category = document.getElementById('paperCategory').value.trim();
     const paperClass = document.getElementById('paperClass').value.trim();
     const subject = document.getElementById('paperSubject').value.trim();
-    const fileName = document.getElementById('paperFileName').value.trim();
+    const fileName = pdfFile.name;
     const year = document.getElementById('paperYear').value.trim();
     const paperType = document.getElementById('paperType').value;
     const pdfFile = document.getElementById('paperPdf').files[0];
@@ -661,7 +661,7 @@ function deletePaperPrompt(paperId, paperTitle) {
     );
 }
 
-// ===== JOB FUNCTIONS =====
+// ===== JOB FUNCTIONS js =====
 async function loadJobs() {
     try {
         const jobsList = document.getElementById('jobsList');
