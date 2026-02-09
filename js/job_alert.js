@@ -78,18 +78,17 @@ function jobCard(job, type) {
         <p><b>Last Date:</b> ${formatDate(job.lastDate)}</p>
 
         ${job.jobPdf ? `
-          <a
-            class="btn btn-outline"
-            <a href="${job.jobPdf}" target="_blank">
-              Download PDF
-            </a>
-            target="_blank">
-            View / Download PDF
-          </a>
-        ` : `<p><i>No PDF available</i></p>`}
-      </div>
-    `;
-  }
+      <a
+        href="${job.jobPdf.startsWith('http') ? job.jobPdf : API_URL + job.jobPdf}"
+        class="btn btn-outline"
+        target="_blank">
+        View / Download PDF
+      </a>
+    ` : `<p><i>No PDF available</i></p>`}
+
+          </div>
+        `;
+      }
 
   /* ===== PRIVATE / INFORMATION JOB ===== */
   if (type === 'information') {

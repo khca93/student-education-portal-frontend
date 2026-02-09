@@ -422,7 +422,9 @@ function renderPapersTable(papers) {
         const fileName = paper.pdfPath || 'paper.pdf';
         const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
         const pdfUrl = paper.pdfPath
-            ? API_BASE + paper.pdfPath
+            ? (paper.pdfPath.startsWith('http')
+                ? paper.pdfPath
+                : API_BASE + paper.pdfPath)
             : '#';
 
 
@@ -487,7 +489,9 @@ async function openEditPaper(paperId) {
 
         if (paper.pdfPath) {
             const fileName = paper.pdfPath.split('/').pop();
-            const pdfUrl = API_BASE + paper.pdfPath;
+            const pdfUrl = paper.pdfPath.startsWith('http')
+                ? paper.pdfPath
+                : API_BASE + paper.pdfPath;
             const fileInfo = document.getElementById('editPdfFileInfo');
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');
@@ -544,6 +548,7 @@ async function submitAddPaper(e) {
             },
             body: formData
         });
+
 
         const data = await response.json();
 
@@ -606,6 +611,7 @@ async function submitEditPaper(e) {
             body: formData
         });
 
+
         const data = await response.json();
 
         submitBtn.innerHTML = originalText;
@@ -643,6 +649,7 @@ function deletePaperPrompt(paperId, paperTitle) {
                         'Content-Type': 'application/json'
                     }
                 });
+
 
                 const data = await response.json();
 
@@ -742,7 +749,12 @@ function renderJobsTable(jobs) {
         const jobTypeText = getJobTypeText(job.jobType);
         const jobTypeClass = getJobTypeClass(job.jobType);
         const lastDate = job.lastDate ? new Date(job.lastDate).toLocaleDateString('en-IN') : '-';
-        const pdfUrl = job.jobPdf || '#';
+        const pdfUrl = job.jobPdf
+            ? (job.jobPdf.startsWith('http')
+                ? job.jobPdf
+                : API_BASE + job.jobPdf)
+            : '#';
+
 
 
         html += `
@@ -838,10 +850,7 @@ async function openEditJob(jobId) {
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');
         }
-        if (!fileName) {
-            showAlert('File name is required', 'error');
-            return;
-        }
+        
         showModal('editJobModal');
     } catch (error) {
         showAlert('Failed to load job details', 'error');
@@ -1125,7 +1134,12 @@ function renderApplicationsTable(applications) {
             ? application.jobId.jobTitle
             : 'Job Not Found';
 
-        const resumeUrl = application.resume ? API_BASE + application.resume : '#';
+        const resumeUrl = application.resume
+            ? (application.resume.startsWith('http')
+                ? application.resume
+                : API_BASE + application.resume)
+            : '#';
+
         const appliedDate = application.appliedAt ?
             new Date(application.appliedAt).toLocaleDateString('en-IN', {
                 day: '2-digit',
