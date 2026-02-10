@@ -41,35 +41,34 @@ function isLoggedIn(userType = 'student') {
 // API Request Helper
 function apiRequest(endpoint, options = {}, userType = 'student') {
     const token = getToken(userType);
-    let config = {
-        headers: {
-            'Content-Type': 'application/json'
-        }
+
+    // merge default config + options
+    const config = {
+        headers: {},
+        ...options
     };
 
-    // Copy options to config
-    for (let key in options) {
-        if (options.hasOwnProperty(key)) {
-            config[key] = options[key];
-        }
-    }
-
-    // Update headers
-    config.headers = config.headers || {};
+    // add auth token if present
     if (token) {
         config.headers['Authorization'] = 'Bearer ' + token;
     }
 
+    // set JSON content-type ONLY if not FormData
+    if (!(config.body instanceof FormData)) {
+        config.headers['Content-Type'] = 'application/json';
+    }
+
     return fetch(API_URL + endpoint, config)
-        .then(function (response) {
-            return response.json().then(function (data) {
+        .then(response =>
+            response.json().then(data => {
                 if (!response.ok) {
                     throw new Error(data.message || 'Something went wrong');
                 }
                 return data;
-            });
-        });
+            })
+        );
 }
+
 
 // Navigation Functions
 function navigateToCategory(category) {
@@ -463,7 +462,8 @@ async function loadExamPapers() {
             throw new Error('Failed to load exam papers');
         }
 
-        return await response.json();
+        const data = await response.json();
+        return data.papers || [];
     } catch (error) {
         console.error('Error loading exam papers:', error);
         throw error;
@@ -503,21 +503,29 @@ async function loadStudentJobs() {
     }
 }
 
-function openExamPaperPDF(pdfPath) {
-    if (!pdfPath) {
-        alert("PDF not available");
-        return;
-    }
+// ✅✅✅ FIXED FUNCTION:
+function openExamPaperPDF(pdfPath, paperName = "paper") {
+  if (!pdfPath) {
+    alert("PDF not available");
+    return;
+  }
 
-    // ✅ ALWAYS open from backend server
-    const fullUrl = pdfPath.startsWith("http")
-        ? pdfPath
-        : API_URL + pdfPath;
-
-    window.open(fullUrl, "_blank");
+  // ✅ FORCE DOWNLOAD FIX
+  const link = document.createElement('a');
+  link.href = pdfPath;
+  
+  // Extract filename
+  const fileName = paperName.replace(/[^a-z0-9]/gi, '_') + '.pdf';
+  link.download = fileName;
+  
+  // Open in new tab for viewing
+  window.open(pdfPath, '_blank');
+  
+  // Also trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
-
-
 
 function openCategory(categorySlug) {
 
@@ -540,7 +548,6 @@ function openCategory(categorySlug) {
     window.location.href =
         `exam_papers.html?category=${encodeURIComponent(actualCategory)}`;
 }
-
 
 // ===== WINDOW OBJECT EXPORTS =====
 window.API_URL = API_URL;
@@ -596,11 +603,5 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
-// ===== DASHBOARD FUNCTIONS =====
-// D:\WEBFILE\StudentEducationPortal\frontend\js\main.js
-
-
-
-
 
 console.log('Main.js loaded successfully');

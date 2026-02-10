@@ -34,9 +34,6 @@ fetch(API_URL + "/api/student/auth/saved-papers", {
     }
 
     data.papers.forEach(p => {
-      // ✅ ALWAYS encode before using in URL
-    
-
       const div = document.createElement("div");
       div.className = "paper-card";
 
@@ -44,17 +41,13 @@ fetch(API_URL + "/api/student/auth/saved-papers", {
         <h4>${p.subject} (${p.year})</h4>
         <p>${p.category} | ${p["class"]}</p>
 
-       <a
-        href="${API_URL}${p.pdfPath}"
-        target="_blank">
-        View
-      </a>
+        <a href="${p.pdfPath}" target="_blank" class="btn">
+          <i class="fas fa-eye"></i> View PDF
+        </a>
 
-      <a
-        href="${API_URL}${p.pdfPath}"
-        download>
-        Download
-      </a>
+        <a href="${p.pdfPath}" download="${p.subject}_${p.year}.pdf" class="btn">
+          <i class="fas fa-download"></i> Download
+        </a>
       `;
 
       container.appendChild(div);

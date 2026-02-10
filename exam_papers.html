@@ -255,7 +255,6 @@
 
     <script>
         /* ================= CATEGORY FIX ================= */
-
         const categoryMap = {
             "10th-ssc": "10th SSC",
             "10th-cbse": "10th CBSE",
@@ -279,13 +278,13 @@
                 : "https://student-education-portal-backend.onrender.com";
 
         let apiUrl = API_BASE + "/api/exam-papers";
+        let allPapers = [];
 
         if (category) {
             apiUrl += `?category=${encodeURIComponent(category.trim())}`;
         }
-        let allPapers = [];
 
-
+        /* ================= LOAD PAPERS ================= */
         fetch(apiUrl)
             .then(res => res.json())
             .then(data => {
@@ -293,11 +292,12 @@
                 populateFilters(allPapers);
                 renderPapers(allPapers);
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error("Error loading papers:", error);
                 document.getElementById("papers").innerHTML = "<p>Error loading papers</p>";
             });
 
-        /* ================= RENDER ================= */
+        /* ================= RENDER PAPERS ================= */
         function renderPapers(papers) {
             const container = document.getElementById("papers");
             container.innerHTML = "";
@@ -312,55 +312,78 @@
                 div.className = "paper-card";
 
                 div.innerHTML = `
-                    <div class="paper-left">
-                        <h3>${p.fileName || `${p.subject} (${p.year})`}</h3>
-                        <div class="paper-tags">
-                            <span>${p.category}</span>
-                            <span>${p["class"]}</span>
-                            <span>${p.year}</span>
-                            <span>${p.subject}</span>
-                        </div>
+                <div class="paper-left">
+                    <h3>${p.fileName || `${p.subject} (${p.year})`}</h3>
+                    <div class="paper-tags">
+                        <span>${p.category}</span>
+                        <span>${p["class"]}</span>
+                        <span>${p.year}</span>
+                        <span>${p.subject}</span>
                     </div>
+                </div>
 
-                    <!-- ✅ ALL BUTTONS INSIDE paper-actions -->
-                    <div class="paper-actions">
+                <div class="paper-actions">
+                    <!-- VIEW -->
+                    <button class="btn-outline"
+                        onclick="viewPaper('${p.pdfPath}')"
+                        title="View Paper">
+                        <i class="fas fa-eye"></i>
+                    </button>
 
-                        <!-- VIEW -->
-                        <a class="btn-outline"
-                            href="${p.pdfPath.startsWith('http') ? p.pdfPath : API_BASE + p.pdfPath}"
-                            target="_blank"
-                            title="View Paper">
-                            <i class="fas fa-eye"></i>
-                        </a>
+                    <!-- DOWNLOAD -->
+                    <button class="btn-primary"
+                        onclick="downloadPaperNow('${p.pdfPath}', '${p.subject}')"
+                        title="Download Paper">
+                        <i class="fas fa-download"></i>
+                    </button>
 
-                        <!-- DOWNLOAD -->
-                        <a class="btn-primary"
-                            href="${p.pdfPath.startsWith('http') ? p.pdfPath : API_BASE + p.pdfPath}"
-                            download
-                            title="Download Paper">
-                            <i class="fas fa-download"></i>
-                        </a>
-
-                        <!-- SAVE -->
-                        <button class="btn-save"
-                            title="Save Paper"
-                            onclick="savePaper('${p._id}')">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-
-                    </div>
-                `;
+                    <!-- SAVE -->
+                    <button class="btn-save"
+                        onclick="savePaper('${p._id}')"
+                        title="Save Paper">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
+            `;
 
                 container.appendChild(div);
             });
         }
 
-        // ================= SAVE PAPER =================
+        /* ================= VIEW PAPER ================= */
+        function viewPaper(pdfUrl) {
+            window.open(pdfUrl, '_blank');
+        }
+
+        /* ================= DOWNLOAD PAPER ================= */
+        function downloadPaperNow(pdfUrl, paperName) {
+            console.log("Downloading:", pdfUrl);
+
+            // Create download link
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+
+            // Create safe filename
+            const safeName = (paperName || 'paper')
+                .replace(/[^a-zA-Z0-9\s]/g, '')
+                .replace(/\s+/g, '_')
+                .trim();
+
+            link.download = `${safeName}.pdf`;
+            link.target = '_blank';
+
+            // Append, click, remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /* ================= SAVE PAPER ================= */
         function savePaper(paperId) {
             const token = localStorage.getItem("studentToken");
 
             if (!token) {
-                alert("Please login first");
+                alert("Please login first to save papers");
                 window.location.href = "login.html";
                 return;
             }
@@ -368,19 +391,23 @@
             fetch(`${API_BASE}/api/student/auth/save-paper/${paperId}`, {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer " + token
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
                 }
             })
                 .then(res => res.json())
                 .then(data => {
-                    alert(data.message || "Paper saved");
+                    if (data.success) {
+                        alert("✓ Paper saved successfully!");
+                    } else {
+                        alert(data.message || "Error saving paper");
+                    }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert("Error saving paper");
+                    alert("Network error. Please try again.");
                 });
         }
-
 
         /* ================= FILTERS ================= */
         function populateFilters(data) {
@@ -400,28 +427,39 @@
         }
 
         function applyFilters() {
-            const y = filterYear.value;
-            const s = filterSubject.value;
-            const c = filterClass.value;
-            const q = searchBox.value.toLowerCase();
+            const y = document.getElementById("filterYear").value;
+            const s = document.getElementById("filterSubject").value;
+            const c = document.getElementById("filterClass").value;
+            const q = document.getElementById("searchBox").value.toLowerCase();
 
-            renderPapers(
-                allPapers.filter(p =>
-                    (!y || p.year == y) &&
-                    (!s || p.subject === s) &&
-                    (!c || p["class"].toLowerCase().includes(c.toLowerCase())) &&
-                    (
-                        p.subject.toLowerCase().includes(q) ||
-                        p.category.toLowerCase().includes(q)
-                    )
+            const filtered = allPapers.filter(p =>
+                (!y || p.year == y) &&
+                (!s || p.subject === s) &&
+                (!c || p["class"].toLowerCase().includes(c.toLowerCase())) &&
+                (
+                    p.subject.toLowerCase().includes(q) ||
+                    p.category.toLowerCase().includes(q)
                 )
             );
+
+            renderPapers(filtered);
         }
 
-        filterYear.addEventListener("change", applyFilters);
-        filterSubject.addEventListener("change", applyFilters);
-        filterClass.addEventListener("change", applyFilters);
-        searchBox.addEventListener("input", applyFilters);
+        /* ================= EVENT LISTENERS ================= */
+        document.getElementById("filterYear").addEventListener("change", applyFilters);
+        document.getElementById("filterSubject").addEventListener("change", applyFilters);
+        document.getElementById("filterClass").addEventListener("change", applyFilters);
+        document.getElementById("searchBox").addEventListener("input", applyFilters);
+
+        /* ================= TEST FUNCTION ================= */
+        window.testDownload = function () {
+            if (allPapers.length > 0) {
+                const paper = allPapers[0];
+                console.log("Testing download for:", paper.subject);
+                console.log("PDF URL:", paper.pdfPath);
+                downloadPaperNow(paper.pdfPath, paper.subject);
+            }
+        };
     </script>
 
     <!-- ✅ HEADER + FOOTER LOADER -->
