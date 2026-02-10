@@ -422,8 +422,8 @@ function renderPapersTable(papers) {
         const fileName = paper.pdfPath
             ? paper.pdfPath.split('/').pop()
             : 'paper.pdf';
-            const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
-            const pdfUrl = paper.pdfPath
+        const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
+        const pdfUrl = paper.pdfPath
             ? (paper.pdfPath.startsWith('http')
                 ? paper.pdfPath
                 : API_BASE + paper.pdfPath)
@@ -490,9 +490,7 @@ async function openEditPaper(paperId) {
 
         if (paper.pdfPath) {
             const fileName = paper.pdfPath.split('/').pop();
-            const pdfUrl = paper.pdfPath.startsWith('http')
-                ? paper.pdfPath
-                : API_BASE + paper.pdfPath;
+            const pdfUrl = paper.pdfPath;
             const fileInfo = document.getElementById('editPdfFileInfo');
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');

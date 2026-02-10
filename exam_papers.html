@@ -355,29 +355,6 @@
             window.open(pdfUrl, '_blank');
         }
 
-        /* ================= DOWNLOAD PAPER ================= */
-        function downloadPaperNow(pdfUrl, paperName) {
-            console.log("Downloading:", pdfUrl);
-
-            // Create download link
-            const link = document.createElement('a');
-            link.href = pdfUrl;
-
-            // Create safe filename
-            const safeName = (paperName || 'paper')
-                .replace(/[^a-zA-Z0-9\s]/g, '')
-                .replace(/\s+/g, '_')
-                .trim();
-
-            link.download = `${safeName}.pdf`;
-            link.target = '_blank';
-
-            // Append, click, remove
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
         /* ================= SAVE PAPER ================= */
         function savePaper(paperId) {
             const token = localStorage.getItem("studentToken");
