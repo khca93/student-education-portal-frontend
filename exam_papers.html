@@ -342,8 +342,8 @@
                     <!-- SAVE -->
                      <button class="btn-save"
                         type="button"
+                        title="Save Paper"
                         onclick="savePaper('${p._id}')">
-                        title="Save Paper">
                         <i class="fas fa-bookmark"></i>
                     </button>
                 </div>
@@ -355,7 +355,11 @@
 
         /* ================= VIEW PAPER ================= */
         function viewPaper(pdfUrl) {
-            window.open(pdfUrl, '_blank');
+            const viewerUrl =
+                "https://docs.google.com/gview?embedded=true&url=" +
+                encodeURIComponent(pdfUrl);
+
+            window.open(viewerUrl, "_blank");
         }
 
         /* ================= SAVE PAPER ================= */
@@ -408,6 +412,7 @@
         function downloadPaperNow(pdfUrl, paperName) {
             const a = document.createElement("a");
             a.href = pdfUrl;
+            a.target = "_self";
 
             // force proper pdf filename
             const safeName = paperName
