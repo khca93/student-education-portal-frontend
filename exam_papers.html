@@ -324,22 +324,25 @@
 
                 <div class="paper-actions">
                     <!-- VIEW -->
-                    <button class="btn-outline"
+                    <a href="javascript:void(0)"
+                        class="btn-outline"
                         onclick="viewPaper('${p.pdfPath}')"
                         title="View Paper">
                         <i class="fas fa-eye"></i>
-                    </button>
+                        </a>
 
                     <!-- DOWNLOAD -->
-                    <button class="btn-primary"
+                    <a href="javascript:void(0)"
+                        class="btn-primary"
                         onclick="downloadPaperNow('${p.pdfPath}', '${p.subject}')"
                         title="Download Paper">
                         <i class="fas fa-download"></i>
-                    </button>
+                        </a>
 
                     <!-- SAVE -->
-                    <button class="btn-save"
-                        onclick="savePaper('${p._id}')"
+                     <button class="btn-save"
+                        type="button"
+                        onclick="savePaper('${p._id}')">
                         title="Save Paper">
                         <i class="fas fa-bookmark"></i>
                     </button>
@@ -402,7 +405,20 @@
                 select.appendChild(opt);
             });
         }
+        function downloadPaperNow(pdfUrl, paperName) {
+            const a = document.createElement("a");
+            a.href = pdfUrl;
 
+            // force proper pdf filename
+            const safeName = paperName
+                ? paperName.replace(/[^a-zA-Z0-9]/g, "_")
+                : "exam_paper";
+
+            a.download = safeName + ".pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
         function applyFilters() {
             const y = document.getElementById("filterYear").value;
             const s = document.getElementById("filterSubject").value;
