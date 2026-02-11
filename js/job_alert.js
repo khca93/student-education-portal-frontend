@@ -42,7 +42,10 @@ function filterJobs(type) {
   const card = document.getElementById('card-' + type);
   if (card) card.classList.add('active');
 
-  const jobs = ALL_JOBS.filter(j => j.jobType && j.jobType === type);
+  const jobs = ALL_JOBS.filter(j =>
+    j.jobType &&
+    j.jobType.toLowerCase() === type
+  );
   renderJobs(jobs, type);
 }
 
@@ -220,3 +223,10 @@ function formatDate(date) {
     year: 'numeric'
   });
 }
+/* ===============================
+   MAKE FUNCTIONS GLOBAL
+================================ */
+window.filterJobs = filterJobs;
+window.openApplyModal = openApplyModal;
+window.closeApplyModal = closeApplyModal;
+
