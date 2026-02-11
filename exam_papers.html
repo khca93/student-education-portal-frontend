@@ -312,42 +312,42 @@
                 div.className = "paper-card";
 
                 div.innerHTML = `
-                <div class="paper-left">
-                    <h3>${p.fileName || `${p.subject} (${p.year})`}</h3>
-                    <div class="paper-tags">
-                        <span>${p.category}</span>
-                        <span>${p["class"]}</span>
-                        <span>${p.year}</span>
-                        <span>${p.subject}</span>
+                    <div class="paper-left">
+                        <h3>${p.fileName || `${p.subject} (${p.year})`}</h3>
+                        <div class="paper-tags">
+                            <span>${p.category}</span>
+                            <span>${p["class"]}</span>
+                            <span>${p.year}</span>
+                            <span>${p.subject}</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="paper-actions">
-                    <!-- VIEW -->
-                    <a href="javascript:void(0)"
-                        class="btn-outline"
-                        onclick="viewPaper('${p.pdfPath}')"
-                        title="View Paper">
-                        <i class="fas fa-eye"></i>
-                        </a>
+                    <div class="paper-actions">
+                        <!-- VIEW -->
+                        <a href="javascript:void(0)"
+                            class="btn-outline"
+                            onclick="viewPaper('${p.pdfPath}')"
+                            title="View Paper">
+                            <i class="fas fa-eye"></i>
+                            </a>
 
-                    <!-- DOWNLOAD -->
-                    <a href="javascript:void(0)"
-                        class="btn-primary"
-                        onclick="downloadPaperNow('${p.pdfPath}', '${p.subject}')"
-                        title="Download Paper">
-                        <i class="fas fa-download"></i>
-                        </a>
+                        <!-- DOWNLOAD -->
+                        <a href="javascript:void(0)"
+                            class="btn-primary"
+                            onclick="downloadPaperNow('${p.pdfPath}', '${p.subject}')"
+                            title="Download Paper">
+                            <i class="fas fa-download"></i>
+                            </a>
 
-                    <!-- SAVE -->
-                     <button class="btn-save"
-                        type="button"
-                        title="Save Paper"
-                        onclick="savePaper('${p._id}')">
-                        <i class="fas fa-bookmark"></i>
-                    </button>
-                </div>
-            `;
+                        <!-- SAVE -->
+                        <button class="btn-save"
+                            type="button"
+                            title="Save Paper"
+                            onclick="savePaper('${p._id}')">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                `;
 
                 container.appendChild(div);
             });
@@ -412,18 +412,18 @@
         function downloadPaperNow(pdfUrl, paperName) {
             const a = document.createElement("a");
             a.href = pdfUrl;
-            a.target = "_self";
 
-            // force proper pdf filename
             const safeName = paperName
                 ? paperName.replace(/[^a-zA-Z0-9]/g, "_")
                 : "exam_paper";
 
             a.download = safeName + ".pdf";
+
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
+
         function applyFilters() {
             const y = document.getElementById("filterYear").value;
             const s = document.getElementById("filterSubject").value;
@@ -433,11 +433,11 @@
             const filtered = allPapers.filter(p =>
                 (!y || p.year == y) &&
                 (!s || p.subject === s) &&
-                (!c || p["class"].toLowerCase().includes(c.toLowerCase())) &&
-                (
-                    p.subject.toLowerCase().includes(q) ||
-                    p.category.toLowerCase().includes(q)
-                )
+                (!c || (p["class"] && p["class"].toLowerCase().includes(c.toLowerCase())))
+                    (
+                        (p.subject && p.subject.toLowerCase().includes(q)) ||
+                        (p.category && p.category.toLowerCase().includes(q))
+                    )
             );
 
             renderPapers(filtered);

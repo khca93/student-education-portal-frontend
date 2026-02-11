@@ -26,7 +26,7 @@
 <body>
 
   <!-- ✅ HEADER MUST BE FIRST -->
-  <div id="header-container"></div> 
+  <div id="header-container"></div>
 
   <main class="container">
 
@@ -84,7 +84,7 @@
 
         <input type="text" name="applicantName" placeholder="Full Name" required>
         <input type="text" name="qualification" placeholder="Qualification" required>
-        <input type="text" name="mobile" placeholder="Mobile Number" required>
+        <input type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" placeholder="Mobile Number" required>
         <input type="email" name="email" placeholder="Email Address" required>
 
         <input type="file" name="resume" accept=".pdf" required>
@@ -100,9 +100,9 @@
   <div id="footer-container"></div>
 
   <!-- SCRIPTS AT END -->
-   <script src="js/main.js"></script>
-  <script src="js/job_alert.js"></script>
   <script src="js/load-components.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/job_alert.js"></script>
 
 </body>
 

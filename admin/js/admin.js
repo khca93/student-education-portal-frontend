@@ -423,11 +423,7 @@ function renderPapersTable(papers) {
             ? paper.pdfPath.split('/').pop()
             : 'paper.pdf';
         const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
-        const pdfUrl = paper.pdfPath
-            ? (paper.pdfPath.startsWith('http')
-                ? paper.pdfPath
-                : API_BASE + paper.pdfPath)
-            : '#';
+        const pdfUrl = paper.pdfPath || '#';
 
 
         html += `
@@ -487,6 +483,8 @@ async function openEditPaper(paperId) {
         document.getElementById('editPaperSubject').value = paper.subject || '';
         document.getElementById('editPaperYear').value = paper.year || '';
         document.getElementById('editPaperType').value = paper.paperType || '';
+        document.getElementById('editPaperFileName').value = paper.fileName || '';
+
 
         if (paper.pdfPath) {
             const fileName = paper.pdfPath.split('/').pop();
@@ -583,6 +581,7 @@ async function submitEditPaper(e) {
     const year = document.getElementById('editPaperYear').value.trim();
     const paperType = document.getElementById('editPaperType').value;
     const pdfFile = document.getElementById('editPaperPdf').files[0];
+    const fileName = document.getElementById('editPaperFileName').value.trim();
 
     const formData = new FormData();
     formData.append('category', category);
@@ -590,6 +589,8 @@ async function submitEditPaper(e) {
     formData.append('subject', subject);
     formData.append('year', year);
     formData.append('paperType', paperType);
+    formData.append('fileName', fileName);
+
 
     if (pdfFile) {
         formData.append('pdf', pdfFile);
@@ -839,7 +840,7 @@ async function openEditJob(jobId) {
 
         if (job.jobPdf) {
             const fileName = job.jobPdf.split('/').pop();
-            const pdfUrl = job.jobPdf;
+            const pdfUrl = job.jobPdf || '#';
             const fileInfo = document.getElementById('editJobPdfFileInfo');
             fileInfo.innerHTML = `Current file: <a href="${pdfUrl}" target="_blank">${fileName}</a>`;
             fileInfo.classList.add('has-file');

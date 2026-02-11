@@ -35,7 +35,7 @@ function removeToken(userType = 'student') {
 }
 
 function isLoggedIn(userType = 'student') {
-    return !!getToken(userType);
+    return Boolean(getToken(userType));
 }
 
 // API Request Helper
@@ -429,26 +429,39 @@ function redirect(path, delay = 1500) {
 }
 
 // API Request with FormData support
-function apiRequestWithFormData(endpoint, formData, method = 'POST', userType = 'admin') {
+function apiRequest(endpoint, options = {}, userType = 'student') {
     const token = getToken(userType);
 
-    return fetch(API_URL + endpoint, {
-        method: method,
-        headers: {
-            'Authorization': 'Bearer ' + token
-            // Don't set Content-Type for FormData
-        },
-        body: formData
-    })
-        .then(function (response) {
-            return response.json().then(function (data) {
-                if (!response.ok) {
-                    throw new Error(data.message || 'Something went wrong');
-                }
-                return data;
-            });
+    const config = {
+        headers: {},
+        ...options
+    };
+
+    if (token) {
+        config.headers['Authorization'] = 'Bearer ' + token;
+    }
+
+    if (!(config.body instanceof FormData)) {
+        config.headers['Content-Type'] = 'application/json';
+    }
+
+    return fetch(API_URL + endpoint, config)
+        .then(async response => {
+            let data;
+            try {
+                data = await response.json();
+            } catch {
+                throw new Error('Invalid server response');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Something went wrong');
+            }
+
+            return data;
         });
 }
+
 
 // ===== JOB MANAGEMENT FUNCTIONS =====
 

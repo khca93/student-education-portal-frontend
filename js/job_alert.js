@@ -20,9 +20,11 @@ async function loadJobs() {
     const res = await fetch(API_URL + '/api/jobs');
     const data = await res.json();
 
-    if (data.success) {
-      ALL_JOBS = data.jobs || [];
+    if (data.success && Array.isArray(data.jobs)) {
+      ALL_JOBS = data.jobs;
       filterJobs('government');
+    } else {
+      ALL_JOBS = [];
     }
   } catch (err) {
     console.error('Load jobs error:', err);
@@ -40,7 +42,7 @@ function filterJobs(type) {
   const card = document.getElementById('card-' + type);
   if (card) card.classList.add('active');
 
-  const jobs = ALL_JOBS.filter(j => j.jobType === type);
+  const jobs = ALL_JOBS.filter(j => j.jobType && j.jobType === type);
   renderJobs(jobs, type);
 }
 
@@ -79,7 +81,7 @@ function jobCard(job, type) {
 
         ${job.jobPdf ? `
       <a
-        href="${job.jobPdf.startsWith('http') ? job.jobPdf : API_URL + job.jobPdf}"
+        href="${job.jobPdf}"
         class="btn btn-outline"
         target="_blank">
         View / Download PDF
@@ -88,7 +90,7 @@ function jobCard(job, type) {
 
           </div>
         `;
-      }
+  }
 
   /* ===== PRIVATE / INFORMATION JOB ===== */
   if (type === 'information') {
@@ -164,7 +166,17 @@ if (form) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(form);
+    const formData = new FormData();
+    formData.append('jobId', form.jobId.value);
+    formData.append('applicantName', form.applicantName.value);
+    formData.append('qualification', form.qualification.value);
+    formData.append('email', form.email.value);
+    formData.append('mobile', form.mobile.value);
+
+    const resumeFile = form.resume.files[0];
+    if (resumeFile) {
+      formData.append('resume', resumeFile);  // ⚠️ MUST MATCH multer field name
+    }
 
     try {
       const res = await fetch(API_URL + '/api/jobs/apply', {
