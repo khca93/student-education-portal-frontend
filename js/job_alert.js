@@ -36,18 +36,31 @@ async function loadJobs() {
 ================================ */
 
 function filterJobs(type) {
+
   document.querySelectorAll('.filter-card')
     .forEach(card => card.classList.remove('active'));
 
   const card = document.getElementById('card-' + type);
-  if (card) card.classList.add('active');
+  if (card) {
+    card.classList.add('active');
+  }
 
-  const jobs = ALL_JOBS.filter(j =>
-    j.jobType &&
-    j.jobType.toLowerCase() === type
-  );
+  const jobs = ALL_JOBS.filter(j => {
+    if (!j.jobType) return false;
+
+    const dbType = j.jobType.toLowerCase().trim();
+
+    if (type === 'government' && dbType.includes('government')) return true;
+    if (type === 'information' && (dbType.includes('information') || dbType.includes('private'))) return true;
+    if (type === 'apply' && (dbType.includes('apply') || dbType.includes('intern'))) return true;
+
+    return false;
+  });
+
   renderJobs(jobs, type);
 }
+
+
 
 /* ===============================
    RENDER JOB LIST
@@ -229,4 +242,3 @@ function formatDate(date) {
 window.filterJobs = filterJobs;
 window.openApplyModal = openApplyModal;
 window.closeApplyModal = closeApplyModal;
-
