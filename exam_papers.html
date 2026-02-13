@@ -433,15 +433,17 @@
             const filtered = allPapers.filter(p =>
                 (!y || p.year == y) &&
                 (!s || p.subject === s) &&
-                (!c || (p["class"] && p["class"].toLowerCase().includes(c.toLowerCase())))
-                    (
-                        (p.subject && p.subject.toLowerCase().includes(q)) ||
-                        (p.category && p.category.toLowerCase().includes(q))
-                    )
+                (!c || (p["class"] && p["class"].toLowerCase() === c.toLowerCase())) &&
+                (!q ||
+                    (p.subject && p.subject.toLowerCase().includes(q)) ||
+                    (p.category && p.category.toLowerCase().includes(q)) ||
+                    (p.year && p.year.toString().includes(q))
+                )
             );
 
             renderPapers(filtered);
         }
+
 
         /* ================= EVENT LISTENERS ================= */
         document.getElementById("filterYear").addEventListener("change", applyFilters);
