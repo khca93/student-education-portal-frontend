@@ -141,6 +141,140 @@ function logoutAdmin() {
     });
 }
 
+async function loadblogs() {
+    try {
+
+        const token = getToken('admin');
+        if (!token) {
+            showAlert('Please login again', 'error');
+            return;
+        }
+
+        const blogsContainer = document.getElementById('blogsList');
+        if (!blogsContainer) return;
+
+        blogsContainer.innerHTML = `
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading blogs...</p>
+            </div>
+        `;
+
+        const response = await fetch(API_BASE + '/api/blogs', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            blogsContainer.innerHTML = `<p>Failed to load blogs</p>`;
+            return;
+        }
+
+        const blogs = data.blogs || [];
+
+        if (blogs.length === 0) {
+            blogsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-blog"></i>
+                    <p>No blogs found. Create your first blog!</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="papers-table-container">
+                <table class="papers-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        blogs.forEach(blog => {
+
+            const date = blog.createdAt
+                ? new Date(blog.createdAt).toLocaleDateString('en-IN')
+                : '-';
+
+            html += `
+                <tr>
+                    <td><strong>${blog.title}</strong></td>
+                    <td>${blog.category || '-'}</td>
+                    <td>${date}</td>
+                    <td>
+                        <a href="../blog.html?slug=${blog.slug}" target="_blank" class="btn btn-view">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+
+                        <button class="btn btn-edit" onclick="openEditBlog('${blog._id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+
+                        <button class="btn btn-delete" onclick="deleteBlog('${blog._id}', '${blog.title}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        blogsContainer.innerHTML = html;
+
+    } catch (err) {
+        console.error(err);
+        showAlert('Failed to load blogs', 'error');
+    }
+}
+
+async function deleteBlog(blogId, blogTitle) {
+
+    showConfirm(
+        `Are you sure you want to delete "${blogTitle}"?`,
+        async function () {
+
+            try {
+
+                const token = getToken('admin');
+
+                const response = await fetch(API_BASE + '/api/blogs/' + blogId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Blog deleted successfully!', 'success');
+                    loadblogs();
+                } else {
+                    showAlert('Failed to delete blog', 'error');
+                }
+
+            } catch (err) {
+                showAlert('Server error', 'error');
+            }
+
+        }
+    );
+}
 // ===== SECTION NAVIGATION =====
 function showSection(section) {
 
@@ -179,6 +313,7 @@ function showSection(section) {
         }
     });
 
+
     // Load section data
     switch (section) {
         case 'dashboard':
@@ -192,6 +327,9 @@ function showSection(section) {
             break;
         case 'applications':
             loadApplications();
+            break;
+        case 'blogs':
+            loadblogs();
             break;
     }
 
@@ -242,6 +380,7 @@ async function loadDashboardStats() {
         animateCounter(document.getElementById('totalJobs'), totalJobs);
         animateCounter(document.getElementById('totalApplications'), totalApplications);
         animateCounter(document.getElementById('totalStudents'), totalStudents);
+
 
     } catch (error) {
         console.error(error);
@@ -1494,6 +1633,176 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+tinymce.init({
+    selector: '#blogContent',
+    height: 500,
+    menubar: true,
+    plugins: [
+        'advlist autolink lists link image charmap preview anchor',
+        'searchreplace visualblocks code fullscreen',
+        'insertdatetime media table code help wordcount'
+    ],
+    toolbar: 'undo redo | blocks | bold italic underline strikethrough | \
+    forecolor backcolor | alignleft aligncenter alignright alignjustify | \
+    bullist numlist outdent indent | table image media | removeformat | code fullscreen preview',
+    image_title: true,
+    automatic_uploads: true
+});
+
+if (document.getElementById('editBlogContent')) {
+    tinymce.init({
+        selector: '#editBlogContent',
+        height: 400,
+        menubar: false,
+        plugins: 'link image lists code',
+        toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code'
+    });
+}
+
+async function submitBlog() {
+
+    const titleInput = document.getElementById('blogTitle');
+    const categoryInput = document.getElementById('blogCategory');
+    const image = document.getElementById('blogImage').value.trim();
+    const messageDiv = document.getElementById('blogMessage');
+
+    const title = titleInput.value.trim();
+    const content = tinymce.get('blogContent').getContent().trim();
+    const category = categoryInput.value.trim();
+
+    if (!title || !content) {
+        messageDiv.innerHTML = "❌ Title and Content required";
+        return;
+    }
+
+    const token = getToken('admin');
+    if (!token) {
+        messageDiv.innerHTML = "❌ Please login again";
+        return;
+    }
+
+    try {
+
+        messageDiv.innerHTML = "⏳ Publishing...";
+
+        const res = await fetch(API_BASE + '/api/blogs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+           body: JSON.stringify({ title, content, category, image })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            messageDiv.innerHTML = "✅ Blog Published Successfully";
+
+            titleInput.value = '';
+            categoryInput.value = '';
+            tinymce.get('blogContent').setContent('');
+            document.getElementById('blogImage').value = '';
+
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+
+        } else {
+            messageDiv.innerHTML = "❌ " + (data.message || "Failed to publish");
+        }
+
+    } catch (err) {
+        messageDiv.innerHTML = "❌ Server Error";
+    }
+}
+
+async function openEditBlog(blogId) {
+
+    try {
+
+        const token = getToken('admin');
+
+        const res = await fetch(API_BASE + '/api/blogs/id/' + blogId, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            showAlert('Failed to load blog', 'error');
+            return;
+        }
+
+        const blog = data.blog;
+
+        document.getElementById('editBlogId').value = blog._id;
+        document.getElementById('editBlogTitle').value = blog.title;
+        document.getElementById('editBlogCategory').value = blog.category || '';
+        document.getElementById('editBlogImage').value = blog.image || '';
+
+        if (tinymce.get('editBlogContent')) {
+            tinymce.get('editBlogContent').setContent(blog.content);
+        }
+
+        showModal('editBlogModal');
+
+    } catch (err) {
+        showAlert('Server error', 'error');
+    }
+}
+
+async function submitEditBlog(e) {
+
+    e.preventDefault();
+
+    const blogId = document.getElementById('editBlogId').value;
+    const title = document.getElementById('editBlogTitle').value.trim();
+    const category = document.getElementById('editBlogCategory').value.trim();
+
+    const editor = tinymce.get('editBlogContent');
+    const content = editor ? editor.getContent().trim() : '';
+    const image = document.getElementById('editBlogImage').value.trim();
+
+    if (!title || !content) {
+        showAlert('Title and content required', 'error');
+        return;
+    }
+
+    try {
+
+        const token = getToken('admin');
+
+        const res = await fetch(API_BASE + '/api/blogs/id/' + blogId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+           body: JSON.stringify({ title, content, category, image })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            showAlert('Blog updated successfully!', 'success');
+            hideModal('editBlogModal');
+            loadblogs();
+
+        } else {
+            showAlert('Failed to update blog', 'error');
+        }
+
+    } catch (err) {
+        showAlert('Server error', 'error');
+    }
+}
+
+
 // ===== GLOBAL FUNCTIONS =====
 window.showSection = showSection;
 window.toggleMobileMenu = toggleMobileMenu;
@@ -1516,3 +1825,6 @@ window.applyApplicationFilters = applyApplicationFilters;
 window.clearApplicationFilters = clearApplicationFilters;
 window.filterApplications = filterApplications;
 window.scrollToTop = scrollToTop;
+window.submitBlog = submitBlog;
+window.openEditBlog = openEditBlog;
+window.submitEditBlog = submitEditBlog;

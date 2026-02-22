@@ -7,6 +7,7 @@
     <title>Admin Dashboard - Student Education Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
 </head>
 
 <body>
@@ -44,6 +45,9 @@
 
                 <a href="javascript:void(0)" onclick="showSection('applications')">
                     <i class="fas fa-users"></i> Applications
+                </a>
+                <a href="javascript:void(0)" onclick="showSection('blogs')">
+                    <i class="fas fa-blog"></i> Blogs
                 </a>
             </div>
 
@@ -131,6 +135,7 @@
                         </button>
                     </div>
                 </div>
+
             </div>
 
             <!-- JOBS SECTION -->
@@ -350,6 +355,34 @@
 
                     </div>
 
+                </div>
+            </div>
+
+            <!-- BLOGS SECTION -->
+            <div id="blogs-section" class="section">
+                <div class="papers-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-blog"></i> Blog Management</h2>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <input type="text" id="blogTitle" placeholder="Blog Title" class="form-control"
+                            style="margin-bottom:10px;" />
+                        <input type="text" id="blogImage" placeholder="Image URL (optional)" class="form-control"
+                            style="margin-bottom:10px;" />
+                        <textarea id="blogContent"></textarea>
+
+                        <input type="text" id="blogCategory" placeholder="Category" class="form-control"
+                            style="margin-top:10px;" />
+
+                        <button class="btn btn-primary" style="margin-top:15px;" onclick="submitBlog()">
+                            <i class="fas fa-paper-plane"></i> Publish Blog
+                        </button>
+
+                        <div id="blogMessage" style="margin-top:10px;"></div>
+
+                    </div>
+                    <div id="blogsList" style="margin-top:30px;"></div>
                 </div>
             </div>
         </div>
@@ -644,7 +677,45 @@
             </div>
         </div>
     </div>
+    <div id="editBlogModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Blog</h3>
+                <button class="close-modal" onclick="hideModal('editBlogModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="submitEditBlog(event)">
+                    <input type="hidden" id="editBlogId">
 
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" class="form-control" id="editBlogTitle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Content *</label>
+                        <textarea id="editBlogContent"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" class="form-control" id="editBlogCategory">
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" class="form-control" id="editBlogImage">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline"
+                            onclick="hideModal('editBlogModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Blog
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script src="js/admin.js"></script>
 
 

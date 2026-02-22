@@ -38,37 +38,6 @@ function isLoggedIn(userType = 'student') {
     return Boolean(getToken(userType));
 }
 
-// API Request Helper
-function apiRequest(endpoint, options = {}, userType = 'student') {
-    const token = getToken(userType);
-
-    // merge default config + options
-    const config = {
-        headers: {},
-        ...options
-    };
-
-    // add auth token if present
-    if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token;
-    }
-
-    // set JSON content-type ONLY if not FormData
-    if (!(config.body instanceof FormData)) {
-        config.headers['Content-Type'] = 'application/json';
-    }
-
-    return fetch(API_URL + endpoint, config)
-        .then(response =>
-            response.json().then(data => {
-                if (!response.ok) {
-                    throw new Error(data.message || 'Something went wrong');
-                }
-                return data;
-            })
-        );
-}
-
 
 // Navigation Functions
 function navigateToCategory(category) {
@@ -308,6 +277,7 @@ function init() {
             link.classList.add('active');
         }
     });
+    loadFeaturedBlog();
 }
 
 
@@ -518,26 +488,26 @@ async function loadStudentJobs() {
 
 // ✅✅✅ FIXED FUNCTION:
 function openExamPaperPDF(pdfPath, paperName = "paper") {
-  if (!pdfPath) {
-    alert("PDF not available");
-    return;
-  }
+    if (!pdfPath) {
+        alert("PDF not available");
+        return;
+    }
 
-  // ✅ FORCE DOWNLOAD FIX
-  const link = document.createElement('a');
-  link.href = pdfPath;
-  
-  // Extract filename
-  const fileName = paperName.replace(/[^a-z0-9]/gi, '_') + '.pdf';
-  link.download = fileName;
-  
-  // Open in new tab for viewing
-  window.open(pdfPath, '_blank');
-  
-  // Also trigger download
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    // ✅ FORCE DOWNLOAD FIX
+    const link = document.createElement('a');
+    link.href = pdfPath;
+
+    // Extract filename
+    const fileName = paperName.replace(/[^a-z0-9]/gi, '_') + '.pdf';
+    link.download = fileName;
+
+    // Open in new tab for viewing
+    window.open(pdfPath, '_blank');
+
+    // Also trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function openCategory(categorySlug) {
@@ -584,7 +554,7 @@ window.loadExamPapers = loadExamPapers;
 window.getExamPaperById = getExamPaperById;
 window.loadStudentJobs = loadStudentJobs;
 
-// EducationPortal object for backward compatibility
+
 window.EducationPortal = {
     API_URL: API_URL,
     adminLogin: adminLogin,
@@ -600,7 +570,6 @@ window.EducationPortal = {
     hideModal: hideModal,
     showConfirm: showConfirm,
     apiRequest: apiRequest,
-    apiRequestWithFormData: apiRequestWithFormData,
     loadExamPapers: loadExamPapers,
     getExamPaperById: getExamPaperById,
     getJobTypeClass: getJobTypeClass,
@@ -617,4 +586,78 @@ if (document.readyState === 'loading') {
     init();
 }
 
+
+async function loadFeaturedBlog(){
+
+    const container = document.getElementById('featuredBlog');
+
+    // 🔒 Important safety check
+    if(!container) return;
+
+    try {
+
+        const res = await fetch(API_URL + '/api/blogs/featured');
+        const data = await res.json();
+
+        if(!data.success || !data.blog){
+            container.innerHTML = "<p style='text-align:center;'>No blog available.</p>";
+            return;
+        }
+
+        const blog = data.blog;
+
+        const previewText = blog.content
+            .replace(/<[^>]*>/g, '')
+            .substring(0, 200) + "...";
+
+        container.innerHTML = `
+            <div style="
+                display:flex;
+                flex-wrap:wrap;
+                background:white;
+                border-radius:12px;
+                box-shadow:0 5px 15px rgba(0,0,0,0.08);
+                overflow:hidden;
+            ">
+
+                ${blog.image ? `
+                    <div style="flex:1; min-width:300px;">
+                        <img src="${blog.image}" 
+                             style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                ` : ""}
+
+                <div style="flex:1; padding:30px; min-width:300px;">
+                    <div style="color:#2563eb; font-weight:bold; margin-bottom:10px;">
+                        ${blog.category || "General"}
+                    </div>
+
+                    <h3 style="margin-bottom:15px;">
+                        ${blog.title}
+                    </h3>
+
+                    <p style="color:#555; margin-bottom:20px;">
+                        ${previewText}
+                    </p>
+
+                    <a href="blog.html?slug=${blog.slug}" 
+                       style="
+                        display:inline-block;
+                        padding:10px 20px;
+                        background:#2563eb;
+                        color:white;
+                        border-radius:8px;
+                        text-decoration:none;
+                       ">
+                       Read Full Article →
+                    </a>
+                </div>
+            </div>
+        `;
+
+    } catch (err) {
+        console.error("Featured blog error:", err);
+        container.innerHTML = "<p style='text-align:center;'>Failed to load blog.</p>";
+    }
+}
 console.log('Main.js loaded successfully');

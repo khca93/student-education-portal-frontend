@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Blogs - Student Education Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #f1f5f9;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category {
+            font-size: 12px;
+            color: #2563eb;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .empty {
+            text-align: center;
+            margin-top: 50px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Latest Blogs</h1>
+
+    <div style="text-align:center; margin-bottom:20px;">
+        <input type="text" id="searchInput" placeholder="Search blogs..." onkeyup="handleSearch(event)"
+            style="padding:10px; width:250px; border-radius:8px; margin-right:10px;" />
+
+        <select id="categoryFilter" onchange="changeCategory()" style="padding:10px; border-radius:8px;">
+            <option value="all">All Categories</option>
+        </select>
+    </div><script>
+
+const API_BASE = "https://student-education-portal-backend.onrender.com";
+
+let currentPage = 1;
+let totalPages = 1;
+let currentCategory = "all";
+let currentSearch = "";
+
+async function loadBlogs(page = 1){
+
+    const res = await fetch(
+        API_BASE + '/api/blogs?page=' + page +
+        '&category=' + currentCategory +
+        '&search=' + currentSearch
+    );
+
+    const data = await res.json();
+
+    const grid = document.getElementById('blogGrid');
+
+    if(!data.success || !data.blogs || data.blogs.length === 0){
+        grid.innerHTML = "<div class='empty'>No blogs found.</div>";
+        document.getElementById('pagination').innerHTML = "";
+        return;
+    }
+
+    currentPage = data.currentPage;
+    totalPages = data.totalPages;
+
+    let html = "";
+
+    data.blogs.forEach(blog => {
+
+        const date = new Date(blog.createdAt).toLocaleDateString('en-IN');
+
+        html += `
+            <div class="card" onclick="openBlog('${blog.slug}')">
+
+                ${blog.image ? `
+                    <img src="${blog.image}" 
+                         style="width:100%; height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px;" />
+                ` : ""}
+
+                <div class="category">${blog.category || 'General'}</div>
+                <div class="title">${blog.title}</div>
+                <div class="date">${date}</div>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+
+    renderPagination();
+}
+
+async function loadCategories(){
+
+    const res = await fetch(API_BASE + '/api/blogs');
+    const data = await res.json();
+
+    if(!data.success) return;
+
+    const select = document.getElementById('categoryFilter');
+    const categories = new Set();
+
+    data.blogs.forEach(blog => {
+        if(blog.category){
+            categories.add(blog.category);
+        }
+    });
+
+    categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        select.appendChild(option);
+    });
+}
+
+function handleSearch(event){
+    currentSearch = document.getElementById('searchInput').value.trim();
+    loadBlogs(1);
+}
+
+function changeCategory(){
+    currentCategory = document.getElementById('categoryFilter').value;
+    loadBlogs(1);
+}
+
+function renderPagination(){
+
+    const pagination = document.getElementById('pagination');
+
+    let buttons = "";
+
+    if(currentPage > 1){
+        buttons += `<button onclick="loadBlogs(${currentPage - 1})">Previous</button>`;
+    }
+
+    for(let i = 1; i <= totalPages; i++){
+        buttons += `
+            <button onclick="loadBlogs(${i})"
+                style="${i === currentPage ? 'font-weight:bold;background:#2563eb;color:white;' : ''}">
+                ${i}
+            </button>
+        `;
+    }
+
+    if(currentPage < totalPages){
+        buttons += `<button onclick="loadBlogs(${currentPage + 1})">Next</button>`;
+    }
+
+    pagination.innerHTML = buttons;
+}
+
+function openBlog(slug){
+    window.location.href = "blog.html?slug=" + slug;
+}
+
+loadCategories();
+loadBlogs();
+
+</script>
+
+</body>
+
+</html>
