@@ -218,3 +218,57 @@ body{
   margin-top: 16px;
   text-align: right;
 }
+/* ===== Modern Job Card ===== */
+
+.modern-card {
+  border-left: 5px solid #4f46e5;
+  transition: 0.3s;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+}
+
+.job-title-main {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 15px;
+}
+
+.job-meta {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.job-meta div {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.job-meta span {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.job-summary {
+  background: #eef2ff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #4338ca;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.job-description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4b5563;
+  white-space: pre-line;
+}

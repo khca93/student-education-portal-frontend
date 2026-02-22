@@ -68,16 +68,13 @@ function filterJobs(type) {
 
 function renderJobs(jobs, type) {
   const list = document.getElementById('jobList');
-  list.innerHTML = '';
 
   if (!jobs.length) {
     list.innerHTML = `<div class="job-card"><p>No jobs available.</p></div>`;
     return;
   }
 
-  jobs.forEach(job => {
-    list.insertAdjacentHTML('beforeend', jobCard(job, type));
-  });
+  list.innerHTML = jobs.map(job => jobCard(job, type)).join('');
 }
 
 /* ===============================
@@ -86,63 +83,97 @@ function renderJobs(jobs, type) {
 
 function jobCard(job, type) {
 
-  /* ===== GOVERNMENT JOB ===== */
+  // Safe Description (XSS Protection)
+  const safeDescription = job.jobDescription
+    ? job.jobDescription.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    : 'No description available.';
+
+  /* ======================
+     GOVERNMENT JOB
+  =======================*/
   if (type === 'government') {
     return `
-      <div class="job-card">
-        <h3>${job.jobTitle || '-'}</h3>
+      <div class="job-card modern-card">
 
-        <p><b>Qualification:</b> ${job.qualification || '-'}</p>
-        <p><b>Last Date:</b> ${formatDate(job.lastDate)}</p>
+        <h3 class="job-title-main">${job.jobTitle || '-'}</h3>
 
-        ${job.jobPdf ? `
-      <a
-        href="${job.jobPdf}"
-        class="btn btn-outline"
-        target="_blank">
-        View / Download PDF
-      </a>
-    ` : `<p><i>No PDF available</i></p>`}
-
+        <div class="job-meta">
+          <div><span>Qualification:</span> ${job.qualification || '-'}</div>
+          <div><span>Last Date:</span> 
+            ${job.lastDate ? formatDate(job.lastDate) : 'Not Specified'}
           </div>
-        `;
-  }
-
-  /* ===== PRIVATE / INFORMATION JOB ===== */
-  if (type === 'information') {
-    return `
-      <div class="job-card info-card">
-        <div class="job-card-header">
-          <h3 class="job-title">${job.jobTitle || '-'}</h3>
-          <span class="posted-date">
-            <i class="fa-regular fa-calendar"></i>
-            Posted: ${job.createdAt ? formatDate(job.createdAt) : '-'}
-          </span>
         </div>
 
-        <div class="job-card-body">
-          <p><b>Company:</b> ${job.companyName || '-'}</p>
-          <p class="job-desc">${job.jobDescription || ''}</p>
+        <div class="job-summary">
+          <i class="fa-solid fa-file-pdf"></i>
+          Official Notification PDF:
         </div>
+
+        ${
+          job.jobPdf
+            ? `<a href="${job.jobPdf}" class="btn btn-outline" target="_blank">
+                View / Download PDF
+              </a>`
+            : `<p><i>No PDF available</i></p>`
+        }
+
       </div>
     `;
   }
 
-  /* ===== INTERNSHIP / APPLY JOB ===== */
+  /* ======================
+     PRIVATE / INFORMATION
+  =======================*/
+  if (type === 'information') {
+    return `
+      <div class="job-card modern-card">
+
+        <h3 class="job-title-main">${job.jobTitle || '-'}</h3>
+
+        <div class="job-meta">
+          <div><span>Qualification:</span> ${job.qualification || '-'}</div>
+          <div><span>Company / Department:</span> ${job.companyName || '-'}</div>
+          <div><span>Last Date:</span> 
+            ${job.lastDate ? formatDate(job.lastDate) : 'Not Specified'}
+          </div>
+        </div>
+
+        <div class="job-summary">
+          <i class="fa-solid fa-circle-info"></i>
+          Important job details are given below:
+        </div>
+
+        <div class="job-description">
+          ${safeDescription}
+        </div>
+
+      </div>
+    `;
+  }
+
+  /* ======================
+     INTERNSHIP / APPLY
+  =======================*/
   return `
-    <div class="job-card apply-card">
-      <div class="job-card-header">
-        <h3 class="job-title">${job.jobTitle || '-'}</h3>
-        <span class="posted-date">
-          <i class="fa-regular fa-calendar"></i>
-          Posted: ${job.createdAt ? formatDate(job.createdAt) : '-'}
-        </span>
+    <div class="job-card modern-card">
+
+      <h3 class="job-title-main">${job.jobTitle || '-'}</h3>
+
+      <div class="job-meta">
+        <div><span>Qualification:</span> ${job.qualification || '-'}</div>
+        <div><span>Company / Department:</span> ${job.companyName || '-'}</div>
+        <div><span>Last Date:</span> 
+          ${job.lastDate ? formatDate(job.lastDate) : 'Not Specified'}
+        </div>
       </div>
 
-      <div class="job-card-body">
-        <p><b>Qualification:</b> ${job.qualification || '-'}</p>
-        <p><b>Company / Department:</b> ${job.companyName || '-'}</p>
-        <p class="job-desc">${job.jobDescription || ''}</p>
+      <div class="job-summary">
+        <i class="fa-solid fa-circle-info"></i>
+        Please read the full job description before applying.
+      </div>
+
+      <div class="job-description">
+        ${safeDescription}
       </div>
 
       <div class="job-card-footer">
@@ -153,6 +184,7 @@ function jobCard(job, type) {
           Apply Now
         </button>
       </div>
+
     </div>
   `;
 }
