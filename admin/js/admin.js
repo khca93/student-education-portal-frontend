@@ -1636,14 +1636,17 @@ function scrollToTop() {
 tinymce.init({
     selector: '#blogContent',
     height: 600,
-    menubar: true,
     branding: false,
     resize: true,
+
+    /* FULL MENU BAR */
+    menubar: 'file edit view insert format tools table help',
 
     plugins: [
         'advlist autolink lists link image media table code fullscreen preview',
         'searchreplace visualblocks wordcount emoticons',
-        'insertdatetime charmap anchor help'
+        'insertdatetime charmap anchor help',
+        'table'
     ],
 
     toolbar: `
@@ -1666,16 +1669,20 @@ tinymce.init({
     image_title: true,
     image_caption: true,
     image_advtab: true,
+    image_dimensions: true,
     automatic_uploads: true,
     paste_data_images: true,
+
+    /* YouTube Direct Embed */
+    media_live_embeds: true,
 
     /* ================= TABLE SETTINGS ================= */
 
     table_advtab: true,
     table_cell_advtab: true,
     table_row_advtab: true,
-    table_default_attributes: {
-        border: '1'
+    table_default_styles: {
+        width: '100%'
     },
 
     /* ================= CONTENT STYLE ================= */
@@ -1707,6 +1714,11 @@ tinymce.init({
             border-radius: 8px;
         }
 
+        figure.image {
+            display: inline-block;
+            margin: 10px;
+        }
+
         img.alignleft {
             float: left;
             margin-right: 15px;
@@ -1715,10 +1727,6 @@ tinymce.init({
         img.alignright {
             float: right;
             margin-left: 15px;
-        }
-
-        img.shadow {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
     `
 });

@@ -79,6 +79,7 @@
     async function loadBlog() {
 
       const slug = getSlug();
+      console.log("Slug:", slug);
 
       if (!slug) {
         document.body.innerHTML = "Blog not found";
