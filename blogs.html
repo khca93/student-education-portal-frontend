@@ -80,43 +80,48 @@
         <select id="categoryFilter" onchange="changeCategory()" style="padding:10px; border-radius:8px;">
             <option value="all">All Categories</option>
         </select>
-    </div><script>
+        <div class="container">
+            <div class="grid" id="blogGrid"></div>
+            <div id="pagination" style="text-align:center;margin-top:30px;"></div>
+        </div>
+    </div>
+    <script>
 
-const API_BASE = "https://student-education-portal-backend.onrender.com";
+        const API_BASE = "https://student-education-portal-backend.onrender.com";
 
-let currentPage = 1;
-let totalPages = 1;
-let currentCategory = "all";
-let currentSearch = "";
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentCategory = "all";
+        let currentSearch = "";
 
-async function loadBlogs(page = 1){
+        async function loadBlogs(page = 1) {
 
-    const res = await fetch(
-        API_BASE + '/api/blogs?page=' + page +
-        '&category=' + currentCategory +
-        '&search=' + currentSearch
-    );
+            const res = await fetch(
+                API_BASE + '/api/blogs?page=' + page +
+                '&category=' + currentCategory +
+                '&search=' + currentSearch
+            );
 
-    const data = await res.json();
+            const data = await res.json();
 
-    const grid = document.getElementById('blogGrid');
+            const grid = document.getElementById('blogGrid');
 
-    if(!data.success || !data.blogs || data.blogs.length === 0){
-        grid.innerHTML = "<div class='empty'>No blogs found.</div>";
-        document.getElementById('pagination').innerHTML = "";
-        return;
-    }
+            if (!data.success || !data.blogs || data.blogs.length === 0) {
+                grid.innerHTML = "<div class='empty'>No blogs found.</div>";
+                document.getElementById('pagination').innerHTML = "";
+                return;
+            }
 
-    currentPage = data.currentPage;
-    totalPages = data.totalPages;
+            currentPage = data.currentPage;
+            totalPages = data.totalPages;
 
-    let html = "";
+            let html = "";
 
-    data.blogs.forEach(blog => {
+            data.blogs.forEach(blog => {
 
-        const date = new Date(blog.createdAt).toLocaleDateString('en-IN');
+                const date = new Date(blog.createdAt).toLocaleDateString('en-IN');
 
-        html += `
+                html += `
             <div class="card" onclick="openBlog('${blog.slug}')">
 
                 ${blog.image ? `
@@ -129,81 +134,81 @@ async function loadBlogs(page = 1){
                 <div class="date">${date}</div>
             </div>
         `;
-    });
+            });
 
-    grid.innerHTML = html;
+            grid.innerHTML = html;
 
-    renderPagination();
-}
-
-async function loadCategories(){
-
-    const res = await fetch(API_BASE + '/api/blogs');
-    const data = await res.json();
-
-    if(!data.success) return;
-
-    const select = document.getElementById('categoryFilter');
-    const categories = new Set();
-
-    data.blogs.forEach(blog => {
-        if(blog.category){
-            categories.add(blog.category);
+            renderPagination();
         }
-    });
 
-    categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        select.appendChild(option);
-    });
-}
+        async function loadCategories() {
 
-function handleSearch(event){
-    currentSearch = document.getElementById('searchInput').value.trim();
-    loadBlogs(1);
-}
+            const res = await fetch(API_BASE + '/api/blogs');
+            const data = await res.json();
 
-function changeCategory(){
-    currentCategory = document.getElementById('categoryFilter').value;
-    loadBlogs(1);
-}
+            if (!data.success) return;
 
-function renderPagination(){
+            const select = document.getElementById('categoryFilter');
+            const categories = new Set();
 
-    const pagination = document.getElementById('pagination');
+            data.blogs.forEach(blog => {
+                if (blog.category) {
+                    categories.add(blog.category);
+                }
+            });
 
-    let buttons = "";
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+        }
 
-    if(currentPage > 1){
-        buttons += `<button onclick="loadBlogs(${currentPage - 1})">Previous</button>`;
-    }
+        function handleSearch(event) {
+            currentSearch = document.getElementById('searchInput').value.trim();
+            loadBlogs(1);
+        }
 
-    for(let i = 1; i <= totalPages; i++){
-        buttons += `
+        function changeCategory() {
+            currentCategory = document.getElementById('categoryFilter').value;
+            loadBlogs(1);
+        }
+
+        function renderPagination() {
+
+            const pagination = document.getElementById('pagination');
+
+            let buttons = "";
+
+            if (currentPage > 1) {
+                buttons += `<button onclick="loadBlogs(${currentPage - 1})">Previous</button>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                buttons += `
             <button onclick="loadBlogs(${i})"
                 style="${i === currentPage ? 'font-weight:bold;background:#2563eb;color:white;' : ''}">
                 ${i}
             </button>
         `;
-    }
+            }
 
-    if(currentPage < totalPages){
-        buttons += `<button onclick="loadBlogs(${currentPage + 1})">Next</button>`;
-    }
+            if (currentPage < totalPages) {
+                buttons += `<button onclick="loadBlogs(${currentPage + 1})">Next</button>`;
+            }
 
-    pagination.innerHTML = buttons;
-}
+            pagination.innerHTML = buttons;
+        }
 
-function openBlog(slug){
-    window.location.href = "blog.html?slug=" + slug;
-}
+        function openBlog(slug) {
+            window.location.href = "blog.html?slug=" + slug;
+        }
 
-loadCategories();
-loadBlogs();
+        loadCategories();
+        loadBlogs();
 
-</script>
+    </script>
 
 </body>
 

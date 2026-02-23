@@ -160,11 +160,7 @@ async function loadblogs() {
             </div>
         `;
 
-        const response = await fetch(API_BASE + '/api/blogs', {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
+        const response = await fetch(API_BASE + '/api/blogs');
 
         const data = await response.json();
 
@@ -1639,14 +1635,12 @@ tinymce.init({
     branding: false,
     resize: true,
 
-    /* FULL MENU BAR */
     menubar: 'file edit view insert format tools table help',
 
     plugins: [
         'advlist autolink lists link image media table code fullscreen preview',
         'searchreplace visualblocks wordcount emoticons',
-        'insertdatetime charmap anchor help',
-        'table'
+        'insertdatetime charmap anchor help'
     ],
 
     toolbar: `
@@ -1656,31 +1650,44 @@ tinymce.init({
         alignleft aligncenter alignright alignjustify |
         bullist numlist outdent indent |
         link image media table |
-        tableprops tabledelete |
-        tableinsertrowbefore tableinsertrowafter tabledeleterow |
-        tableinsertcolbefore tableinsertcolafter tabledeletecol |
-        tablemergecells tablesplitcells |
         emoticons charmap |
         removeformat code preview fullscreen
     `,
 
-    /* ================= IMAGE SETTINGS ================= */
+    /* ================= IMAGE UPLOAD FIX ================= */
 
-    image_title: true,
-    image_caption: true,
-    image_advtab: true,
-    image_dimensions: true,
     automatic_uploads: true,
-    paste_data_images: true,
+    images_upload_handler: async function (blobInfo, success, failure) {
 
-    /* YouTube Direct Embed */
-    media_live_embeds: true,
+        const token = getToken('admin');
+        const formData = new FormData();
+        formData.append('image', blobInfo.blob());
 
-    /* ================= TABLE SETTINGS ================= */
+        try {
 
-    table_advtab: true,
-    table_cell_advtab: true,
-    table_row_advtab: true,
+            const res = await fetch(API_BASE + '/api/blogs/upload-image', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                success(data.url);
+            } else {
+                failure('Upload failed');
+            }
+
+        } catch (err) {
+            failure('Server error');
+        }
+    },
+
+    /* ================= TABLE ================= */
+
     table_default_styles: {
         width: '100%'
     },
@@ -1712,21 +1719,6 @@ tinymce.init({
             max-width: 100%;
             height: auto;
             border-radius: 8px;
-        }
-
-        figure.image {
-            display: inline-block;
-            margin: 10px;
-        }
-
-        img.alignleft {
-            float: left;
-            margin-right: 15px;
-        }
-
-        img.alignright {
-            float: right;
-            margin-left: 15px;
         }
     `
 });
@@ -1857,13 +1849,13 @@ async function submitEditBlog(e) {
 
         const token = getToken('admin');
 
-        const res = await fetch(API_BASE + '/api/blogs/id/' + blogId, {
+        const res = await fetch(API_BASE + '/api/blogs/' + blogId, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-           body: JSON.stringify({ title, content, category, image })
+            body: JSON.stringify({ title, content, category, image })
         });
 
         const data = await res.json();

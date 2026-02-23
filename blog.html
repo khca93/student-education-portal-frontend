@@ -60,6 +60,7 @@
     <h1 id="blogTitle"></h1>
     <div class="meta" id="blogMeta"></div>
     <div class="content" id="blogContent"></div>
+    <div id="blogImageContainer"></div> 
     <hr style="margin:40px 0;" />
 
     <h3>Related Articles</h3>
@@ -146,6 +147,7 @@
           "afterend",
           `<img src="${blog.image}"
               style="width:100%; border-radius:12px; margin:20px 0;" />`
+              
         );
       }
       let processedContent = blog.content;
