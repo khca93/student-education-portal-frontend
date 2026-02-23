@@ -32,7 +32,10 @@
 
     <h1 id="blogTitle"></h1>
     <div class="meta" id="blogMeta"></div>
-
+    <div class="like-section">
+      <button onclick="likeBlog()">👍 Like</button>
+      <span id="likeCount"></span>
+    </div>
     <!-- Blog Main Image -->
     <div id="blogImageContainer"></div>
 
@@ -119,9 +122,10 @@
           " | 👁 " + (blog.views || 0) + " Views";
 
         // LIKE COUNT SHOW
-        document.getElementById('likeCount').innerText =
-          (blog.likes || 0) + " Likes";
-
+        const likeEl = document.getElementById('likeCount');
+        if (likeEl) {
+          likeEl.innerText = (blog.likes || 0) + " Likes";
+        }
         // YOUTUBE EMBED
         let processedContent = blog.content.replace(
           /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,

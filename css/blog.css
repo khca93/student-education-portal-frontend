@@ -19,7 +19,7 @@ h1 {
 }
 
 .meta {
-  color: #666;
+  color: #504f4f;
   margin-bottom: 20px;
   font-size: 14px;
 }
@@ -46,7 +46,7 @@ h1 {
 .content table,
 .content th,
 .content td {
-  border: 1px solid #d1d5db !important;
+  border: 1px solid #dae0e7 !important;
 }
 
 .content th,
