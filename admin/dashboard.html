@@ -7,7 +7,8 @@
     <title>Admin Dashboard - Student Education Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/mh9q17fql7uesni1kyxuhg4nxl07ss54vttsap3qqcrh6e6d/tinymce/8/tinymce.min.js"
+        referrerpolicy="origin" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -368,12 +369,22 @@
                     <div style="margin-top:20px;">
                         <input type="text" id="blogTitle" placeholder="Blog Title" class="form-control"
                             style="margin-bottom:10px;" />
-                        <input type="text" id="blogImage" placeholder="Image URL (optional)" class="form-control"
+                        <input type="text" id="blogImageUrl" placeholder="Image URL (optional)" class="form-control"
+                            style="margin-bottom:10px;" />
+
+                        <!-- OR Upload Image -->
+                        <input type="file" id="blogImageFile" accept="image/*" class="form-control"
                             style="margin-bottom:10px;" />
                         <textarea id="blogContent"></textarea>
 
-                        <input type="text" id="blogCategory" placeholder="Category" class="form-control"
-                            style="margin-top:10px;" />
+                        <select id="blogCategory" class="form-control" style="margin-top:10px;">
+                            <option value="">Select Category</option>
+                            <option value="Jobs">Job Related</option>
+                            <option value="Exam">Exam Related</option>
+                            <option value="Career">Career Guidance</option>
+                            <option value="Education">Education News</option>
+                        </select>
+                        style="margin-top:10px;" />
 
                         <button class="btn btn-primary" style="margin-top:15px;" onclick="submitBlog()">
                             <i class="fas fa-paper-plane"></i> Publish Blog

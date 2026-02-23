@@ -1635,18 +1635,43 @@ function scrollToTop() {
 
 tinymce.init({
     selector: '#blogContent',
-    height: 500,
+    height: 550,
     menubar: true,
+    branding: false,
+
     plugins: [
-        'advlist autolink lists link image charmap preview anchor',
-        'searchreplace visualblocks code fullscreen',
-        'insertdatetime media table code help wordcount'
+        'advlist autolink lists link image media table code fullscreen preview',
+        'searchreplace visualblocks wordcount emoticons'
     ],
-    toolbar: 'undo redo | blocks | bold italic underline strikethrough | \
-    forecolor backcolor | alignleft aligncenter alignright alignjustify | \
-    bullist numlist outdent indent | table image media | removeformat | code fullscreen preview',
+
+    toolbar: `
+        undo redo | blocks | 
+        bold italic underline strikethrough | 
+        forecolor backcolor | 
+        alignleft aligncenter alignright alignjustify | 
+        bullist numlist outdent indent | 
+        link image media table | 
+        emoticons | removeformat | 
+        code preview fullscreen
+    `,
+
     image_title: true,
-    automatic_uploads: true
+    automatic_uploads: true,
+    paste_data_images: true,
+
+    content_style: `
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        iframe {
+            max-width: 100%;
+        }
+    `
 });
 
 if (document.getElementById('editBlogContent')) {
@@ -1661,14 +1686,12 @@ if (document.getElementById('editBlogContent')) {
 
 async function submitBlog() {
 
-    const titleInput = document.getElementById('blogTitle');
-    const categoryInput = document.getElementById('blogCategory');
-    const image = document.getElementById('blogImage').value.trim();
-    const messageDiv = document.getElementById('blogMessage');
-
-    const title = titleInput.value.trim();
+    const title = document.getElementById('blogTitle').value.trim();
     const content = tinymce.get('blogContent').getContent().trim();
-    const category = categoryInput.value.trim();
+    const category = document.getElementById('blogCategory').value.trim();
+    const imageUrl = document.getElementById('blogImageUrl').value.trim();
+    const imageFile = document.getElementById('blogImageFile').files[0];
+    const messageDiv = document.getElementById('blogMessage');
 
     if (!title || !content) {
         messageDiv.innerHTML = "❌ Title and Content required";
@@ -1676,9 +1699,16 @@ async function submitBlog() {
     }
 
     const token = getToken('admin');
-    if (!token) {
-        messageDiv.innerHTML = "❌ Please login again";
-        return;
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('category', category);
+
+    if (imageFile) {
+        formData.append('image', imageFile);
+    } else if (imageUrl) {
+        formData.append('imageUrl', imageUrl);
     }
 
     try {
@@ -1688,29 +1718,23 @@ async function submitBlog() {
         const res = await fetch(API_BASE + '/api/blogs', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             },
-           body: JSON.stringify({ title, content, category, image })
+            body: formData
         });
 
         const data = await res.json();
 
         if (data.success) {
-
             messageDiv.innerHTML = "✅ Blog Published Successfully";
-
-            titleInput.value = '';
-            categoryInput.value = '';
             tinymce.get('blogContent').setContent('');
-            document.getElementById('blogImage').value = '';
-
-            setTimeout(() => {
-                messageDiv.innerHTML = '';
-            }, 3000);
-
+            document.getElementById('blogTitle').value = '';
+            document.getElementById('blogCategory').value = '';
+            document.getElementById('blogImageUrl').value = '';
+            document.getElementById('blogImageFile').value = '';
+            loadblogs();
         } else {
-            messageDiv.innerHTML = "❌ " + (data.message || "Failed to publish");
+            messageDiv.innerHTML = "❌ Failed";
         }
 
     } catch (err) {

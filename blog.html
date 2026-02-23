@@ -147,7 +147,17 @@
               style="width:100%; border-radius:12px; margin:20px 0;" />`
         );
       }
-      document.getElementById('blogContent').innerHTML = blog.content;
+      let processedContent = blog.content;
+
+      // Convert YouTube links to embed
+      processedContent = processedContent.replace(
+        /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,
+        `<iframe width="100%" height="400"
+    src="https://www.youtube.com/embed/$1"
+    frameborder="0" allowfullscreen></iframe>`
+      );
+
+      document.getElementById('blogContent').innerHTML = processedContent;
 
     }
     async function loadRelatedBlogs(slug) {
