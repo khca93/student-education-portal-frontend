@@ -1635,41 +1635,90 @@ function scrollToTop() {
 
 tinymce.init({
     selector: '#blogContent',
-    height: 550,
+    height: 600,
     menubar: true,
     branding: false,
+    resize: true,
 
     plugins: [
         'advlist autolink lists link image media table code fullscreen preview',
-        'searchreplace visualblocks wordcount emoticons'
+        'searchreplace visualblocks wordcount emoticons',
+        'insertdatetime charmap anchor help'
     ],
 
     toolbar: `
-        undo redo | blocks | 
-        bold italic underline strikethrough | 
-        forecolor backcolor | 
-        alignleft aligncenter alignright alignjustify | 
-        bullist numlist outdent indent | 
-        link image media table | 
-        emoticons | removeformat | 
-        code preview fullscreen
+        undo redo | blocks fontfamily fontsize |
+        bold italic underline strikethrough |
+        forecolor backcolor |
+        alignleft aligncenter alignright alignjustify |
+        bullist numlist outdent indent |
+        link image media table |
+        tableprops tabledelete |
+        tableinsertrowbefore tableinsertrowafter tabledeleterow |
+        tableinsertcolbefore tableinsertcolafter tabledeletecol |
+        tablemergecells tablesplitcells |
+        emoticons charmap |
+        removeformat code preview fullscreen
     `,
 
+    /* ================= IMAGE SETTINGS ================= */
+
     image_title: true,
+    image_caption: true,
+    image_advtab: true,
     automatic_uploads: true,
     paste_data_images: true,
+
+    /* ================= TABLE SETTINGS ================= */
+
+    table_advtab: true,
+    table_cell_advtab: true,
+    table_row_advtab: true,
+    table_default_attributes: {
+        border: '1'
+    },
+
+    /* ================= CONTENT STYLE ================= */
 
     content_style: `
         body {
             font-family: Arial, sans-serif;
             font-size: 16px;
+            line-height: 1.7;
         }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
         img {
             max-width: 100%;
             height: auto;
+            border-radius: 8px;
         }
-        iframe {
-            max-width: 100%;
+
+        img.alignleft {
+            float: left;
+            margin-right: 15px;
+        }
+
+        img.alignright {
+            float: right;
+            margin-left: 15px;
+        }
+
+        img.shadow {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
     `
 });
