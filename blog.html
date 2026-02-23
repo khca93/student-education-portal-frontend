@@ -5,72 +5,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title id="metaTitle">Student Education Portal Blog</title>
-  <meta name="description" id="metaDescription" content="Student Education Portal Blog">
+  <title>Student Education Portal Blog</title>
+  <meta name="description" content="Student Education Portal Blog">
 
   <!-- Open Graph -->
-  <meta property="og:title" id="ogTitle" content="Student Education Portal Blog">
-  <meta property="og:description" id="ogDescription" content="Student Education Portal Blog">
-  <meta property="og:image" id="ogImage" content="">
+  <meta property="og:title" id="ogTitle">
+  <meta property="og:description" id="ogDescription">
+  <meta property="og:image" id="ogImage">
   <meta property="og:type" content="article">
-  <meta property="og:url" id="ogUrl" content="">
+  <meta property="og:url" id="ogUrl">
 
-  <!-- Twitter Card -->
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" id="twitterTitle" content="">
-  <meta name="twitter:description" id="twitterDescription" content="">
-  <meta name="twitter:image" id="twitterImage" content="">
+  <meta name="twitter:title" id="twitterTitle">
+  <meta name="twitter:description" id="twitterDescription">
+  <meta name="twitter:image" id="twitterImage">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 40px;
-      background: #f8fafc;
-    }
+  <!-- External CSS -->
+  <link rel="stylesheet" href="blog.css">
 
-    .blog-container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    }
-
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .meta {
-      color: #666;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-
-    .content {
-      line-height: 1.7;
-    }
-  </style>
 </head>
 
 <body>
 
   <div class="blog-container">
+
     <h1 id="blogTitle"></h1>
     <div class="meta" id="blogMeta"></div>
+
+    <!-- Blog Main Image -->
+    <div id="blogImageContainer"></div>
+
+    <!-- Blog Content -->
     <div class="content" id="blogContent"></div>
-    <div id="blogImageContainer"></div> 
-    <hr style="margin:40px 0;" />
+    <h3>Comments</h3>
+
+    <div id="commentsContainer"></div>
+
+    <div class="comment-form">
+      <input type="text" id="commentName" placeholder="Your Name">
+      <textarea id="commentMessage" placeholder="Write your comment..."></textarea>
+      <button onclick="submitComment()">Post Comment</button>
+    </div>
+    <hr>
 
     <h3>Related Articles</h3>
-    <div id="relatedBlogs" style="margin-top:20px;"></div>
+    <div id="relatedBlogs"></div>
+
   </div>
-  <button onclick="likeBlog()">👍 Like</button>
-  <span id="likeCount"></span>
+
   <script>
 
     const API_BASE = "https://student-education-portal-backend.onrender.com";
+    let currentBlogId = null;
 
     function getSlug() {
       const params = new URLSearchParams(window.location.search);
@@ -80,94 +67,137 @@
     async function loadBlog() {
 
       const slug = getSlug();
-      console.log("Slug:", slug);
-
       if (!slug) {
         document.body.innerHTML = "Blog not found";
         return;
       }
 
-      const res = await fetch(API_BASE + '/api/blogs/' + slug);
-      const data = await res.json();
+      try {
 
-      if (!data.success) {
-        document.body.innerHTML = "Blog not found";
+        const res = await fetch(API_BASE + '/api/blogs/' + slug);
+        const data = await res.json();
+
+        if (!data.success) {
+          document.body.innerHTML = "Blog not found";
+          return;
+        }
+
+        const blog = data.blog;
+
+        // SAVE ID FOR LIKE & COMMENT
+        currentBlogId = blog._id;
+
+        // ===== SEO =====
+        const plainText = blog.content.replace(/<[^>]*>/g, '');
+        const description = blog.metaDescription || plainText.substring(0, 150);
+        const title = blog.metaTitle || blog.title + " | Student Education Portal";
+
+        document.title = title;
+        document.querySelector('meta[name="description"]').setAttribute("content", description);
+
+        document.getElementById('ogTitle').setAttribute("content", title);
+        document.getElementById('ogDescription').setAttribute("content", description);
+        document.getElementById('ogUrl').setAttribute("content", window.location.href);
+
+        document.getElementById('twitterTitle').setAttribute("content", title);
+        document.getElementById('twitterDescription').setAttribute("content", description);
+
+        if (blog.image) {
+          document.getElementById('ogImage').setAttribute("content", blog.image);
+          document.getElementById('twitterImage').setAttribute("content", blog.image);
+
+          document.getElementById('blogImageContainer').innerHTML =
+            `<img src="${blog.image}" class="main-blog-image">`;
+        }
+
+        document.getElementById('blogTitle').innerText = blog.title;
+
+        document.getElementById('blogMeta').innerHTML =
+          "Category: " + (blog.category || 'General') +
+          " | " +
+          new Date(blog.createdAt).toLocaleDateString('en-IN') +
+          " | 👁 " + (blog.views || 0) + " Views";
+
+        // LIKE COUNT SHOW
+        document.getElementById('likeCount').innerText =
+          (blog.likes || 0) + " Likes";
+
+        // YOUTUBE EMBED
+        let processedContent = blog.content.replace(
+          /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,
+          `<iframe src="https://www.youtube.com/embed/$1"
+        frameborder="0" allowfullscreen class="youtube-embed"></iframe>`
+        );
+
+        document.getElementById('blogContent').innerHTML = processedContent;
+
+        renderComments(blog.comments);
+        loadRelatedBlogs(blog.slug);
+
+      } catch (err) {
+        document.body.innerHTML = "Failed to load blog";
+      }
+    }
+
+
+    // ================= LIKE =================
+
+    async function likeBlog() {
+
+      if (!currentBlogId) return;
+
+      try {
+
+        const res = await fetch(API_BASE + '/api/blogs/like/' + currentBlogId, {
+          method: 'POST'
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('likeCount').innerText =
+            data.likes + " Likes";
+        }
+
+      } catch (err) {
+        console.error("Like error", err);
+      }
+    }
+
+
+    // ================= COMMENTS =================
+
+    function renderComments(comments) {
+
+      const container = document.getElementById('commentsContainer');
+
+      if (!comments || comments.length === 0) {
+        container.innerHTML = "<p>No comments yet.</p>";
         return;
       }
 
-      const blog = data.blog;
-      loadRelatedBlogs(blog.slug);
-      // ===== SEO + OPEN GRAPH UPDATE =====
+      let html = "";
 
-      const plainText = blog.content.replace(/<[^>]*>/g, '');
-      const description = blog.metaDescription || plainText.substring(0, 150);
-      const title = blog.metaTitle || blog.title + " | Student Education Portal";
+      comments.forEach(c => {
+        html += `
+      <div class="single-comment">
+        <strong>${c.name}</strong>
+        <small>${new Date(c.createdAt).toLocaleDateString('en-IN')}</small>
+        <p>${c.message}</p>
+      </div>
+    `;
+      });
 
-      // Standard Meta
-      document.title = title;
-
-      document.querySelector('meta[name="description"]')
-        .setAttribute("content", description);
-
-      // Open Graph
-      document.getElementById('ogTitle')
-        .setAttribute("content", title);
-
-      document.getElementById('ogDescription')
-        .setAttribute("content", description);
-
-      document.getElementById('ogUrl')
-        .setAttribute("content", window.location.href);
-
-      if (blog.image) {
-        document.getElementById('ogImage')
-          .setAttribute("content", blog.image);
-
-        document.getElementById('twitterImage')
-          .setAttribute("content", blog.image);
-      }
-
-      // Twitter
-      document.getElementById('twitterTitle')
-        .setAttribute("content", title);
-
-      document.getElementById('twitterDescription')
-        .setAttribute("content", description);
-
-
-      document.getElementById('blogTitle').innerText = blog.title;
-      document.getElementById('blogMeta').innerHTML =
-        "Category: " + (blog.category || 'General') +
-        " | " +
-        new Date(blog.createdAt).toLocaleDateString('en-IN') +
-        " | 👁 " + (blog.views || 0) + " Views";
-
-      if (blog.image) {
-        document.getElementById('blogTitle').insertAdjacentHTML(
-          "afterend",
-          `<img src="${blog.image}"
-              style="width:100%; border-radius:12px; margin:20px 0;" />`
-              
-        );
-      }
-      let processedContent = blog.content;
-
-      // Convert YouTube links to embed
-      processedContent = processedContent.replace(
-        /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,
-        `<iframe width="100%" height="400"
-    src="https://www.youtube.com/embed/$1"
-    frameborder="0" allowfullscreen></iframe>`
-      );
-
-      document.getElementById('blogContent').innerHTML = processedContent;
-
+      container.innerHTML = html;
     }
+
+
+    // ================= RELATED =================
+
     async function loadRelatedBlogs(slug) {
 
       const res = await fetch(API_BASE + '/api/blogs/related/' + slug);
       const data = await res.json();
-
       const container = document.getElementById('relatedBlogs');
 
       if (!data.success || data.blogs.length === 0) {
@@ -175,37 +205,26 @@
         return;
       }
 
-      let html = "<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;'>";
+      let html = "<div class='related-grid'>";
 
       data.blogs.forEach(blog => {
 
-        const preview = blog.content
-          .replace(/<[^>]*>/g, '')
-          .substring(0, 100) + "...";
+        const preview =
+          blog.content.replace(/<[^>]*>/g, '').substring(0, 100) + "...";
 
         html += `
-        <div style="
-            background:#f8fafc;
-            padding:15px;
-            border-radius:10px;
-            cursor:pointer;
-        " onclick="openRelated('${blog.slug}')">
-
-            ${blog.image ? `
-                <img src="${blog.image}" 
-                     style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;">
-            ` : ""}
-
-            <strong>${blog.title}</strong>
-            <p style="font-size:13px;color:#555;">${preview}</p>
-        </div>
-      `;
+      <div class="related-card" onclick="openRelated('${blog.slug}')">
+        ${blog.image ? `<img src="${blog.image}" class="related-image">` : ""}
+        <h4>${blog.title}</h4>
+        <p>${preview}</p>
+      </div>
+    `;
       });
 
       html += "</div>";
-
       container.innerHTML = html;
     }
+
     function openRelated(slug) {
       window.location.href = "blog.html?slug=" + slug;
     }
