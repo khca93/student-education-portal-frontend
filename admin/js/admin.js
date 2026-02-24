@@ -1454,7 +1454,7 @@ async function loadApplications() {
     }
 }
 
-/* ================= TINYMCE INITIALIZATION ================= */
+/* ================= TINYMCE INITIALIZATION - FIXED VERSION ================= */
 
 // Main Blog Editor Initialization
 function initMainTinyMCE() {
@@ -1466,23 +1466,46 @@ function initMainTinyMCE() {
             resize: true,
             menubar: 'file edit view insert format tools table help',
             
-            // ✅ फक्त कॉमा वापरा, स्पेस नाही!
+            // ✅ योग्य प्लगइन फॉरमॅट - स्ट्रिंग म्हणून
             plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
             
-            toolbar: [
-                'undo redo | blocks | bold italic underline strikethrough',
-                'alignleft aligncenter alignright alignjustify',
-                'bullist numlist outdent indent',
-                'table tabledelete tableprops',
-                'link image media | forecolor backcolor',
-                'emoticons | code fullscreen preview'
-            ].join(' | '),
+            // ✅ सिम्पल टूलबार ज्यात टेबल आणि इमेज बटन्स आहेत
+            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table | image media link | code fullscreen preview',
             
             toolbar_mode: 'sliding',
             automatic_uploads: true,
             
-            images_upload_handler: async function (blobInfo, success, failure) {
-                // ... तुमचा एक्झिस्टिंग कोड
+            // ✅ इमेज अपलोड हँडलर - एरर फिक्स केली
+            images_upload_handler: function(blobInfo, success, failure) {
+                console.log('Uploading image...', blobInfo.blob().type);
+                
+                const token = getToken('admin');
+                if (!token) {
+                    failure('Not authenticated');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('image', blobInfo.blob(), blobInfo.filename());
+                
+                fetch(API_BASE + '/api/blogs/upload-image', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.url) {
+                        success(data.url);
+                    } else {
+                        failure('Upload failed: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(err => {
+                    failure('Server error: ' + err.message);
+                });
             },
             
             table_default_styles: {
@@ -1496,27 +1519,22 @@ function initMainTinyMCE() {
                     font-size: 16px;
                     line-height: 1.7;
                 }
-                
                 table {
                     border-collapse: collapse;
                     width: 100%;
                     margin: 20px 0;
                 }
-                
                 table, th, td {
                     border: 1px solid #d1d5db;
                 }
-                
                 th, td {
                     padding: 10px;
                     text-align: left;
                 }
-                
                 th {
                     background-color: #f3f4f6;
                     font-weight: 600;
                 }
-                
                 img {
                     max-width: 100%;
                     height: auto;
@@ -1524,7 +1542,7 @@ function initMainTinyMCE() {
                 }
             `
         });
-        console.log('Main TinyMCE initialized');
+        console.log('Main TinyMCE initialized successfully');
     }
 }
 
@@ -1538,23 +1556,43 @@ function initEditTinyMCE() {
             resize: true,
             menubar: 'file edit view insert format tools table help',
             
-            // ✅ फक्त कॉमा वापरा
             plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
             
-            toolbar: [
-                'undo redo | blocks | bold italic underline strikethrough',
-                'alignleft aligncenter alignright alignjustify',
-                'bullist numlist outdent indent',
-                'table tabledelete tableprops',
-                'link image media | forecolor backcolor',
-                'emoticons | code fullscreen preview'
-            ].join(' | '),
+            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table | image media link | code fullscreen preview',
             
             toolbar_mode: 'sliding',
             automatic_uploads: true,
             
-            images_upload_handler: async function (blobInfo, success, failure) {
-                // ... तुमचा एक्झिस्टिंग कोड
+            images_upload_handler: function(blobInfo, success, failure) {
+                console.log('Uploading image...', blobInfo.blob().type);
+                
+                const token = getToken('admin');
+                if (!token) {
+                    failure('Not authenticated');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('image', blobInfo.blob(), blobInfo.filename());
+                
+                fetch(API_BASE + '/api/blogs/upload-image', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.url) {
+                        success(data.url);
+                    } else {
+                        failure('Upload failed: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(err => {
+                    failure('Server error: ' + err.message);
+                });
             },
             
             table_default_styles: {
@@ -1568,27 +1606,22 @@ function initEditTinyMCE() {
                     font-size: 16px;
                     line-height: 1.7;
                 }
-                
                 table {
                     border-collapse: collapse;
                     width: 100%;
                     margin: 20px 0;
                 }
-                
                 table, th, td {
                     border: 1px solid #d1d5db;
                 }
-                
                 th, td {
                     padding: 10px;
                     text-align: left;
                 }
-                
                 th {
                     background-color: #f3f4f6;
                     font-weight: 600;
                 }
-                
                 img {
                     max-width: 100%;
                     height: auto;
@@ -1596,7 +1629,7 @@ function initEditTinyMCE() {
                 }
             `
         });
-        console.log('Edit TinyMCE initialized');
+        console.log('Edit TinyMCE initialized successfully');
     }
 }
 
