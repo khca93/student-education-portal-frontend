@@ -1466,57 +1466,23 @@ function initMainTinyMCE() {
             resize: true,
             menubar: 'file edit view insert format tools table help',
             
-            plugins: [
-                'advlist autolink lists link image media table code fullscreen preview',
-                'searchreplace visualblocks wordcount emoticons',
-                'insertdatetime charmap anchor help'
-            ],
+            // ✅ फक्त कॉमा वापरा, स्पेस नाही!
+            plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
             
             toolbar: [
-                'undo redo | styles | bold italic underline strikethrough',
+                'undo redo | blocks | bold italic underline strikethrough',
                 'alignleft aligncenter alignright alignjustify',
                 'bullist numlist outdent indent',
-                'table tabledelete tableprops tablerowprops tablecellprops',
-                'tableinsertrowbefore tableinsertrowafter tabledeleterow',
-                'tableinsertcolbefore tableinsertcolafter tabledeletecol',
+                'table tabledelete tableprops',
                 'link image media | forecolor backcolor',
                 'emoticons | code fullscreen preview'
             ].join(' | '),
             
             toolbar_mode: 'sliding',
-            
             automatic_uploads: true,
             
             images_upload_handler: async function (blobInfo, success, failure) {
-                const token = getToken('admin');
-                
-                if (!token) {
-                    failure('Not authenticated');
-                    return;
-                }
-                
-                const formData = new FormData();
-                formData.append('image', blobInfo.blob(), blobInfo.filename());
-                
-                try {
-                    const res = await fetch(API_BASE + '/api/blogs/upload-image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: formData
-                    });
-                    
-                    const data = await res.json();
-                    
-                    if (data.success && data.url) {
-                        success(data.url);
-                    } else {
-                        failure('Upload failed: ' + (data.message || 'Unknown error'));
-                    }
-                } catch (err) {
-                    failure('Server error: ' + err.message);
-                }
+                // ... तुमचा एक्झिस्टिंग कोड
             },
             
             table_default_styles: {
@@ -1572,57 +1538,23 @@ function initEditTinyMCE() {
             resize: true,
             menubar: 'file edit view insert format tools table help',
             
-            plugins: [
-                'advlist autolink lists link image media table code fullscreen preview',
-                'searchreplace visualblocks wordcount emoticons',
-                'insertdatetime charmap anchor help'
-            ],
+            // ✅ फक्त कॉमा वापरा
+            plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
             
             toolbar: [
-                'undo redo | styles | bold italic underline strikethrough',
+                'undo redo | blocks | bold italic underline strikethrough',
                 'alignleft aligncenter alignright alignjustify',
                 'bullist numlist outdent indent',
-                'table tabledelete tableprops tablerowprops tablecellprops',
-                'tableinsertrowbefore tableinsertrowafter tabledeleterow',
-                'tableinsertcolbefore tableinsertcolafter tabledeletecol',
+                'table tabledelete tableprops',
                 'link image media | forecolor backcolor',
                 'emoticons | code fullscreen preview'
             ].join(' | '),
             
             toolbar_mode: 'sliding',
-            
             automatic_uploads: true,
             
             images_upload_handler: async function (blobInfo, success, failure) {
-                const token = getToken('admin');
-                
-                if (!token) {
-                    failure('Not authenticated');
-                    return;
-                }
-                
-                const formData = new FormData();
-                formData.append('image', blobInfo.blob(), blobInfo.filename());
-                
-                try {
-                    const res = await fetch(API_BASE + '/api/blogs/upload-image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: formData
-                    });
-                    
-                    const data = await res.json();
-                    
-                    if (data.success && data.url) {
-                        success(data.url);
-                    } else {
-                        failure('Upload failed: ' + (data.message || 'Unknown error'));
-                    }
-                } catch (err) {
-                    failure('Server error: ' + err.message);
-                }
+                // ... तुमचा एक्झिस्टिंग कोड
             },
             
             table_default_styles: {
