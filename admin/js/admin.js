@@ -1631,6 +1631,8 @@ function scrollToTop() {
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    /* ================= MAIN BLOG EDITOR ================= */
+
     if (document.getElementById('blogContent')) {
 
         tinymce.init({
@@ -1640,6 +1642,14 @@ document.addEventListener('DOMContentLoaded', function () {
             resize: true,
 
             menubar: 'file edit view insert format tools table help',
+
+            /* ✅ FIXED INSERT MENU */
+            menu: {
+                insert: {
+                    title: 'Insert',
+                    items: 'image media link table hr charmap emoticons'
+                }
+            },
 
             plugins: [
                 'advlist autolink lists link image media table code fullscreen preview',
@@ -1698,7 +1708,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
 
-            /* ================= TABLE STYLE ================= */
+            /* ================= TABLE DEFAULT STYLE ================= */
 
             table_default_styles: {
                 width: '100%'
@@ -1736,17 +1746,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+    /* ================= EDIT BLOG MODAL EDITOR ================= */
+
     if (document.getElementById('editBlogContent')) {
         tinymce.init({
             selector: '#editBlogContent',
             height: 400,
             menubar: false,
-            plugins: 'link image lists code',
-            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code'
+            plugins: 'link image lists table code',
+            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image table | code'
         });
     }
 
-}); // ✅ close DOMContentLoaded
+});
 
 if (document.getElementById('editBlogContent')) {
     tinymce.init({
