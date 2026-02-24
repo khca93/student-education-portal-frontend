@@ -1458,161 +1458,42 @@ async function loadApplications() {
 
 // Main Blog Editor Initialization
 function initMainTinyMCE() {
-    if (document.getElementById('blogContent') && !tinymce.get('blogContent')) {
+    if (document.getElementById('blogContent')) {
         tinymce.init({
             selector: '#blogContent',
-            height: 600,
+            height: 500,
+            plugins: 'table image link',
+            toolbar: 'undo redo | bold italic | bullist numlist | table | image',
             branding: false,
-            resize: true,
-            menubar: 'file edit view insert format tools table help',
-            
-            plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
-            
-            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table | image media link | code fullscreen preview',
-            
-            toolbar_mode: 'sliding',
-            automatic_uploads: true,
-            
-            images_upload_handler: function(blobInfo, success, failure) {
-                console.log('Uploading image:', blobInfo.filename());
-                
-                try {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        console.log('✅ Image converted to base64 successfully');
-                        success(e.target.result);
-                    };
-                    
-                    reader.onerror = function(e) {
-                        console.error('❌ FileReader error:', e);
-                        failure('Image reading failed: ' + e.message);
-                    };
-                    
-                    reader.readAsDataURL(blobInfo.blob());
-                    
-                } catch (err) {
-                    console.error('❌ Image upload error:', err);
-                    failure('Image upload failed: ' + err.message);
-                }
-            },
-            
-            table_default_styles: {
-                width: '100%',
-                borderCollapse: 'collapse'
-            },
-            
-            content_style: `
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    line-height: 1.7;
-                    padding: 20px;
-                }
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin: 20px 0;
-                }
-                table, th, td {
-                    border: 1px solid #d1d5db;
-                }
-                th, td {
-                    padding: 10px;
-                    text-align: left;
-                }
-                th {
-                    background-color: #f3f4f6;
-                    font-weight: 600;
-                }
-                img {
-                    max-width: 100%;
-                    height: auto;
-                    border-radius: 8px;
-                }
-            `
+            images_upload_handler: function(blobInfo, success) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    success(e.target.result);
+                };
+                reader.readAsDataURL(blobInfo.blob());
+            }
         });
-        console.log('✅ Main TinyMCE initialized successfully');
+        console.log('✅ TinyMCE initialized');
     }
 }
 
 // Edit Blog Editor Initialization
 function initEditTinyMCE() {
-    if (document.getElementById('editBlogContent') && !tinymce.get('editBlogContent')) {
+    if (document.getElementById('editBlogContent')) {
         tinymce.init({
             selector: '#editBlogContent',
-            height: 600,
+            height: 500,
+            plugins: 'table image link',
+            toolbar: 'undo redo | bold italic | bullist numlist | table | image',
             branding: false,
-            resize: true,
-            menubar: 'file edit view insert format tools table help',
-            
-            plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
-            
-            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table | image media link | code fullscreen preview',
-            
-            toolbar_mode: 'sliding',
-            automatic_uploads: true,
-            
-            images_upload_handler: function(blobInfo, success, failure) {
-                console.log('Uploading image:', blobInfo.filename());
-                
-                try {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        console.log('✅ Image converted to base64 successfully');
-                        success(e.target.result);
-                    };
-                    
-                    reader.onerror = function(e) {
-                        console.error('❌ FileReader error:', e);
-                        failure('Image reading failed: ' + e.message);
-                    };
-                    
-                    reader.readAsDataURL(blobInfo.blob());
-                    
-                } catch (err) {
-                    console.error('❌ Image upload error:', err);
-                    failure('Image upload failed: ' + err.message);
-                }
-            },
-            
-            table_default_styles: {
-                width: '100%',
-                borderCollapse: 'collapse'
-            },
-            
-            content_style: `
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    line-height: 1.7;
-                    padding: 20px;
-                }
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin: 20px 0;
-                }
-                table, th, td {
-                    border: 1px solid #d1d5db;
-                }
-                th, td {
-                    padding: 10px;
-                    text-align: left;
-                }
-                th {
-                    background-color: #f3f4f6;
-                    font-weight: 600;
-                }
-                img {
-                    max-width: 100%;
-                    height: auto;
-                    border-radius: 8px;
-                }
-            `
+            images_upload_handler: function(blobInfo, success) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    success(e.target.result);
+                };
+                reader.readAsDataURL(blobInfo.blob());
+            }
         });
-        console.log('✅ Edit TinyMCE initialized successfully');
     }
 }
 
