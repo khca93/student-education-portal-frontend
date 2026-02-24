@@ -335,25 +335,10 @@
 
                     <!-- APPLICATIONS TABLE -->
                     <div id="applicationsList">
-
-                        <table class="applications-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Mobile</th>
-                                    <th>Job</th>
-                                    <th>Resume</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="applicationsTable">
-                                <!-- JS will inject rows here -->
-                            </tbody>
-                        </table>
-
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading applications...</p>
+                        </div>
                     </div>
 
                 </div>
@@ -364,35 +349,56 @@
                 <div class="papers-section">
                     <div class="section-header">
                         <h2><i class="fas fa-blog"></i> Blog Management</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-primary" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                                <i class="fas fa-plus"></i> New Blog
+                            </button>
+                        </div>
                     </div>
 
-                    <div style="margin-top:20px;">
-                        <input type="text" id="blogTitle" placeholder="Blog Title" class="form-control"
-                            style="margin-bottom:10px;" />
-                        <input type="text" id="blogImageUrl" placeholder="Image URL (optional)" class="form-control"
-                            style="margin-bottom:10px;" />
+                    <!-- Blog Editor -->
+                    <div class="blog-editor-container"
+                        style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+                        <h3><i class="fas fa-pen"></i> Create New Blog</h3>
 
-                        <!-- OR Upload Image -->
-                        <input type="file" id="blogImageFile" accept="image/*" class="form-control"
-                            style="margin-bottom:10px;" />
-                        <textarea id="blogContent"></textarea>
+                        <div style="margin-top:20px;">
+                            <input type="text" id="blogTitle" placeholder="Blog Title" class="form-control"
+                                style="margin-bottom:10px;" />
 
-                        <select id="blogCategory" class="form-control" style="margin-top:10px;">
-                            <option value="">Select Category</option>
-                            <option value="Jobs">Job Related</option>
-                            <option value="Exam">Exam Related</option>
-                            <option value="Career">Career Guidance</option>
-                            <option value="Education">Education News</option>
-                        </select>
+                            <div style="display: flex; gap: 10px; margin-bottom:10px;">
+                                <input type="text" id="blogImageUrl" placeholder="Image URL (optional)"
+                                    class="form-control" />
+                                <span style="color: #666; padding: 0 10px;">OR</span>
+                                <input type="file" id="blogImageFile" accept="image/*" class="form-control" />
+                            </div>
 
-                        <button class="btn btn-primary" style="margin-top:15px;" onclick="submitBlog()">
-                            <i class="fas fa-paper-plane"></i> Publish Blog
-                        </button>
+                            <textarea id="blogContent"></textarea>
 
-                        <div id="blogMessage" style="margin-top:10px;"></div>
+                            <div style="display: flex; gap: 10px; margin-top:10px;">
+                                <select id="blogCategory" class="form-control" style="flex: 1;">
+                                    <option value="">Select Category</option>
+                                    <option value="Jobs">Job Related</option>
+                                    <option value="Exam">Exam Related</option>
+                                    <option value="Career">Career Guidance</option>
+                                    <option value="Education">Education News</option>
+                                </select>
 
+                                <button class="btn btn-primary" onclick="submitBlog()" style="min-width: 150px;">
+                                    <i class="fas fa-paper-plane"></i> Publish Blog
+                                </button>
+                            </div>
+
+                            <div id="blogMessage" style="margin-top:10px;"></div>
+                        </div>
                     </div>
-                    <div id="blogsList" style="margin-top:30px;"></div>
+
+                    <!-- Blogs List -->
+                    <div id="blogsList" style="margin-top:30px;">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading blogs...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -687,8 +693,10 @@
             </div>
         </div>
     </div>
+
+    <!-- EDIT BLOG MODAL -->
     <div id="editBlogModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content modal-lg"> <!-- Added modal-lg class -->
             <div class="modal-header">
                 <h3><i class="fas fa-edit"></i> Edit Blog</h3>
                 <button class="close-modal" onclick="hideModal('editBlogModal')">&times;</button>
@@ -704,17 +712,21 @@
 
                     <div class="form-group">
                         <label>Content *</label>
-                        <textarea id="editBlogContent"></textarea>
+                        <textarea id="editBlogContent" class="tinymce-editor"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Category</label>
-                        <input type="text" class="form-control" id="editBlogCategory">
+                        <input type="text" class="form-control" id="editBlogCategory"
+                            placeholder="e.g., Jobs, Exam, Career">
                     </div>
+
                     <div class="form-group">
                         <label>Image URL</label>
-                        <input type="text" class="form-control" id="editBlogImage">
+                        <input type="text" class="form-control" id="editBlogImage"
+                            placeholder="https://example.com/image.jpg">
                     </div>
+
                     <div class="form-actions">
                         <button type="button" class="btn btn-outline"
                             onclick="hideModal('editBlogModal')">Cancel</button>
@@ -726,6 +738,7 @@
             </div>
         </div>
     </div>
+
     <script src="js/admin.js"></script>
 
 

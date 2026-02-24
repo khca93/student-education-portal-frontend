@@ -73,9 +73,11 @@ h1 {
 
 /* YouTube */
 .youtube-embed {
-  width: 100%;
-  height: 400px;
-  margin: 20px 0;
+    width: 100%;
+    height: 400px;
+    margin: 20px 0;
+    border: none;
+    border-radius: 12px;
 }
 
 /* Lists */
@@ -113,21 +115,42 @@ h1 {
   margin-bottom: 10px;
 }
 .comment-form {
-  margin-top: 20px;
+    margin-top: 20px;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
 }
 
 .comment-form input,
 .comment-form textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.comment-form input:focus,
+.comment-form textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .comment-form button {
-  padding: 10px 15px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+    padding: 12px 24px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.comment-form button:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
 }

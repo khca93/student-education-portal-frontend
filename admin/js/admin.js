@@ -21,7 +21,6 @@ function formatFileSize(bytes) {
 console.log('admin.js loaded');
 
 function showAlert(message, type = 'info') {
-    // Create a better alert system
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type}`;
     alertDiv.innerHTML = `
@@ -35,7 +34,6 @@ function showAlert(message, type = 'info') {
     `;
     document.body.appendChild(alertDiv);
 
-    // Auto remove after 5 seconds
     setTimeout(() => {
         if (alertDiv.parentElement) {
             alertDiv.remove();
@@ -45,7 +43,6 @@ function showAlert(message, type = 'info') {
 
 function showConfirm(message, onConfirm, onCancel = null) {
     const overlay = document.createElement('div');
-
     overlay.style.position = 'fixed';
     overlay.style.top = 0;
     overlay.style.left = 0;
@@ -112,7 +109,6 @@ function hideModal(modalId) {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
 
-        // Reset forms
         const forms = {
             'addPaperModal': ['addPaperForm', 'pdfFileInfo', 'No file selected'],
             'editPaperModal': ['editPaperForm', 'editPdfFileInfo', 'Current file will be kept'],
@@ -143,7 +139,6 @@ function logoutAdmin() {
 
 async function loadblogs() {
     try {
-
         const token = getToken('admin');
         if (!token) {
             showAlert('Please login again', 'error');
@@ -161,7 +156,6 @@ async function loadblogs() {
         `;
 
         const response = await fetch(API_BASE + '/api/blogs');
-
         const data = await response.json();
 
         if (!data.success) {
@@ -196,7 +190,6 @@ async function loadblogs() {
         `;
 
         blogs.forEach(blog => {
-
             const date = blog.createdAt
                 ? new Date(blog.createdAt).toLocaleDateString('en-IN')
                 : '-';
@@ -210,15 +203,12 @@ async function loadblogs() {
                         <a href="../blog.html?slug=${blog.slug}" target="_blank" class="btn btn-view">
                             <i class="fas fa-eye"></i> View
                         </a>
-
                         <button class="btn btn-edit" onclick="openEditBlog('${blog._id}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-
                         <button class="btn btn-delete" onclick="deleteBlog('${blog._id}', '${blog.title}')">
                             <i class="fas fa-trash"></i> Delete
                         </button>
-
                     </td>
                 </tr>
             `;
@@ -239,15 +229,11 @@ async function loadblogs() {
 }
 
 async function deleteBlog(blogId, blogTitle) {
-
     showConfirm(
         `Are you sure you want to delete "${blogTitle}"?`,
         async function () {
-
             try {
-
                 const token = getToken('admin');
-
                 const response = await fetch(API_BASE + '/api/blogs/' + blogId, {
                     method: 'DELETE',
                     headers: {
@@ -263,28 +249,23 @@ async function deleteBlog(blogId, blogTitle) {
                 } else {
                     showAlert('Failed to delete blog', 'error');
                 }
-
             } catch (err) {
                 showAlert('Server error', 'error');
             }
-
         }
     );
 }
+
 // ===== SECTION NAVIGATION =====
 function showSection(section) {
-
-
     currentSection = section;
 
-    // Hide all sections
     const sections = document.querySelectorAll('.section');
     sections.forEach(function (sectionElement) {
         sectionElement.classList.remove('active');
         sectionElement.style.display = 'none';
     });
 
-    // Show target section
     const targetSectionId = section + '-section';
     const targetSection = document.getElementById(targetSectionId);
 
@@ -293,15 +274,11 @@ function showSection(section) {
     targetSection.classList.add('active');
     targetSection.style.display = 'block';
 
-    // Update sidebar active state
     const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-
-    // Remove active class from all links
     sidebarLinks.forEach(link => {
         link.classList.remove('active');
     });
 
-    // Add active class to clicked link
     sidebarLinks.forEach(link => {
         const onclickAttr = link.getAttribute('onclick');
         if (onclickAttr && onclickAttr.includes("showSection('" + section + "')")) {
@@ -309,8 +286,6 @@ function showSection(section) {
         }
     });
 
-
-    // Load section data
     switch (section) {
         case 'dashboard':
             loadDashboardStats();
@@ -329,7 +304,6 @@ function showSection(section) {
             break;
     }
 
-    // Close mobile menu if open
     if (window.innerWidth <= 992) {
         const sidebar = document.getElementById('sidebar');
         if (sidebar && sidebar.classList.contains('active')) {
@@ -369,7 +343,6 @@ async function loadDashboardStats() {
             totalApplications = 0
         } = data.stats;
 
-        // Students = unique applicants (simple assumption)
         const totalStudents = totalApplications;
 
         animateCounter(document.getElementById('totalPapers'), totalPapers);
@@ -377,12 +350,10 @@ async function loadDashboardStats() {
         animateCounter(document.getElementById('totalApplications'), totalApplications);
         animateCounter(document.getElementById('totalStudents'), totalStudents);
 
-
     } catch (error) {
         console.error(error);
         showAlert('Failed to load dashboard stats', 'error');
 
-        // fallback
         ['totalPapers', 'totalJobs', 'totalApplications', 'totalStudents']
             .forEach(id => {
                 const el = document.getElementById(id);
@@ -391,8 +362,6 @@ async function loadDashboardStats() {
     }
 }
 
-
-// Animate counter from 0 to target value
 function animateCounter(element, target) {
     if (!element) return;
 
@@ -401,7 +370,6 @@ function animateCounter(element, target) {
 
     const duration = 1000;
     const startTime = Date.now();
-    const increment = target > current ? 1 : -1;
 
     function updateCounter() {
         const elapsed = Date.now() - startTime;
@@ -560,7 +528,6 @@ function renderPapersTable(papers) {
         const badgeClass = paper.paperType === 'Final Exam Paper' ? 'badge-final' : 'badge-practice';
         const pdfUrl = paper.pdfPath || '#';
 
-
         html += `
             <tr>
                 <td><strong>${paper.category || 'N/A'}</strong></td>
@@ -619,7 +586,6 @@ async function openEditPaper(paperId) {
         document.getElementById('editPaperYear').value = paper.year || '';
         document.getElementById('editPaperType').value = paper.paperType || '';
         document.getElementById('editPaperFileName').value = paper.fileName || '';
-
 
         if (paper.pdfPath) {
             const fileName = paper.pdfPath.split('/').pop();
@@ -681,7 +647,6 @@ async function submitAddPaper(e) {
             body: formData
         });
 
-
         const data = await response.json();
 
         submitBtn.innerHTML = originalText;
@@ -726,7 +691,6 @@ async function submitEditPaper(e) {
     formData.append('paperType', paperType);
     formData.append('fileName', fileName);
 
-
     if (pdfFile) {
         formData.append('pdf', pdfFile);
     }
@@ -745,7 +709,6 @@ async function submitEditPaper(e) {
             },
             body: formData
         });
-
 
         const data = await response.json();
 
@@ -769,7 +732,6 @@ async function submitEditPaper(e) {
         submitBtn.disabled = false;
         showAlert('Failed to update paper: ' + error.message, 'error');
     }
-
 }
 
 function deletePaperPrompt(paperId, paperTitle) {
@@ -785,7 +747,6 @@ function deletePaperPrompt(paperId, paperTitle) {
                         'Content-Type': 'application/json'
                     }
                 });
-
 
                 const data = await response.json();
 
@@ -1360,7 +1321,6 @@ async function loadJobFilterOptions() {
     }
 }
 
-
 function deleteApplicationPrompt(applicationId, applicantName) {
     showConfirm(
         `Are you sure you want to delete application from "${applicantName}"? This action cannot be undone.`,
@@ -1494,21 +1454,415 @@ async function loadApplications() {
     }
 }
 
+/* ================= TINYMCE INITIALIZATION ================= */
+
+// Main Blog Editor Initialization
+function initMainTinyMCE() {
+    if (document.getElementById('blogContent') && !tinymce.get('blogContent')) {
+        tinymce.init({
+            selector: '#blogContent',
+            height: 600,
+            branding: false,
+            resize: true,
+            menubar: 'file edit view insert format tools table help',
+            
+            plugins: [
+                'advlist autolink lists link image media table code fullscreen preview',
+                'searchreplace visualblocks wordcount emoticons',
+                'insertdatetime charmap anchor help'
+            ],
+            
+            toolbar: [
+                'undo redo | styles | bold italic underline strikethrough',
+                'alignleft aligncenter alignright alignjustify',
+                'bullist numlist outdent indent',
+                'table tabledelete tableprops tablerowprops tablecellprops',
+                'tableinsertrowbefore tableinsertrowafter tabledeleterow',
+                'tableinsertcolbefore tableinsertcolafter tabledeletecol',
+                'link image media | forecolor backcolor',
+                'emoticons | code fullscreen preview'
+            ].join(' | '),
+            
+            toolbar_mode: 'sliding',
+            
+            automatic_uploads: true,
+            
+            images_upload_handler: async function (blobInfo, success, failure) {
+                const token = getToken('admin');
+                
+                if (!token) {
+                    failure('Not authenticated');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('image', blobInfo.blob(), blobInfo.filename());
+                
+                try {
+                    const res = await fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success && data.url) {
+                        success(data.url);
+                    } else {
+                        failure('Upload failed: ' + (data.message || 'Unknown error'));
+                    }
+                } catch (err) {
+                    failure('Server error: ' + err.message);
+                }
+            },
+            
+            table_default_styles: {
+                width: '100%',
+                borderCollapse: 'collapse'
+            },
+            
+            content_style: `
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
+                    line-height: 1.7;
+                }
+                
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    margin: 20px 0;
+                }
+                
+                table, th, td {
+                    border: 1px solid #d1d5db;
+                }
+                
+                th, td {
+                    padding: 10px;
+                    text-align: left;
+                }
+                
+                th {
+                    background-color: #f3f4f6;
+                    font-weight: 600;
+                }
+                
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                }
+            `
+        });
+        console.log('Main TinyMCE initialized');
+    }
+}
+
+// Edit Blog Editor Initialization
+function initEditTinyMCE() {
+    if (document.getElementById('editBlogContent') && !tinymce.get('editBlogContent')) {
+        tinymce.init({
+            selector: '#editBlogContent',
+            height: 600,
+            branding: false,
+            resize: true,
+            menubar: 'file edit view insert format tools table help',
+            
+            plugins: [
+                'advlist autolink lists link image media table code fullscreen preview',
+                'searchreplace visualblocks wordcount emoticons',
+                'insertdatetime charmap anchor help'
+            ],
+            
+            toolbar: [
+                'undo redo | styles | bold italic underline strikethrough',
+                'alignleft aligncenter alignright alignjustify',
+                'bullist numlist outdent indent',
+                'table tabledelete tableprops tablerowprops tablecellprops',
+                'tableinsertrowbefore tableinsertrowafter tabledeleterow',
+                'tableinsertcolbefore tableinsertcolafter tabledeletecol',
+                'link image media | forecolor backcolor',
+                'emoticons | code fullscreen preview'
+            ].join(' | '),
+            
+            toolbar_mode: 'sliding',
+            
+            automatic_uploads: true,
+            
+            images_upload_handler: async function (blobInfo, success, failure) {
+                const token = getToken('admin');
+                
+                if (!token) {
+                    failure('Not authenticated');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('image', blobInfo.blob(), blobInfo.filename());
+                
+                try {
+                    const res = await fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success && data.url) {
+                        success(data.url);
+                    } else {
+                        failure('Upload failed: ' + (data.message || 'Unknown error'));
+                    }
+                } catch (err) {
+                    failure('Server error: ' + err.message);
+                }
+            },
+            
+            table_default_styles: {
+                width: '100%',
+                borderCollapse: 'collapse'
+            },
+            
+            content_style: `
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
+                    line-height: 1.7;
+                }
+                
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    margin: 20px 0;
+                }
+                
+                table, th, td {
+                    border: 1px solid #d1d5db;
+                }
+                
+                th, td {
+                    padding: 10px;
+                    text-align: left;
+                }
+                
+                th {
+                    background-color: #f3f4f6;
+                    font-weight: 600;
+                }
+                
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                }
+            `
+        });
+        console.log('Edit TinyMCE initialized');
+    }
+}
+
+// Open Edit Blog with TinyMCE
+async function openEditBlog(blogId) {
+    try {
+        const token = getToken('admin');
+        
+        const res = await fetch(API_BASE + '/api/blogs/id/' + blogId, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        
+        const data = await res.json();
+        
+        if (!data.success) {
+            showAlert('Failed to load blog', 'error');
+            return;
+        }
+        
+        const blog = data.blog;
+        
+        document.getElementById('editBlogId').value = blog._id;
+        document.getElementById('editBlogTitle').value = blog.title;
+        document.getElementById('editBlogCategory').value = blog.category || '';
+        document.getElementById('editBlogImage').value = blog.image || '';
+        
+        // Initialize editor if not already done
+        initEditTinyMCE();
+        
+        // Small delay to ensure editor is ready
+        setTimeout(() => {
+            const editor = tinymce.get('editBlogContent');
+            if (editor) {
+                editor.setContent(blog.content);
+            }
+        }, 500);
+        
+        showModal('editBlogModal');
+        
+    } catch (err) {
+        showAlert('Server error: ' + err.message, 'error');
+    }
+}
+
+// Submit Blog
+async function submitBlog() {
+    const title = document.getElementById('blogTitle').value.trim();
+    const editor = tinymce.get('blogContent');
+    const content = editor ? editor.getContent().trim() : '';
+    const category = document.getElementById('blogCategory').value.trim();
+    const imageUrl = document.getElementById('blogImageUrl').value.trim();
+    const imageFile = document.getElementById('blogImageFile').files[0];
+    const messageDiv = document.getElementById('blogMessage');
+
+    if (!title || !content) {
+        messageDiv.innerHTML = '<span style="color: red;">❌ Title and Content required</span>';
+        return;
+    }
+
+    const token = getToken('admin');
+    if (!token) {
+        showAlert('Session expired. Please login again.', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('category', category);
+
+    if (imageFile) {
+        formData.append('image', imageFile);
+    } else if (imageUrl) {
+        formData.append('imageUrl', imageUrl);
+    }
+
+    try {
+        messageDiv.innerHTML = '<span style="color: blue;">⏳ Publishing...</span>';
+
+        const res = await fetch(API_BASE + '/api/blogs', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            messageDiv.innerHTML = '<span style="color: green;">✅ Blog Published Successfully</span>';
+            
+            // Clear form
+            document.getElementById('blogTitle').value = '';
+            document.getElementById('blogCategory').value = '';
+            document.getElementById('blogImageUrl').value = '';
+            document.getElementById('blogImageFile').value = '';
+            if (editor) {
+                editor.setContent('');
+            }
+            
+            loadblogs();
+            
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        } else {
+            messageDiv.innerHTML = '<span style="color: red;">❌ Failed: ' + (data.message || 'Unknown error') + '</span>';
+        }
+
+    } catch (err) {
+        messageDiv.innerHTML = '<span style="color: red;">❌ Server Error: ' + err.message + '</span>';
+    }
+}
+
+// Submit Edit Blog
+async function submitEditBlog(e) {
+    e.preventDefault();
+
+    const blogId = document.getElementById('editBlogId').value;
+    const title = document.getElementById('editBlogTitle').value.trim();
+    const category = document.getElementById('editBlogCategory').value.trim();
+
+    const editor = tinymce.get('editBlogContent');
+    const content = editor ? editor.getContent().trim() : '';
+    const image = document.getElementById('editBlogImage').value.trim();
+
+    if (!title || !content) {
+        showAlert('Title and content required', 'error');
+        return;
+    }
+
+    try {
+        const token = getToken('admin');
+
+        const res = await fetch(API_BASE + '/api/blogs/' + blogId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ title, content, category, image })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            showAlert('Blog updated successfully!', 'success');
+            hideModal('editBlogModal');
+            loadblogs();
+        } else {
+            showAlert('Failed to update blog: ' + (data.message || 'Unknown error'), 'error');
+        }
+
+    } catch (err) {
+        showAlert('Server error: ' + err.message, 'error');
+    }
+}
+
+// Add refresh button dynamically
+function addRefreshButtonToDashboard() {
+    const dashboardActions = document.querySelector('#dashboard-section .dashboard-actions .action-buttons');
+    if (dashboardActions) {
+        const existingRefreshBtn = dashboardActions.querySelector('.refresh-all-btn');
+        if (!existingRefreshBtn) {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.className = 'btn btn-outline refresh-all-btn';
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh All';
+            refreshBtn.onclick = reloadAllData;
+            dashboardActions.appendChild(refreshBtn);
+        }
+    }
+}
+
+// Scroll to top function
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function () {
     const adminToken = getToken('admin');
 
-    // Only block if token is missing
     if (!adminToken) {
         window.location.href = '../admin_login.html';
         return;
     }
 
-    // ❌ DO NOT auto logout if API fails
     console.log('Admin token found, dashboard allowed');
 
+    // Initialize TinyMCE for main blog editor with delay
+    setTimeout(() => {
+        initMainTinyMCE();
+    }, 1000);
 
+    // File input handlers
     const editPaperPdfInput = document.getElementById('editPaperPdf');
     if (editPaperPdfInput) {
         editPaperPdfInput.addEventListener('change', function () {
@@ -1587,7 +1941,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Setup scroll indicator
     const scrollIndicator = document.getElementById('scrollIndicator');
     if (scrollIndicator) {
-        // Hide initially
         scrollIndicator.style.display = 'none';
 
         window.addEventListener('scroll', function () {
@@ -1608,309 +1961,6 @@ document.addEventListener('DOMContentLoaded', function () {
         showSection('dashboard');
     }, 300);
 });
-
-// Add refresh button dynamically
-function addRefreshButtonToDashboard() {
-    const dashboardActions = document.querySelector('#dashboard-section .dashboard-actions .action-buttons');
-    if (dashboardActions) {
-        const existingRefreshBtn = dashboardActions.querySelector('.refresh-all-btn');
-        if (!existingRefreshBtn) {
-            const refreshBtn = document.createElement('button');
-            refreshBtn.className = 'btn btn-outline refresh-all-btn';
-            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh All';
-            refreshBtn.onclick = reloadAllData;
-            dashboardActions.appendChild(refreshBtn);
-        }
-    }
-}
-
-// Scroll to top function
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-
-    /* ================= MAIN BLOG EDITOR ================= */
-
-    if (document.getElementById('blogContent')) {
-
-        tinymce.init({
-            selector: '#blogContent',
-            height: 600,
-            branding: false,
-            resize: true,
-
-            menubar: 'file edit view insert format tools table help',
-
-            plugins: [
-                'advlist autolink lists link image media table code fullscreen preview',
-                'searchreplace visualblocks wordcount emoticons',
-                'insertdatetime charmap anchor help'
-            ],
-
-            toolbar: `
-                undo redo |
-                blocks |
-                bold italic underline strikethrough |
-                alignleft aligncenter alignright alignjustify |
-                bullist numlist |
-                link image table media |
-                forecolor backcolor |
-                emoticons |
-                code fullscreen preview
-                toolbar_mode: 'sliding',
-            `,
-
-            /* ================= IMAGE UPLOAD ================= */
-
-            automatic_uploads: true,
-
-            images_upload_handler: async function (blobInfo, success, failure) {
-
-                const token = getToken('admin');
-
-                if (!token) {
-                    failure('Not authenticated');
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('image', blobInfo.blob(), blobInfo.filename());
-
-                try {
-
-                    const res = await fetch(API_BASE + '/api/blogs/upload-image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: formData
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success && data.url) {
-                        success(data.url);
-                    } else {
-                        failure('Upload failed');
-                    }
-
-                } catch (err) {
-                    console.error(err);
-                    failure('Server error');
-                }
-            },
-
-            /* ================= TABLE DEFAULT STYLE ================= */
-
-            table_default_styles: {
-                width: '100%'
-            },
-
-            /* ================= CONTENT STYLE ================= */
-
-            content_style: `
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    line-height: 1.7;
-                }
-
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                }
-
-                table, th, td {
-                    border: 1px solid #ccc;
-                    padding: 8px;
-                }
-
-                th {
-                    background: #f1f5f9;
-                }
-
-                img {
-                    max-width: 100%;
-                    height: auto;
-                    border-radius: 8px;
-                }
-            `
-        });
-    }
-
-    /* ================= EDIT BLOG MODAL EDITOR ================= */
-
-    if (document.getElementById('editBlogContent')) {
-        tinymce.init({
-            selector: '#editBlogContent',
-            height: 400,
-            menubar: false,
-            plugins: 'link image lists table code',
-            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image table | code'
-        });
-    }
-
-});
-
-if (document.getElementById('editBlogContent')) {
-    tinymce.init({
-        selector: '#editBlogContent',
-        height: 400,
-        menubar: false,
-        plugins: 'link image lists code',
-        toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code'
-    });
-}
-
-async function submitBlog() {
-
-    const title = document.getElementById('blogTitle').value.trim();
-    const editor = tinymce.get('blogContent');
-    const content = editor ? editor.getContent().trim() : '';
-    const category = document.getElementById('blogCategory').value.trim();
-    const imageUrl = document.getElementById('blogImageUrl').value.trim();
-    const imageFile = document.getElementById('blogImageFile').files[0];
-    const messageDiv = document.getElementById('blogMessage');
-
-    if (!title || !content) {
-        messageDiv.innerHTML = "❌ Title and Content required";
-        return;
-    }
-
-    const token = getToken('admin');
-    if (!token) {
-        showAlert('Session expired. Please login again.', 'error');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('category', category);
-
-    if (imageFile) {
-        formData.append('image', imageFile);
-    } else if (imageUrl) {
-        formData.append('imageUrl', imageUrl);
-    }
-
-    try {
-
-        messageDiv.innerHTML = "⏳ Publishing...";
-
-        const res = await fetch(API_BASE + '/api/blogs', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-            body: formData
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            messageDiv.innerHTML = "✅ Blog Published Successfully";
-            tinymce.get('blogContent').setContent('');
-            document.getElementById('blogTitle').value = '';
-            document.getElementById('blogCategory').value = '';
-            document.getElementById('blogImageUrl').value = '';
-            document.getElementById('blogImageFile').value = '';
-            loadblogs();
-        } else {
-            messageDiv.innerHTML = "❌ Failed";
-        }
-
-    } catch (err) {
-        messageDiv.innerHTML = "❌ Server Error";
-    }
-}
-
-async function openEditBlog(blogId) {
-
-    try {
-
-        const token = getToken('admin');
-
-        const res = await fetch(API_BASE + '/api/blogs/id/' + blogId, {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        const data = await res.json();
-
-        if (!data.success) {
-            showAlert('Failed to load blog', 'error');
-            return;
-        }
-
-        const blog = data.blog;
-
-        document.getElementById('editBlogId').value = blog._id;
-        document.getElementById('editBlogTitle').value = blog.title;
-        document.getElementById('editBlogCategory').value = blog.category || '';
-        document.getElementById('editBlogImage').value = blog.image || '';
-
-        if (tinymce.get('editBlogContent')) {
-            tinymce.get('editBlogContent').setContent(blog.content);
-        }
-
-        showModal('editBlogModal');
-
-    } catch (err) {
-        showAlert('Server error', 'error');
-    }
-}
-
-async function submitEditBlog(e) {
-
-    e.preventDefault();
-
-    const blogId = document.getElementById('editBlogId').value;
-    const title = document.getElementById('editBlogTitle').value.trim();
-    const category = document.getElementById('editBlogCategory').value.trim();
-
-    const editor = tinymce.get('editBlogContent');
-    const content = editor ? editor.getContent().trim() : '';
-    const image = document.getElementById('editBlogImage').value.trim();
-
-    if (!title || !content) {
-        showAlert('Title and content required', 'error');
-        return;
-    }
-
-    try {
-
-        const token = getToken('admin');
-
-        const res = await fetch(API_BASE + '/api/blogs/' + blogId, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ title, content, category, image })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-
-            showAlert('Blog updated successfully!', 'success');
-            hideModal('editBlogModal');
-            loadblogs();
-
-        } else {
-            showAlert('Failed to update blog', 'error');
-        }
-
-    } catch (err) {
-        showAlert('Server error', 'error');
-    }
-}
-
 
 // ===== GLOBAL FUNCTIONS =====
 window.showSection = showSection;
