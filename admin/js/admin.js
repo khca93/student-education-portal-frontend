@@ -1466,72 +1466,35 @@ function initMainTinyMCE() {
             resize: true,
             menubar: 'file edit view insert format tools table help',
             
-            // योग्य प्लगइन फॉरमॅट
             plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
             
-            // टूलबार - टेबल आणि इमेज बटन्ससह
             toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table | image media link | code fullscreen preview',
             
             toolbar_mode: 'sliding',
             automatic_uploads: true,
             
-            // ✅ इमेज अपलोड हँडलर - पूर्णपणे फिक्स केलेला
             images_upload_handler: function(blobInfo, success, failure) {
-                console.log('Uploading image...', blobInfo.filename());
+                console.log('Uploading image:', blobInfo.filename());
                 
-                // तात्पुरता उपाय - बेस64 इमेज म्हणून अपलोड करा
-                // ह्यामुळे सर्व्हर एरर येणार नाही आणि इमेज यशस्वीपणे अपलोड होईल
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    success(e.target.result);
-                };
-                reader.onerror = function(e) {
-                    failure('Image reading failed');
-                };
-                reader.readAsDataURL(blobInfo.blob());
-                
-                /* 
-                // जर तुम्हाला सर्व्हरवर अपलोड करायचे असेल तर हा कोड वापरा:
-                
-                const token = getToken('admin');
-                if (!token) {
-                    failure('Not authenticated');
-                    return;
-                }
-                
-                const formData = new FormData();
-                formData.append('image', blobInfo.blob(), blobInfo.filename());
-                
-                fetch(API_BASE + '/api/blogs/upload-image', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.url) {
-                        success(data.url);
-                    } else {
-                        // फॉलबॅक - बेस64 इमेज वापरा
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            success(e.target.result);
-                        };
-                        reader.readAsDataURL(blobInfo.blob());
-                    }
-                })
-                .catch(err => {
-                    console.error('Upload error:', err);
-                    // एरर आल्यास बेस64 इमेज वापरा
+                try {
                     const reader = new FileReader();
+                    
                     reader.onload = function(e) {
+                        console.log('✅ Image converted to base64 successfully');
                         success(e.target.result);
                     };
+                    
+                    reader.onerror = function(e) {
+                        console.error('❌ FileReader error:', e);
+                        failure('Image reading failed: ' + e.message);
+                    };
+                    
                     reader.readAsDataURL(blobInfo.blob());
-                });
-                */
+                    
+                } catch (err) {
+                    console.error('❌ Image upload error:', err);
+                    failure('Image upload failed: ' + err.message);
+                }
             },
             
             table_default_styles: {
@@ -1590,19 +1553,28 @@ function initEditTinyMCE() {
             toolbar_mode: 'sliding',
             automatic_uploads: true,
             
-            // ✅ इमेज अपलोड हँडलर - पूर्णपणे फिक्स केलेला
             images_upload_handler: function(blobInfo, success, failure) {
-                console.log('Uploading image...', blobInfo.filename());
+                console.log('Uploading image:', blobInfo.filename());
                 
-                // तात्पुरता उपाय - बेस64 इमेज म्हणून अपलोड करा
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    success(e.target.result);
-                };
-                reader.onerror = function(e) {
-                    failure('Image reading failed');
-                };
-                reader.readAsDataURL(blobInfo.blob());
+                try {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        console.log('✅ Image converted to base64 successfully');
+                        success(e.target.result);
+                    };
+                    
+                    reader.onerror = function(e) {
+                        console.error('❌ FileReader error:', e);
+                        failure('Image reading failed: ' + e.message);
+                    };
+                    
+                    reader.readAsDataURL(blobInfo.blob());
+                    
+                } catch (err) {
+                    console.error('❌ Image upload error:', err);
+                    failure('Image upload failed: ' + err.message);
+                }
             },
             
             table_default_styles: {
@@ -1644,93 +1616,6 @@ function initEditTinyMCE() {
     }
 }
 
-// Edit Blog Editor Initialization
-function initEditTinyMCE() {
-    if (document.getElementById('editBlogContent') && !tinymce.get('editBlogContent')) {
-        tinymce.init({
-            selector: '#editBlogContent',
-            height: 600,
-            branding: false,
-            resize: true,
-            menubar: 'file edit view insert format tools table help',
-            
-            plugins: 'advlist autolink lists link image media table code fullscreen preview searchreplace visualblocks wordcount emoticons insertdatetime charmap anchor help',
-            
-            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table | image media link | code fullscreen preview',
-            
-            toolbar_mode: 'sliding',
-            automatic_uploads: true,
-            
-            images_upload_handler: function(blobInfo, success, failure) {
-                console.log('Uploading image...', blobInfo.blob().type);
-                
-                const token = getToken('admin');
-                if (!token) {
-                    failure('Not authenticated');
-                    return;
-                }
-                
-                const formData = new FormData();
-                formData.append('image', blobInfo.blob(), blobInfo.filename());
-                
-                fetch(API_BASE + '/api/blogs/upload-image', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.url) {
-                        success(data.url);
-                    } else {
-                        failure('Upload failed: ' + (data.message || 'Unknown error'));
-                    }
-                })
-                .catch(err => {
-                    failure('Server error: ' + err.message);
-                });
-            },
-            
-            table_default_styles: {
-                width: '100%',
-                borderCollapse: 'collapse'
-            },
-            
-            content_style: `
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    line-height: 1.7;
-                }
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin: 20px 0;
-                }
-                table, th, td {
-                    border: 1px solid #d1d5db;
-                }
-                th, td {
-                    padding: 10px;
-                    text-align: left;
-                }
-                th {
-                    background-color: #f3f4f6;
-                    font-weight: 600;
-                }
-                img {
-                    max-width: 100%;
-                    height: auto;
-                    border-radius: 8px;
-                }
-            `
-        });
-        console.log('Edit TinyMCE initialized successfully');
-    }
-}
-
 // Open Edit Blog with TinyMCE
 async function openEditBlog(blogId) {
     try {
@@ -1756,10 +1641,8 @@ async function openEditBlog(blogId) {
         document.getElementById('editBlogCategory').value = blog.category || '';
         document.getElementById('editBlogImage').value = blog.image || '';
         
-        // Initialize editor if not already done
         initEditTinyMCE();
         
-        // Small delay to ensure editor is ready
         setTimeout(() => {
             const editor = tinymce.get('editBlogContent');
             if (editor) {
@@ -1822,7 +1705,6 @@ async function submitBlog() {
         if (data.success) {
             messageDiv.innerHTML = '<span style="color: green;">✅ Blog Published Successfully</span>';
             
-            // Clear form
             document.getElementById('blogTitle').value = '';
             document.getElementById('blogCategory').value = '';
             document.getElementById('blogImageUrl').value = '';
@@ -1920,12 +1802,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Admin token found, dashboard allowed');
 
-    // Initialize TinyMCE for main blog editor with delay
     setTimeout(() => {
         initMainTinyMCE();
     }, 1000);
 
-    // File input handlers
     const editPaperPdfInput = document.getElementById('editPaperPdf');
     if (editPaperPdfInput) {
         editPaperPdfInput.addEventListener('change', function () {
@@ -1971,7 +1851,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Setup form event listeners
     const addPaperForm = document.getElementById('addPaperForm');
     if (addPaperForm) {
         addPaperForm.addEventListener('submit', submitAddPaper);
@@ -1992,7 +1871,6 @@ document.addEventListener('DOMContentLoaded', function () {
         editJobForm.addEventListener('submit', submitEditJob);
     }
 
-    // Close modals on outside click
     document.querySelectorAll('.modal').forEach(function (modal) {
         modal.addEventListener('click', function (e) {
             if (e.target === this) {
@@ -2001,7 +1879,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Setup scroll indicator
     const scrollIndicator = document.getElementById('scrollIndicator');
     if (scrollIndicator) {
         scrollIndicator.style.display = 'none';
@@ -2019,7 +1896,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Initialize dashboard
     setTimeout(() => {
         showSection('dashboard');
     }, 300);
