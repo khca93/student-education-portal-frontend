@@ -1629,99 +1629,124 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-tinymce.init({
-    selector: '#blogContent',
-    height: 600,
-    branding: false,
-    resize: true,
+document.addEventListener('DOMContentLoaded', function () {
 
-    menubar: 'file edit view insert format tools table help',
+    if (document.getElementById('blogContent')) {
 
-    plugins: [
-        'advlist autolink lists link image media table code fullscreen preview',
-        'searchreplace visualblocks wordcount emoticons',
-        'insertdatetime charmap anchor help'
-    ],
+        tinymce.init({
+            selector: '#blogContent',
+            height: 600,
+            branding: false,
+            resize: true,
 
-    toolbar: `
-        undo redo | blocks fontfamily fontsize |
-        bold italic underline strikethrough |
-        forecolor backcolor |
-        alignleft aligncenter alignright alignjustify |
-        bullist numlist outdent indent |
-        link image media table |
-        emoticons charmap |
-        removeformat code preview fullscreen
-    `,
+            menubar: 'file edit view insert format tools table help',
 
-    /* ================= IMAGE UPLOAD FIX ================= */
+            plugins: [
+                'advlist autolink lists link image media table code fullscreen preview',
+                'searchreplace visualblocks wordcount emoticons',
+                'insertdatetime charmap anchor help'
+            ],
 
-    automatic_uploads: true,
-    images_upload_handler: async function (blobInfo, success, failure) {
+            toolbar: `
+                undo redo | blocks fontfamily fontsize |
+                bold italic underline strikethrough |
+                forecolor backcolor |
+                alignleft aligncenter alignright alignjustify |
+                bullist numlist outdent indent |
+                link image media table |
+                emoticons charmap |
+                removeformat code preview fullscreen
+            `,
 
-        const token = getToken('admin');
-        const formData = new FormData();
-        formData.append('image', blobInfo.blob());
+            /* ================= IMAGE UPLOAD ================= */
 
-        try {
+            automatic_uploads: true,
 
-            const res = await fetch(API_BASE + '/api/blogs/upload-image', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                },
-                body: formData
-            });
+            images_upload_handler: async function (blobInfo, success, failure) {
 
-            const data = await res.json();
+                const token = getToken('admin');
 
-            if (data.success) {
-                success(data.url);
-            } else {
-                failure('Upload failed');
-            }
+                if (!token) {
+                    failure('Not authenticated');
+                    return;
+                }
 
-        } catch (err) {
-            failure('Server error');
-        }
-    },
+                const formData = new FormData();
+                formData.append('image', blobInfo.blob(), blobInfo.filename());
 
-    /* ================= TABLE ================= */
+                try {
 
-    table_default_styles: {
-        width: '100%'
-    },
+                    const res = await fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    });
 
-    /* ================= CONTENT STYLE ================= */
+                    const data = await res.json();
 
-    content_style: `
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 16px;
-            line-height: 1.7;
-        }
+                    if (data.success && data.url) {
+                        success(data.url);
+                    } else {
+                        failure('Upload failed');
+                    }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
+                } catch (err) {
+                    console.error(err);
+                    failure('Server error');
+                }
+            },
 
-        table, th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-        }
+            /* ================= TABLE STYLE ================= */
 
-        th {
-            background: #f1f5f9;
-        }
+            table_default_styles: {
+                width: '100%'
+            },
 
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-    `
-});
+            /* ================= CONTENT STYLE ================= */
+
+            content_style: `
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
+                    line-height: 1.7;
+                }
+
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                table, th, td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                }
+
+                th {
+                    background: #f1f5f9;
+                }
+
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                }
+            `
+        });
+
+    }
+    if (document.getElementById('editBlogContent')) {
+        tinymce.init({
+            selector: '#editBlogContent',
+            height: 400,
+            menubar: false,
+            plugins: 'link image lists code',
+            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code'
+        });
+    }
+
+}); // ✅ close DOMContentLoaded
 
 if (document.getElementById('editBlogContent')) {
     tinymce.init({
@@ -1736,7 +1761,8 @@ if (document.getElementById('editBlogContent')) {
 async function submitBlog() {
 
     const title = document.getElementById('blogTitle').value.trim();
-    const content = tinymce.get('blogContent').getContent().trim();
+    const editor = tinymce.get('blogContent');
+    const content = editor ? editor.getContent().trim() : '';
     const category = document.getElementById('blogCategory').value.trim();
     const imageUrl = document.getElementById('blogImageUrl').value.trim();
     const imageFile = document.getElementById('blogImageFile').files[0];
@@ -1748,6 +1774,10 @@ async function submitBlog() {
     }
 
     const token = getToken('admin');
+    if (!token) {
+        showAlert('Session expired. Please login again.', 'error');
+        return;
+    }
 
     const formData = new FormData();
     formData.append('title', title);

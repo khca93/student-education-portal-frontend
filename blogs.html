@@ -143,7 +143,7 @@
 
         async function loadCategories() {
 
-            const res = await fetch(API_BASE + '/api/blogs');
+            const res = await fetch(API_BASE + '/api/blogs?page=1&limit=1000');
             const data = await res.json();
 
             if (!data.success) return;
@@ -152,9 +152,7 @@
             const categories = new Set();
 
             data.blogs.forEach(blog => {
-                if (blog.category) {
-                    categories.add(blog.category);
-                }
+                if (blog.category) categories.add(blog.category);
             });
 
             categories.forEach(cat => {

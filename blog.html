@@ -35,6 +35,10 @@
     <div class="like-section">
       <button onclick="likeBlog()">👍 Like</button>
       <span id="likeCount"></span>
+
+      <button onclick="shareWhatsApp()">📲 WhatsApp</button>
+      <button onclick="shareFacebook()">📘 Facebook</button>
+      <button onclick="copyLink()">🔗 Copy Link</button>
     </div>
     <!-- Blog Main Image -->
     <div id="blogImageContainer"></div>
@@ -127,11 +131,17 @@
           likeEl.innerText = (blog.likes || 0) + " Likes";
         }
         // YOUTUBE EMBED
-        let processedContent = blog.content.replace(
-          /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,
-          `<iframe src="https://www.youtube.com/embed/$1"
-        frameborder="0" allowfullscreen class="youtube-embed"></iframe>`
-        );
+        let processedContent = blog.content
+          .replace(
+            /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,
+            `<iframe src="https://www.youtube.com/embed/$1"
+            frameborder="0" allowfullscreen class="youtube-embed"></iframe>`
+          )
+          .replace(
+            /https:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/g,
+            `<iframe src="https://www.youtube.com/embed/$1"
+            frameborder="0" allowfullscreen class="youtube-embed"></iframe>`
+          );
 
         document.getElementById('blogContent').innerHTML = processedContent;
 
@@ -234,6 +244,53 @@
     }
 
     loadBlog();
+    async function submitComment() {
+
+      const name = document.getElementById('commentName').value.trim();
+      const message = document.getElementById('commentMessage').value.trim();
+
+      if (!name || !message) {
+        alert("Name and message required");
+        return;
+      }
+
+      try {
+
+        const res = await fetch(API_BASE + '/api/blogs/comment/' + currentBlogId, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, message })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          renderComments(data.comments);
+          document.getElementById('commentName').value = '';
+          document.getElementById('commentMessage').value = '';
+        }
+
+      } catch (err) {
+        alert("Failed to post comment");
+      }
+    }
+
+    function shareWhatsApp() {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://wa.me/?text=${url}`, '_blank');
+}
+
+function shareFacebook() {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href);
+  alert("Link copied!");
+}
 
   </script>
 
