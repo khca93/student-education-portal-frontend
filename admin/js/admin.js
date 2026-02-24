@@ -1643,14 +1643,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             menubar: 'file edit view insert format tools table help',
 
-            /* ✅ FIXED INSERT MENU */
-            menu: {
-                insert: {
-                    title: 'Insert',
-                    items: 'image media link table hr charmap emoticons'
-                }
-            },
-
             plugins: [
                 'advlist autolink lists link image media table code fullscreen preview',
                 'searchreplace visualblocks wordcount emoticons',
@@ -1658,14 +1650,16 @@ document.addEventListener('DOMContentLoaded', function () {
             ],
 
             toolbar: `
-                undo redo | blocks fontfamily fontsize |
+                undo redo |
+                blocks |
                 bold italic underline strikethrough |
-                forecolor backcolor |
                 alignleft aligncenter alignright alignjustify |
-                bullist numlist outdent indent |
-                link image media table |
-                emoticons charmap |
-                removeformat code preview fullscreen
+                bullist numlist |
+                link image table media |
+                forecolor backcolor |
+                emoticons |
+                code fullscreen preview
+                toolbar_mode: 'sliding',
             `,
 
             /* ================= IMAGE UPLOAD ================= */
@@ -1744,7 +1738,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             `
         });
-
     }
 
     /* ================= EDIT BLOG MODAL EDITOR ================= */
