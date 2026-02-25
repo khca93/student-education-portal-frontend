@@ -178,6 +178,9 @@ function initMainTinyMCE() {
             resize: 'both',
             elementpath: true,
             
+            // FIX Z-INDEX ISSUE - Make editor appear above everything
+            zIndex: 999999,
+            
             // FULL MS WORD LIKE PLUGINS
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
@@ -208,22 +211,7 @@ function initMainTinyMCE() {
             ],
             
             // FONT OPTIONS
-            font_family_formats: [
-                'Arial=arial,helvetica,sans-serif;',
-                'Arial Black=arial black,avant garde;',
-                'Book Antiqua=book antiqua,palatino;',
-                'Comic Sans MS=comic sans ms,sans-serif;',
-                'Courier New=courier new,courier;',
-                'Georgia=georgia,palatino;',
-                'Helvetica=helvetica;',
-                'Impact=impact,chicago;',
-                'Symbol=symbol;',
-                'Tahoma=tahoma,arial,helvetica,sans-serif;',
-                'Terminal=terminal,monaco;',
-                'Times New Roman=times new roman,times;',
-                'Trebuchet MS=trebuchet ms,geneva;',
-                'Verdana=verdana,geneva;'
-            ].join(''),
+            font_family_formats: 'Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva;',
             
             font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
             
@@ -303,34 +291,11 @@ function initMainTinyMCE() {
             // CONTENT CSS
             content_css: [
                 '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-                '//www.tiny.cloud/css/codepen.min.css',
                 '/css/blog.css'
             ],
             
-            // CONTENT STYLE (ADDITIONAL)
-            content_style: `
-                body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; }
-                img { max-width: 100%; height: auto; }
-                img.img-left { float: left; margin: 10px 20px 10px 0; max-width: 50%; }
-                img.img-right { float: right; margin: 10px 0 10px 20px; max-width: 50%; }
-                img.img-center { display: block; margin: 20px auto; }
-                img.img-square { float: left; margin: 10px; max-width: 40%; shape-outside: margin-box; }
-                img.img-border { border: 2px solid #333; border-radius: 4px; }
-                img.img-shadow { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-                table { border-collapse: collapse; width: 100%; margin: 20px 0; }
-                td, th { border: 1px solid #ddd; padding: 8px; }
-                th { background-color: #f2f2f2; }
-                .table-striped tr:nth-child(even) { background-color: #f9f9f9; }
-                .table-bordered td, .table-bordered th { border: 1px solid #000; }
-                .table-hover tr:hover { background-color: #f5f5f5; }
-            `,
-            
             // SETUP - TO TRACK CHANGES
             setup: function(editor) {
-                editor.on('Change', function(e) {
-                    console.log('Content changed');
-                });
-                
                 editor.on('init', function(e) {
                     console.log('TinyMCE initialized');
                 });
@@ -348,6 +313,7 @@ function initEditTinyMCE() {
             height: 600,
             menubar: true,
             branding: false,
+            zIndex: 999999, // FIX Z-INDEX
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -390,15 +356,7 @@ function initEditTinyMCE() {
                         reject({ message: error.message, remove: true });
                     });
                 });
-            },
-            content_style: `
-                body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; }
-                img { max-width: 100%; height: auto; }
-                img.img-left { float: left; margin: 10px 20px 10px 0; max-width: 50%; }
-                img.img-right { float: right; margin: 10px 0 10px 20px; max-width: 50%; }
-                img.img-center { display: block; margin: 20px auto; }
-                img.img-square { float: left; margin: 10px; max-width: 40%; }
-            `
+            }
         });
     }
 }

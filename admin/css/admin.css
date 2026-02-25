@@ -1396,3 +1396,176 @@ textarea.form-control {
 .table-hover tr:hover {
     background-color: #f5f5f5;
 }
+/* ===== FIX TINYMCE Z-INDEX ISSUES ===== */
+.tox {
+    z-index: 999999 !important;
+}
+
+.tox .tox-dialog {
+    z-index: 999999 !important;
+}
+
+.tox .tox-dialog-wrap__backdrop {
+    z-index: 999998 !important;
+    background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.tox .tox-tinymce {
+    z-index: 999999 !important;
+    position: relative !important;
+}
+
+/* Fix modal layering */
+.modal {
+    z-index: 99999 !important;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 100000 !important;
+}
+
+/* Fix image dialog */
+.tox .tox-dialog {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+}
+
+/* Ensure toolbars are clickable */
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary,
+.tox .tox-toolbar__overflow {
+    z-index: 999999 !important;
+}
+
+/* Fix table controls */
+.tox .tox-table-resize__handle {
+    z-index: 999999 !important;
+}
+
+/* Fix context menu */
+.tox .tox-menu {
+    z-index: 999999 !important;
+}
+
+/* Fix fullscreen mode */
+.tox.tox-tinymce--fullscreen {
+    z-index: 999999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ===== ENHANCED FORMATTING STYLES ===== */
+/* Make sure formatting toolbar works */
+.tox .tox-tbtn {
+    margin: 0 2px !important;
+    border-radius: 4px !important;
+    height: 34px !important;
+    width: 34px !important;
+}
+
+.tox .tox-tbtn:hover {
+    background-color: #e2e8f0 !important;
+}
+
+.tox .tox-tbtn--enabled {
+    background-color: #4f46e5 !important;
+    color: white !important;
+}
+
+.tox .tox-tbtn--enabled svg {
+    fill: white !important;
+}
+
+/* Font family dropdown */
+.tox .tox-toolbar .tox-tbtn--select {
+    min-width: 120px !important;
+}
+
+/* Color picker */
+.tox .tox-swatch {
+    margin: 2px !important;
+    border-radius: 4px !important;
+}
+
+/* Table styles in editor */
+.tox table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 10px 0 !important;
+}
+
+.tox td, .tox th {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+}
+
+.tox th {
+    background-color: #f2f2f2 !important;
+    font-weight: bold !important;
+}
+
+/* Image styles in editor */
+.tox img {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.tox img.img-left {
+    float: left !important;
+    margin: 10px 20px 10px 0 !important;
+    max-width: 50% !important;
+}
+
+.tox img.img-right {
+    float: right !important;
+    margin: 10px 0 10px 20px !important;
+    max-width: 50% !important;
+}
+
+.tox img.img-center {
+    display: block !important;
+    margin: 20px auto !important;
+}
+
+.tox img.img-square {
+    float: left !important;
+    margin: 10px !important;
+    max-width: 40% !important;
+    shape-outside: margin-box !important;
+}
+
+.tox img.img-border {
+    border: 2px solid #333 !important;
+    border-radius: 4px !important;
+}
+
+.tox img.img-shadow {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+}
+
+/* ===== MODAL SIZE FIX ===== */
+.modal-content[style*="max-width: 1000px"] {
+    max-width: 1000px !important;
+    width: 95% !important;
+    margin: 20px auto !important;
+}
+
+/* Ensure modal body scrolls */
+.modal-body {
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+}
+
+/* Fix for TinyMCE inside modal */
+.modal-body .tox-tinymce {
+    height: 600px !important;
+    min-height: 500px !important;
+}
