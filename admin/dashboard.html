@@ -47,6 +47,7 @@
                 <a href="javascript:void(0)" onclick="showSection('applications')">
                     <i class="fas fa-users"></i> Applications
                 </a>
+                
                 <a href="javascript:void(0)" onclick="showSection('blogs')">
                     <i class="fas fa-blog"></i> Blogs
                 </a>
@@ -136,7 +137,6 @@
                         </button>
                     </div>
                 </div>
-
             </div>
 
             <!-- JOBS SECTION -->
@@ -227,7 +227,6 @@
                                     <option value="12th CBSE">12th CBSE</option>
                                     <option value="Graduation">Graduation</option>
                                     <option value="Competitive">Competitive</option>
-
                                 </select>
                             </div>
 
@@ -340,55 +339,18 @@
                             <p>Loading applications...</p>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            <!-- BLOGS SECTION -->
+            <!-- BLOGS SECTION (UPDATED - Form removed, only list) -->
             <div id="blogs-section" class="section">
                 <div class="papers-section">
                     <div class="section-header">
                         <h2><i class="fas fa-blog"></i> Blog Management</h2>
                         <div class="section-actions">
-                            <button class="btn btn-primary" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                            <button class="btn btn-primary" onclick="showModal('addBlogModal')">
                                 <i class="fas fa-plus"></i> New Blog
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Blog Editor -->
-                    <div class="blog-editor-container"
-                        style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px;">
-                        <h3><i class="fas fa-pen"></i> Create New Blog</h3>
-
-                        <div style="margin-top:20px;">
-                            <input type="text" id="blogTitle" placeholder="Blog Title" class="form-control"
-                                style="margin-bottom:10px;" />
-
-                            <div style="display: flex; gap: 10px; margin-bottom:10px;">
-                                <input type="text" id="blogImageUrl" placeholder="Image URL (optional)"
-                                    class="form-control" />
-                                <span style="color: #666; padding: 0 10px;">OR</span>
-                                <input type="file" id="blogImageFile" accept="image/*" class="form-control" />
-                            </div>
-
-                            <textarea id="blogContent"></textarea>
-
-                            <div style="display: flex; gap: 10px; margin-top:10px;">
-                                <select id="blogCategory" class="form-control" style="flex: 1;">
-                                    <option value="">Select Category</option>
-                                    <option value="Jobs">Job Related</option>
-                                    <option value="Exam">Exam Related</option>
-                                    <option value="Career">Career Guidance</option>
-                                    <option value="Education">Education News</option>
-                                </select>
-
-                                <button class="btn btn-primary" onclick="submitBlog()" style="min-width: 150px;">
-                                    <i class="fas fa-paper-plane"></i> Publish Blog
-                                </button>
-                            </div>
-
-                            <div id="blogMessage" style="margin-top:10px;"></div>
                         </div>
                     </div>
 
@@ -404,7 +366,8 @@
         </div>
     </div>
 
-    <!-- MODALS -->
+    <!-- ========== ALL MODALS ========== -->
+    
     <!-- ADD PAPER MODAL -->
     <div id="addPaperModal" class="modal">
         <div class="modal-content">
@@ -433,8 +396,7 @@
 
                     <div class="form-group">
                         <label>Subject *</label>
-                        <input type="text" class="form-control" id="paperSubject" placeholder="e.g., Mathematics"
-                            required>
+                        <input type="text" class="form-control" id="paperSubject" placeholder="e.g., Mathematics" required>
                     </div>
 
                     <div class="form-group">
@@ -455,7 +417,6 @@
                         <label>PDF File *</label>
                         <div class="file-upload">
                             <input type="file" class="form-control" id="paperPdf" name="pdf" accept=".pdf" required>
-
                             <button type="button" class="btn btn-outline"
                                 onclick="document.getElementById('paperPdf').click()" style="width: 100%;">
                                 <i class="fas fa-upload"></i> Choose PDF File
@@ -465,8 +426,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn btn-outline"
-                            onclick="hideModal('addPaperModal')">Cancel</button>
+                        <button type="button" class="btn btn-outline" onclick="hideModal('addPaperModal')">Cancel</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Add Paper
                         </button>
@@ -513,6 +473,7 @@
                         <label>Year *</label>
                         <input type="text" class="form-control" id="editPaperYear" required>
                     </div>
+                    
                     <div class="form-group">
                         <label>File Name *</label>
                         <input type="text" class="form-control" id="editPaperFileName"
@@ -532,7 +493,6 @@
                         <label>PDF File (Leave empty to keep current)</label>
                         <div class="file-upload">
                             <input type="file" class="form-control" id="editPaperPdf" name="pdf" accept=".pdf">
-
                             <button type="button" class="btn btn-outline"
                                 onclick="document.getElementById('editPaperPdf').click()" style="width: 100%;">
                                 <i class="fas fa-upload"></i> Choose New PDF
@@ -542,8 +502,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn btn-outline"
-                            onclick="hideModal('editPaperModal')">Cancel</button>
+                        <button type="button" class="btn btn-outline" onclick="hideModal('editPaperModal')">Cancel</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Update Paper
                         </button>
@@ -564,8 +523,7 @@
                 <form id="addJobForm">
                     <div class="form-group">
                         <label>Job Title *</label>
-                        <input type="text" class="form-control" id="jobTitle" placeholder="e.g., Software Engineer"
-                            required>
+                        <input type="text" class="form-control" id="jobTitle" placeholder="e.g., Software Engineer" required>
                     </div>
 
                     <div class="form-group">
@@ -580,8 +538,7 @@
 
                     <div class="form-group">
                         <label>Qualification *</label>
-                        <input type="text" class="form-control" id="qualification" placeholder="e.g., B.Tech, BCA, etc."
-                            required>
+                        <input type="text" class="form-control" id="qualification" placeholder="e.g., B.Tech, BCA, etc." required>
                     </div>
 
                     <div class="form-group">
@@ -683,8 +640,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn btn-outline"
-                            onclick="hideModal('editJobModal')">Cancel</button>
+                        <button type="button" class="btn btn-outline" onclick="hideModal('editJobModal')">Cancel</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Update Job
                         </button>
@@ -694,9 +650,62 @@
         </div>
     </div>
 
+    <!-- ADD BLOG MODAL (NEW) -->
+    <div id="addBlogModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Create New Blog</h3>
+                <button class="close-modal" onclick="hideModal('addBlogModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="event.preventDefault(); submitBlog();">
+                    <div class="form-group">
+                        <label>Blog Title *</label>
+                        <input type="text" class="form-control" id="blogTitle" placeholder="Enter blog title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select class="form-control" id="blogCategory">
+                            <option value="">Select Category</option>
+                            <option value="Jobs">Job Related</option>
+                            <option value="Exam">Exam Related</option>
+                            <option value="Career">Career Guidance</option>
+                            <option value="Education">Education News</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Featured Image URL</label>
+                        <input type="url" class="form-control" id="blogImageUrl" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Or Upload Image</label>
+                        <input type="file" class="form-control" id="blogImageFile" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Blog Content *</label>
+                        <textarea id="blogContent"></textarea>
+                    </div>
+
+                    <div id="blogMessage" style="margin-bottom: 15px;"></div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="hideModal('addBlogModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Publish Blog
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- EDIT BLOG MODAL -->
     <div id="editBlogModal" class="modal">
-        <div class="modal-content modal-lg"> <!-- Added modal-lg class -->
+        <div class="modal-content modal-lg">
             <div class="modal-header">
                 <h3><i class="fas fa-edit"></i> Edit Blog</h3>
                 <button class="close-modal" onclick="hideModal('editBlogModal')">&times;</button>
@@ -711,11 +720,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Content *</label>
-                        <textarea id="editBlogContent" class="tinymce-editor"></textarea>
-                    </div>
-
-                    <div class="form-group">
                         <label>Category</label>
                         <input type="text" class="form-control" id="editBlogCategory"
                             placeholder="e.g., Jobs, Exam, Career">
@@ -727,9 +731,13 @@
                             placeholder="https://example.com/image.jpg">
                     </div>
 
+                    <div class="form-group">
+                        <label>Content *</label>
+                        <textarea id="editBlogContent" class="tinymce-editor"></textarea>
+                    </div>
+
                     <div class="form-actions">
-                        <button type="button" class="btn btn-outline"
-                            onclick="hideModal('editBlogModal')">Cancel</button>
+                        <button type="button" class="btn btn-outline" onclick="hideModal('editBlogModal')">Cancel</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Update Blog
                         </button>
@@ -739,9 +747,8 @@
         </div>
     </div>
 
+    <!-- SCRIPTS (Order is important) -->
     <script src="js/admin.js"></script>
-
-
+    <script src="js/admin-blogs.js"></script>
 </body>
-
 </html>
