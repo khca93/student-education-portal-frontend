@@ -177,3 +177,99 @@ h1 {
     margin: 10px;
     max-width: 40%;
 }
+/* Add at the end of blog.css */
+
+/* Enhanced Image Styles */
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.blog-content img.img-left {
+    float: left;
+    margin: 10px 20px 10px 0;
+    max-width: 50%;
+}
+
+.blog-content img.img-right {
+    float: right;
+    margin: 10px 0 10px 20px;
+    max-width: 50%;
+}
+
+.blog-content img.img-center {
+    display: block;
+    margin: 20px auto;
+}
+
+.blog-content img.img-square {
+    float: left;
+    margin: 10px;
+    max-width: 40%;
+    shape-outside: margin-box;
+}
+
+.blog-content img.img-border {
+    border: 2px solid #333;
+    border-radius: 4px;
+}
+
+.blog-content img.img-shadow {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Enhanced Table Styles */
+.blog-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+}
+
+.blog-content th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.blog-content td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.blog-content tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.blog-content tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Table Classes */
+.blog-content .table-striped tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.blog-content .table-bordered td,
+.blog-content .table-bordered th {
+    border: 1px solid #000;
+}
+
+.blog-content .table-hover tr:hover {
+    background-color: #e8f4fd;
+}
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+    .blog-content table {
+        font-size: 12px;
+    }
+    
+    .blog-content th,
+    .blog-content td {
+        padding: 6px;
+    }
+}

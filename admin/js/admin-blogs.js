@@ -166,6 +166,243 @@ async function openEditBlog(blogId) {
     }
 }
 
+// ========== ENHANCED TINYMCE INITIALIZATION ==========
+// Initialize TinyMCE for main blog editor - MS WORD LIKE
+function initMainTinyMCE() {
+    if (document.getElementById('blogContent') && !tinymce.get('blogContent')) {
+        tinymce.init({
+            selector: '#blogContent',
+            height: 700,
+            menubar: true,
+            branding: false,
+            resize: 'both',
+            elementpath: true,
+            
+            // FULL MS WORD LIKE PLUGINS
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                'directionality', 'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc',
+                'imagetools', 'editimage', 'quickbars', 'codesample'
+            ],
+            
+            // FULL TOOLBAR - LIKE MS WORD
+            toolbar: [
+                'undo redo | styles | bold italic underline strikethrough | forecolor backcolor | fontfamily fontsize',
+                'alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | blockquote',
+                'link image media table | hr pagebreak | charmap emoticons | code fullscreen preview | help'
+            ].join(' | '),
+            
+            // STYLES (HEADINGS, PARAGRAPHS)
+            style_formats: [
+                { title: 'Paragraph', format: 'p' },
+                { title: 'Heading 1', format: 'h1' },
+                { title: 'Heading 2', format: 'h2' },
+                { title: 'Heading 3', format: 'h3' },
+                { title: 'Heading 4', format: 'h4' },
+                { title: 'Heading 5', format: 'h5' },
+                { title: 'Heading 6', format: 'h6' },
+                { title: 'Preformatted', format: 'pre' },
+                { title: 'Code', format: 'code' }
+            ],
+            
+            // FONT OPTIONS
+            font_family_formats: [
+                'Arial=arial,helvetica,sans-serif;',
+                'Arial Black=arial black,avant garde;',
+                'Book Antiqua=book antiqua,palatino;',
+                'Comic Sans MS=comic sans ms,sans-serif;',
+                'Courier New=courier new,courier;',
+                'Georgia=georgia,palatino;',
+                'Helvetica=helvetica;',
+                'Impact=impact,chicago;',
+                'Symbol=symbol;',
+                'Tahoma=tahoma,arial,helvetica,sans-serif;',
+                'Terminal=terminal,monaco;',
+                'Times New Roman=times new roman,times;',
+                'Trebuchet MS=trebuchet ms,geneva;',
+                'Verdana=verdana,geneva;'
+            ].join(''),
+            
+            font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
+            
+            // ADVANCED IMAGE SETTINGS
+            image_advtab: true,
+            image_caption: true,
+            image_title: true,
+            automatic_uploads: true,
+            images_upload_url: API_BASE + '/api/blogs/upload-image',
+            images_upload_handler: function(blobInfo, progress) {
+                return new Promise((resolve, reject) => {
+                    const token = getToken('admin');
+                    if (!token) {
+                        reject({ message: 'Not authenticated', remove: true });
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('image', blobInfo.blob(), blobInfo.filename());
+
+                    fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.url) {
+                            resolve(data.url);
+                        } else {
+                            reject({ message: data.message || 'Upload failed', remove: true });
+                        }
+                    })
+                    .catch(error => {
+                        reject({ message: error.message, remove: true });
+                    });
+                });
+            },
+            
+            // IMAGE OPTIONS
+            image_class_list: [
+                { title: 'None', value: '' },
+                { title: 'Left (Text Wrap)', value: 'img-left' },
+                { title: 'Right (Text Wrap)', value: 'img-right' },
+                { title: 'Center (Block)', value: 'img-center' },
+                { title: 'Square Wrap', value: 'img-square' },
+                { title: 'Border', value: 'img-border' },
+                { title: 'Shadow', value: 'img-shadow' }
+            ],
+            
+            // TABLE SETTINGS
+            table_default_attributes: { border: '1' },
+            table_default_styles: { width: '100%', borderCollapse: 'collapse' },
+            table_class_list: [
+                { title: 'None', value: '' },
+                { title: 'Striped Rows', value: 'table-striped' },
+                { title: 'Bordered', value: 'table-bordered' },
+                { title: 'Hover Rows', value: 'table-hover' }
+            ],
+            table_advtab: true,
+            table_cell_advtab: true,
+            table_row_advtab: true,
+            table_resize_bars: true,
+            table_tab_navigation: true,
+            table_column_resizing: true,
+            
+            // QUICK BARS (FLOATING TOOLBARS)
+            quickbars_selection_toolbar: 'bold italic underline | forecolor backcolor | formatselect | blockquote quicklink',
+            quickbars_insert_toolbar: 'quickimage quicktable | hr pagebreak',
+            quickbars_image_toolbar: 'alignleft aligncenter alignright | rotateleft rotateright | imageoptions',
+            
+            // CONTEXT MENU (RIGHT CLICK)
+            contextmenu: 'link image imagetools table configurepermanentpen spellchecker',
+            
+            // CONTENT CSS
+            content_css: [
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tiny.cloud/css/codepen.min.css',
+                '/css/blog.css'
+            ],
+            
+            // CONTENT STYLE (ADDITIONAL)
+            content_style: `
+                body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; }
+                img { max-width: 100%; height: auto; }
+                img.img-left { float: left; margin: 10px 20px 10px 0; max-width: 50%; }
+                img.img-right { float: right; margin: 10px 0 10px 20px; max-width: 50%; }
+                img.img-center { display: block; margin: 20px auto; }
+                img.img-square { float: left; margin: 10px; max-width: 40%; shape-outside: margin-box; }
+                img.img-border { border: 2px solid #333; border-radius: 4px; }
+                img.img-shadow { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+                table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+                td, th { border: 1px solid #ddd; padding: 8px; }
+                th { background-color: #f2f2f2; }
+                .table-striped tr:nth-child(even) { background-color: #f9f9f9; }
+                .table-bordered td, .table-bordered th { border: 1px solid #000; }
+                .table-hover tr:hover { background-color: #f5f5f5; }
+            `,
+            
+            // SETUP - TO TRACK CHANGES
+            setup: function(editor) {
+                editor.on('Change', function(e) {
+                    console.log('Content changed');
+                });
+                
+                editor.on('init', function(e) {
+                    console.log('TinyMCE initialized');
+                });
+            }
+        });
+        console.log('✅ Enhanced TinyMCE Fully Initialized');
+    }
+}
+
+// Initialize TinyMCE for edit blog editor
+function initEditTinyMCE() {
+    if (document.getElementById('editBlogContent') && !tinymce.get('editBlogContent')) {
+        tinymce.init({
+            selector: '#editBlogContent',
+            height: 600,
+            menubar: true,
+            branding: false,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                'directionality', 'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc',
+                'imagetools', 'editimage', 'quickbars', 'codesample'
+            ],
+            toolbar: 'undo redo | styles | bold italic underline | forecolor backcolor | alignleft aligncenter alignright | bullist numlist | link image table | code fullscreen',
+            image_advtab: true,
+            image_caption: true,
+            automatic_uploads: true,
+            images_upload_url: API_BASE + '/api/blogs/upload-image',
+            images_upload_handler: function(blobInfo, progress) {
+                return new Promise((resolve, reject) => {
+                    const token = getToken('admin');
+                    if (!token) {
+                        reject({ message: 'Not authenticated', remove: true });
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('image', blobInfo.blob(), blobInfo.filename());
+
+                    fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.url) {
+                            resolve(data.url);
+                        } else {
+                            reject({ message: data.message || 'Upload failed', remove: true });
+                        }
+                    })
+                    .catch(error => {
+                        reject({ message: error.message, remove: true });
+                    });
+                });
+            },
+            content_style: `
+                body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; }
+                img { max-width: 100%; height: auto; }
+                img.img-left { float: left; margin: 10px 20px 10px 0; max-width: 50%; }
+                img.img-right { float: right; margin: 10px 0 10px 20px; max-width: 50%; }
+                img.img-center { display: block; margin: 20px auto; }
+                img.img-square { float: left; margin: 10px; max-width: 40%; }
+            `
+        });
+    }
+}
+
 // Submit new blog
 async function submitBlog() {
     const title = document.getElementById('blogTitle').value.trim();
@@ -277,133 +514,6 @@ async function submitEditBlog(e) {
 
     } catch (err) {
         showAlert('Server error: ' + err.message, 'error');
-    }
-}
-
-// Initialize TinyMCE for main blog editor
-function initMainTinyMCE() {
-    if (document.getElementById('blogContent') && !tinymce.get('blogContent')) {
-        tinymce.init({
-            selector: '#blogContent',
-            height: 600,
-            branding: false,
-            plugins: 'advlist autolink lists link image table code fullscreen',
-            toolbar: `
-                undo redo |
-                bold italic underline |
-                alignleft aligncenter alignright |
-                bullist numlist |
-                image table |
-                code fullscreen
-            `,
-            automatic_uploads: true,
-            image_advtab: true,
-            image_caption: true,
-            image_title: true,
-            object_resizing: true,
-            images_upload_handler: function (blobInfo) {
-                return new Promise((resolve, reject) => {
-                    const token = getToken('admin');
-                    if (!token) {
-                        reject('Not authenticated');
-                        return;
-                    }
-
-                    const formData = new FormData();
-                    formData.append('image', blobInfo.blob(), blobInfo.filename());
-
-                    fetch(API_BASE + '/api/blogs/upload-image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: formData
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success && data.url) {
-                                resolve(data.url);
-                            } else {
-                                reject(data.message || 'Upload failed');
-                            }
-                        })
-                        .catch(err => reject(err.message));
-                });
-            },
-            image_class_list: [
-                { title: 'Default (Block)', value: '' },
-                { title: 'Left Wrap', value: 'img-left' },
-                { title: 'Right Wrap', value: 'img-right' },
-                { title: 'Square Wrap', value: 'img-square' }
-            ],
-            content_style: `
-                body { font-family: Arial; font-size:16px; line-height:1.6 }
-                img.img-left {
-                    float: left;
-                    margin: 10px 20px 10px 0;
-                    max-width: 50%;
-                }
-                img.img-right {
-                    float: right;
-                    margin: 10px 0 10px 20px;
-                    max-width: 50%;
-                }
-                img.img-square {
-                    float: left;
-                    margin: 10px;
-                    max-width: 40%;
-                    shape-outside: margin-box;
-                }
-                img {
-                    max-width: 100%;
-                    height: auto;
-                    cursor: move;
-                }
-            `
-        });
-        console.log('✅ TinyMCE Fully Initialized');
-    }
-}
-
-// Initialize TinyMCE for edit blog editor
-function initEditTinyMCE() {
-    if (document.getElementById('editBlogContent') && !tinymce.get('editBlogContent')) {
-        tinymce.init({
-            selector: '#editBlogContent',
-            height: 500,
-            plugins: 'table image link',
-            toolbar: 'undo redo | bold italic | bullist numlist | table | image',
-            branding: false,
-            images_upload_handler: function (blobInfo) {
-                return new Promise((resolve, reject) => {
-                    const token = getToken('admin');
-                    if (!token) {
-                        reject('Not authenticated');
-                        return;
-                    }
-
-                    const formData = new FormData();
-                    formData.append('image', blobInfo.blob(), blobInfo.filename());
-
-                    fetch(API_BASE + '/api/blogs/upload-image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: formData
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success && data.url) {
-                                resolve(data.url);
-                            } else {
-                                reject(data.message || 'Upload failed');
-                            }
-                        })
-                        .catch(err => reject(err.message));
-                });
-            }
-        });
     }
 }
 
