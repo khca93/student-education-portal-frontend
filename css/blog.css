@@ -154,3 +154,26 @@ h1 {
     background: #1d4ed8;
     transform: translateY(-2px);
 }
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    float: left;
+    margin: 10px 20px 10px 0;
+}
+.blog-content img.img-left {
+    float: left;
+    margin: 10px 20px 10px 0;
+    max-width: 50%;
+}
+
+.blog-content img.img-right {
+    float: right;
+    margin: 10px 0 10px 20px;
+    max-width: 50%;
+}
+
+.blog-content img.img-square {
+    float: left;
+    margin: 10px;
+    max-width: 40%;
+}

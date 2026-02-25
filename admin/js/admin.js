@@ -200,13 +200,19 @@ async function loadblogs() {
                     <td>${blog.category || '-'}</td>
                     <td>${date}</td>
                     <td>
-                        <a href="../blog.html?slug=${blog.slug}" target="_blank" class="btn btn-view">
+                        <a href="/blog.html?slug=${blog.slug}" 
+                        target="_blank" 
+                        class="btn btn-view">
                             <i class="fas fa-eye"></i> View
                         </a>
-                        <button class="btn btn-edit" onclick="openEditBlog('${blog._id}')">
+
+                        <button class="btn btn-edit" 
+                                onclick="openEditBlog('${blog._id}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn btn-delete" onclick="deleteBlog('${blog._id}', '${blog.title}')">
+
+                        <button class="btn btn-delete" 
+                                onclick="deleteBlog('${blog._id}', '${blog.title.replace(/'/g, "\\'")}')">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </td>
@@ -1458,13 +1464,32 @@ async function loadApplications() {
 
 // Main Blog Editor Initialization
 function initMainTinyMCE() {
-    if (document.getElementById('blogContent')) {
+    if (document.getElementById('blogContent') && !tinymce.get('blogContent')) {
+
         tinymce.init({
             selector: '#blogContent',
-            height: 500,
-            plugins: 'table image link',
-            toolbar: 'undo redo | bold italic | bullist numlist | table | image',
+            height: 600,
             branding: false,
+
+            plugins: 'advlist autolink lists link image table code fullscreen',
+
+            toolbar: `
+                undo redo |
+                bold italic underline |
+                alignleft aligncenter alignright |
+                bullist numlist |
+                image table |
+                code fullscreen
+            `,
+
+            automatic_uploads: true,
+            image_advtab: true,
+            image_caption: true,
+            image_title: true,
+
+            // 🔥 Drag & Resize enable
+            object_resizing: true,
+
             images_upload_handler: function (blobInfo) {
                 return new Promise((resolve, reject) => {
 
@@ -1496,10 +1521,47 @@ function initMainTinyMCE() {
 
                 });
             },
-        });
-        console.log('✅ TinyMCE initialized');
-    }
 
+            // 🔥 Wrap Options
+            image_class_list: [
+                { title: 'Default (Block)', value: '' },
+                { title: 'Left Wrap', value: 'img-left' },
+                { title: 'Right Wrap', value: 'img-right' },
+                { title: 'Square Wrap', value: 'img-square' }
+            ],
+
+            content_style: `
+                body { font-family: Arial; font-size:16px; line-height:1.6 }
+
+                img.img-left {
+                    float: left;
+                    margin: 10px 20px 10px 0;
+                    max-width: 50%;
+                }
+
+                img.img-right {
+                    float: right;
+                    margin: 10px 0 10px 20px;
+                    max-width: 50%;
+                }
+
+                img.img-square {
+                    float: left;
+                    margin: 10px;
+                    max-width: 40%;
+                    shape-outside: margin-box;
+                }
+
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    cursor: move;
+                }
+            `
+        });
+
+        console.log('✅ TinyMCE Fully Initialized');
+    }
 }
 
 // Edit Blog Editor Initialization

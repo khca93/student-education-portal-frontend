@@ -22,7 +22,9 @@
   <meta name="twitter:image" id="twitterImage">
 
   <!-- External CSS -->
-  <link rel="stylesheet" href="blog.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/blog.css">
 
 </head>
 
@@ -278,19 +280,19 @@
     }
 
     function shareWhatsApp() {
-  const url = encodeURIComponent(window.location.href);
-  window.open(`https://wa.me/?text=${url}`, '_blank');
-}
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://wa.me/?text=${url}`, '_blank');
+    }
 
-function shareFacebook() {
-  const url = encodeURIComponent(window.location.href);
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-}
+    function shareFacebook() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    }
 
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href);
-  alert("Link copied!");
-}
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Link copied!");
+    }
 
   </script>
 
