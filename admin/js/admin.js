@@ -1465,16 +1465,41 @@ function initMainTinyMCE() {
             plugins: 'table image link',
             toolbar: 'undo redo | bold italic | bullist numlist | table | image',
             branding: false,
-            images_upload_handler: function(blobInfo, success) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    success(e.target.result);
-                };
-                reader.readAsDataURL(blobInfo.blob());
-            }
+            images_upload_handler: function (blobInfo) {
+                return new Promise((resolve, reject) => {
+
+                    const token = getToken('admin');
+                    if (!token) {
+                        reject('Not authenticated');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('image', blobInfo.blob(), blobInfo.filename());
+
+                    fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && data.url) {
+                                resolve(data.url);
+                            } else {
+                                reject(data.message || 'Upload failed');
+                            }
+                        })
+                        .catch(err => reject(err.message));
+
+                });
+            },
         });
         console.log('✅ TinyMCE initialized');
     }
+
 }
 
 // Edit Blog Editor Initialization
@@ -1486,13 +1511,37 @@ function initEditTinyMCE() {
             plugins: 'table image link',
             toolbar: 'undo redo | bold italic | bullist numlist | table | image',
             branding: false,
-            images_upload_handler: function(blobInfo, success) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    success(e.target.result);
-                };
-                reader.readAsDataURL(blobInfo.blob());
-            }
+            images_upload_handler: function (blobInfo) {
+                return new Promise((resolve, reject) => {
+
+                    const token = getToken('admin');
+                    if (!token) {
+                        reject('Not authenticated');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('image', blobInfo.blob(), blobInfo.filename());
+
+                    fetch(API_BASE + '/api/blogs/upload-image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && data.url) {
+                                resolve(data.url);
+                            } else {
+                                reject(data.message || 'Upload failed');
+                            }
+                        })
+                        .catch(err => reject(err.message));
+
+                });
+            },
         });
     }
 }
@@ -1501,38 +1550,38 @@ function initEditTinyMCE() {
 async function openEditBlog(blogId) {
     try {
         const token = getToken('admin');
-        
+
         const res = await fetch(API_BASE + '/api/blogs/id/' + blogId, {
             headers: {
                 'Authorization': 'Bearer ' + token
             }
         });
-        
+
         const data = await res.json();
-        
+
         if (!data.success) {
             showAlert('Failed to load blog', 'error');
             return;
         }
-        
+
         const blog = data.blog;
-        
+
         document.getElementById('editBlogId').value = blog._id;
         document.getElementById('editBlogTitle').value = blog.title;
         document.getElementById('editBlogCategory').value = blog.category || '';
         document.getElementById('editBlogImage').value = blog.image || '';
-        
-        initEditTinyMCE();
-        
+
+
+
         setTimeout(() => {
             const editor = tinymce.get('editBlogContent');
             if (editor) {
                 editor.setContent(blog.content);
             }
         }, 500);
-        
+
         showModal('editBlogModal');
-        
+
     } catch (err) {
         showAlert('Server error: ' + err.message, 'error');
     }
@@ -1585,7 +1634,7 @@ async function submitBlog() {
 
         if (data.success) {
             messageDiv.innerHTML = '<span style="color: green;">✅ Blog Published Successfully</span>';
-            
+
             document.getElementById('blogTitle').value = '';
             document.getElementById('blogCategory').value = '';
             document.getElementById('blogImageUrl').value = '';
@@ -1593,9 +1642,9 @@ async function submitBlog() {
             if (editor) {
                 editor.setContent('');
             }
-            
+
             loadblogs();
-            
+
             setTimeout(() => {
                 messageDiv.innerHTML = '';
             }, 3000);
