@@ -168,6 +168,7 @@ async function openEditBlog(blogId) {
 
 // ========== ENHANCED TINYMCE INITIALIZATION ==========
 // Initialize TinyMCE for main blog editor - MS WORD LIKE
+// Initialize TinyMCE for main blog editor - FIXED VERSION
 function initMainTinyMCE() {
     if (document.getElementById('blogContent') && !tinymce.get('blogContent')) {
         tinymce.init({
@@ -178,23 +179,22 @@ function initMainTinyMCE() {
             resize: 'both',
             elementpath: true,
             
-            // FIX Z-INDEX ISSUE - Make editor appear above everything
+            // FIX Z-INDEX ISSUE
             zIndex: 999999,
             
-            // FULL MS WORD LIKE PLUGINS
+            // ✅ FIXED PLUGINS LIST (removed missing plugins)
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
                 'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
-                'directionality', 'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc',
-                'imagetools', 'editimage', 'quickbars', 'codesample'
+                'directionality', 'pagebreak', 'nonbreaking', 'codesample'
             ],
             
-            // FULL TOOLBAR - LIKE MS WORD
+            // ✅ FIXED TOOLBAR (removed missing plugin buttons)
             toolbar: [
                 'undo redo | styles | bold italic underline strikethrough | forecolor backcolor | fontfamily fontsize',
-                'alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | blockquote',
-                'link image media table | hr pagebreak | charmap emoticons | code fullscreen preview | help'
+                'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | blockquote',
+                'link image media table | pagebreak | charmap emoticons | code fullscreen preview | help'
             ].join(' | '),
             
             // STYLES (HEADINGS, PARAGRAPHS)
@@ -215,7 +215,7 @@ function initMainTinyMCE() {
             
             font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
             
-            // ADVANCED IMAGE SETTINGS
+            // IMAGE SETTINGS
             image_advtab: true,
             image_caption: true,
             image_title: true,
@@ -253,7 +253,7 @@ function initMainTinyMCE() {
                 });
             },
             
-            // IMAGE OPTIONS
+            // IMAGE CLASSES
             image_class_list: [
                 { title: 'None', value: '' },
                 { title: 'Left (Text Wrap)', value: 'img-left' },
@@ -277,16 +277,16 @@ function initMainTinyMCE() {
             table_cell_advtab: true,
             table_row_advtab: true,
             table_resize_bars: true,
-            table_tab_navigation: true,
-            table_column_resizing: true,
             
-            // QUICK BARS (FLOATING TOOLBARS)
+            // REMOVED: table_column_resizing (causing warning)
+            
+            // QUICK BARS
             quickbars_selection_toolbar: 'bold italic underline | forecolor backcolor | formatselect | blockquote quicklink',
-            quickbars_insert_toolbar: 'quickimage quicktable | hr pagebreak',
-            quickbars_image_toolbar: 'alignleft aligncenter alignright | rotateleft rotateright | imageoptions',
+            quickbars_insert_toolbar: 'quickimage quicktable | pagebreak',
+            quickbars_image_toolbar: 'alignleft aligncenter alignright | imageoptions',
             
-            // CONTEXT MENU (RIGHT CLICK)
-            contextmenu: 'link image imagetools table configurepermanentpen spellchecker',
+            // CONTEXT MENU
+            contextmenu: 'link image table',
             
             // CONTENT CSS
             content_css: [
@@ -294,7 +294,7 @@ function initMainTinyMCE() {
                 '/css/blog.css'
             ],
             
-            // SETUP - TO TRACK CHANGES
+            // SETUP
             setup: function(editor) {
                 editor.on('init', function(e) {
                     console.log('TinyMCE initialized');
@@ -304,7 +304,6 @@ function initMainTinyMCE() {
         console.log('✅ Enhanced TinyMCE Fully Initialized');
     }
 }
-
 // Initialize TinyMCE for edit blog editor
 function initEditTinyMCE() {
     if (document.getElementById('editBlogContent') && !tinymce.get('editBlogContent')) {
