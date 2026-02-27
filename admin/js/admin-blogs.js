@@ -5,16 +5,7 @@
 console.log('✅ Admin Blogs module started loading');
 
 // Check if API_BASE is available
-if (typeof API_BASE === 'undefined') {
-    console.warn('API_BASE not found, using default');
-    var API_BASE = window.location.hostname === 'localhost'
-        ? 'http://localhost:5000'
-        : 'https://student-education-portal-backend.onrender.com';
-}
-
-// Ensure all required functions exist
-
-
+const API_BASE = window.API_BASE;
 async function loadBlogs() {
     try {
         const token = getToken('admin');
