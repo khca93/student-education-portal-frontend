@@ -1,7 +1,7 @@
 // ===== GLOBAL VARIABLES =====
 // Make API_BASE globally available
-window.API_BASE = window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
+window.API_BASE = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000' 
     : 'https://student-education-portal-backend.onrender.com';
 
 console.log('API_BASE set to:', window.API_BASE);
@@ -224,7 +224,7 @@ async function loadDashboardStats() {
 
         // ✅ FIX: Get as text first
         const responseText = await response.text();
-
+        
         // ✅ FIX: Clean the response (remove any HTML/JS)
         let cleanText = responseText;
         if (responseText.includes('<') || responseText.includes('import')) {
@@ -249,11 +249,11 @@ async function loadDashboardStats() {
         animateCounter(document.getElementById('totalPapers'), data.stats.totalPapers || 0);
         animateCounter(document.getElementById('totalJobs'), data.stats.totalJobs || 0);
         animateCounter(document.getElementById('totalApplications'), data.stats.totalApplications || 0);
-        animateCounter(document.getElementById('totalStudents'), data.stats.totalApplications || 0);
+        animateCounter(document.getElementById('totalStudents'), data.stats.totalStudents || 0);
 
     } catch (error) {
         console.error('Dashboard Stats Error:', error);
-
+        
         // Show demo data
         document.getElementById('totalPapers').textContent = '0';
         document.getElementById('totalJobs').textContent = '0';
@@ -1496,15 +1496,15 @@ async function testAPIConnection() {
         const response = await fetch(API_BASE + '/api/health');
         const text = await response.text();
         console.log('API Health Response:', text);
-
+        
         // Try to parse
         try {
             const data = JSON.parse(text);
             console.log('API is working!', data);
-        } catch (e) {
+        } catch(e) {
             console.error('API returned non-JSON response:', text.substring(0, 200));
         }
-    } catch (err) {
+    } catch(err) {
         console.error('API connection failed:', err);
     }
 }

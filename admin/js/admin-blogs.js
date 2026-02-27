@@ -13,14 +13,6 @@ if (typeof API_BASE === 'undefined') {
 }
 
 // Ensure all required functions exist
-window.loadBlogs = async function () {
-    console.log('loadBlogs called');
-    try {
-        // ... rest of your loadBlogs code
-    } catch (err) {
-        console.error('loadBlogs error:', err);
-    }
-};
 
 
 async function loadBlogs() {
