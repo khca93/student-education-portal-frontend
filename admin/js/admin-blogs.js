@@ -1,6 +1,28 @@
 // ===== ADMIN BLOGS FUNCTIONS =====
 
 // Load all blogs
+
+console.log('✅ Admin Blogs module started loading');
+
+// Check if API_BASE is available
+if (typeof API_BASE === 'undefined') {
+    console.warn('API_BASE not found, using default');
+    var API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000'
+        : 'https://student-education-portal-backend.onrender.com';
+}
+
+// Ensure all required functions exist
+window.loadBlogs = async function () {
+    console.log('loadBlogs called');
+    try {
+        // ... rest of your loadBlogs code
+    } catch (err) {
+        console.error('loadBlogs error:', err);
+    }
+};
+
+
 async function loadBlogs() {
     try {
         const token = getToken('admin');
@@ -178,10 +200,10 @@ function initMainTinyMCE() {
             branding: false,
             resize: 'both',
             elementpath: true,
-            
+
             // FIX Z-INDEX ISSUE
             zIndex: 999999,
-            
+
             // ✅ FIXED PLUGINS LIST (removed missing plugins)
             plugins: [
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
@@ -189,14 +211,14 @@ function initMainTinyMCE() {
                 'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
                 'directionality', 'pagebreak', 'nonbreaking', 'codesample'
             ],
-            
+
             // ✅ FIXED TOOLBAR (removed missing plugin buttons)
             toolbar: [
                 'undo redo | styles | bold italic underline strikethrough | forecolor backcolor | fontfamily fontsize',
                 'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | blockquote',
                 'link image media table | pagebreak | charmap emoticons | code fullscreen preview | help'
             ].join(' | '),
-            
+
             // STYLES (HEADINGS, PARAGRAPHS)
             style_formats: [
                 { title: 'Paragraph', format: 'p' },
@@ -209,19 +231,19 @@ function initMainTinyMCE() {
                 { title: 'Preformatted', format: 'pre' },
                 { title: 'Code', format: 'code' }
             ],
-            
+
             // FONT OPTIONS
             font_family_formats: 'Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva;',
-            
+
             font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 48pt 72pt',
-            
+
             // IMAGE SETTINGS
             image_advtab: true,
             image_caption: true,
             image_title: true,
             automatic_uploads: true,
             images_upload_url: API_BASE + '/api/blogs/upload-image',
-            images_upload_handler: function(blobInfo, progress) {
+            images_upload_handler: function (blobInfo, progress) {
                 return new Promise((resolve, reject) => {
                     const token = getToken('admin');
                     if (!token) {
@@ -239,20 +261,20 @@ function initMainTinyMCE() {
                         },
                         body: formData
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.url) {
-                            resolve(data.url);
-                        } else {
-                            reject({ message: data.message || 'Upload failed', remove: true });
-                        }
-                    })
-                    .catch(error => {
-                        reject({ message: error.message, remove: true });
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.url) {
+                                resolve(data.url);
+                            } else {
+                                reject({ message: data.message || 'Upload failed', remove: true });
+                            }
+                        })
+                        .catch(error => {
+                            reject({ message: error.message, remove: true });
+                        });
                 });
             },
-            
+
             // IMAGE CLASSES
             image_class_list: [
                 { title: 'None', value: '' },
@@ -263,7 +285,7 @@ function initMainTinyMCE() {
                 { title: 'Border', value: 'img-border' },
                 { title: 'Shadow', value: 'img-shadow' }
             ],
-            
+
             // TABLE SETTINGS
             table_default_attributes: { border: '1' },
             table_default_styles: { width: '100%', borderCollapse: 'collapse' },
@@ -277,26 +299,26 @@ function initMainTinyMCE() {
             table_cell_advtab: true,
             table_row_advtab: true,
             table_resize_bars: true,
-            
+
             // REMOVED: table_column_resizing (causing warning)
-            
+
             // QUICK BARS
             quickbars_selection_toolbar: 'bold italic underline | forecolor backcolor | formatselect | blockquote quicklink',
             quickbars_insert_toolbar: 'quickimage quicktable | pagebreak',
             quickbars_image_toolbar: 'alignleft aligncenter alignright | imageoptions',
-            
+
             // CONTEXT MENU
             contextmenu: 'link image table',
-            
+
             // CONTENT CSS
             content_css: [
                 '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
                 '/css/blog.css'
             ],
-            
+
             // SETUP
-            setup: function(editor) {
-                editor.on('init', function(e) {
+            setup: function (editor) {
+                editor.on('init', function (e) {
                     console.log('TinyMCE initialized');
                 });
             }
@@ -325,7 +347,7 @@ function initEditTinyMCE() {
             image_caption: true,
             automatic_uploads: true,
             images_upload_url: API_BASE + '/api/blogs/upload-image',
-            images_upload_handler: function(blobInfo, progress) {
+            images_upload_handler: function (blobInfo, progress) {
                 return new Promise((resolve, reject) => {
                     const token = getToken('admin');
                     if (!token) {
@@ -343,17 +365,17 @@ function initEditTinyMCE() {
                         },
                         body: formData
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.url) {
-                            resolve(data.url);
-                        } else {
-                            reject({ message: data.message || 'Upload failed', remove: true });
-                        }
-                    })
-                    .catch(error => {
-                        reject({ message: error.message, remove: true });
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.url) {
+                                resolve(data.url);
+                            } else {
+                                reject({ message: data.message || 'Upload failed', remove: true });
+                            }
+                        })
+                        .catch(error => {
+                            reject({ message: error.message, remove: true });
+                        });
                 });
             }
         });

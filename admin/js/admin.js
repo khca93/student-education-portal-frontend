@@ -1,14 +1,17 @@
 // ===== GLOBAL VARIABLES =====
+// Make API_BASE globally available
+window.API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000'
+    : 'https://student-education-portal-backend.onrender.com';
+
+console.log('API_BASE set to:', window.API_BASE);
+
 let currentPapers = [];
 let currentJobs = [];
 let currentApplications = [];
 let currentSection = 'dashboard';
 
-const API_BASE =
-    location.hostname === 'localhost'
-        ? 'http://localhost:5000'
-        : 'https://student-education-portal-backend.onrender.com';
-
+const API_BASE = window.API_BASE; // For backward compatibility
 // ===== UTILITY FUNCTIONS =====
 
 function formatFileSize(bytes) {
@@ -204,64 +207,58 @@ async function loadDashboardStats() {
             return;
         }
 
-        // DEBUG: Show loading
-        console.log('Loading dashboard stats...');
+        // ✅ FIX: Clear any previous HTML pollution
+        const statsElements = ['totalPapers', 'totalJobs', 'totalApplications', 'totalStudents'];
+        statsElements.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '...';
+        });
 
-        const response = await fetch(API_BASE + '/api/admin/auth/dashboard', {
+        // ✅ FIX: Add timestamp to prevent caching
+        const response = await fetch(API_BASE + '/api/admin/auth/dashboard?t=' + Date.now(), {
             headers: {
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'application/json'  // Force JSON response
             }
         });
 
-        // DEBUG: Check response
-        console.log('Response status:', response.status);
-        
-        // IMPORTANT: Get response as text first to see what's coming
+        // ✅ FIX: Get as text first
         const responseText = await response.text();
-        console.log('Raw response:', responseText.substring(0, 200)); // First 200 chars
 
-        // Try to parse JSON
-        let data;
-        try {
-            data = JSON.parse(responseText);
-        } catch (e) {
-            console.error('JSON Parse Error:', e);
-            console.log('Full response:', responseText);
-            
-            // Fallback to demo data if API fails
-            document.getElementById('totalPapers').textContent = '0';
-            document.getElementById('totalJobs').textContent = '0';
-            document.getElementById('totalApplications').textContent = '0';
-            document.getElementById('totalStudents').textContent = '0';
-            return;
+        // ✅ FIX: Clean the response (remove any HTML/JS)
+        let cleanText = responseText;
+        if (responseText.includes('<') || responseText.includes('import')) {
+            console.warn('API returned non-JSON, cleaning...');
+            // Try to extract JSON if possible
+            const jsonMatch = responseText.match(/\{.*\}/s);
+            if (jsonMatch) {
+                cleanText = jsonMatch[0];
+            } else {
+                throw new Error('Invalid response format');
+            }
         }
+
+        // Parse JSON
+        const data = JSON.parse(cleanText);
 
         if (!data.success || !data.stats) {
             throw new Error('Invalid stats response');
         }
 
-        const {
-            totalPapers = 0,
-            totalJobs = 0,
-            totalApplications = 0
-        } = data.stats;
-
-        const totalStudents = totalApplications;
-
-        animateCounter(document.getElementById('totalPapers'), totalPapers);
-        animateCounter(document.getElementById('totalJobs'), totalJobs);
-        animateCounter(document.getElementById('totalApplications'), totalApplications);
-        animateCounter(document.getElementById('totalStudents'), totalStudents);
+        // Show data
+        animateCounter(document.getElementById('totalPapers'), data.stats.totalPapers || 0);
+        animateCounter(document.getElementById('totalJobs'), data.stats.totalJobs || 0);
+        animateCounter(document.getElementById('totalApplications'), data.stats.totalApplications || 0);
+        animateCounter(document.getElementById('totalStudents'), data.stats.totalApplications || 0);
 
     } catch (error) {
         console.error('Dashboard Stats Error:', error);
-        showAlert('Failed to load dashboard stats. Using demo data.', 'warning');
 
-        // Set demo data
-        document.getElementById('totalPapers').textContent = '12';
-        document.getElementById('totalJobs').textContent = '8';
-        document.getElementById('totalApplications').textContent = '45';
-        document.getElementById('totalStudents').textContent = '45';
+        // Show demo data
+        document.getElementById('totalPapers').textContent = '0';
+        document.getElementById('totalJobs').textContent = '0';
+        document.getElementById('totalApplications').textContent = '0';
+        document.getElementById('totalStudents').textContent = '0';
     }
 }
 
@@ -1499,15 +1496,15 @@ async function testAPIConnection() {
         const response = await fetch(API_BASE + '/api/health');
         const text = await response.text();
         console.log('API Health Response:', text);
-        
+
         // Try to parse
         try {
             const data = JSON.parse(text);
             console.log('API is working!', data);
-        } catch(e) {
+        } catch (e) {
             console.error('API returned non-JSON response:', text.substring(0, 200));
         }
-    } catch(err) {
+    } catch (err) {
         console.error('API connection failed:', err);
     }
 }

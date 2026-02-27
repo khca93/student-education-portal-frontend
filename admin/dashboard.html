@@ -351,6 +351,9 @@
                             <button class="btn btn-primary" onclick="showModal('addBlogModal')">
                                 <i class="fas fa-plus"></i> New Blog
                             </button>
+                            <button class="btn btn-outline" onclick="forceLoadBlogs()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
                         </div>
                     </div>
 
@@ -363,6 +366,23 @@
                     </div>
                 </div>
             </div>
+
+            <script>
+                // Force load blogs function
+                function forceLoadBlogs() {
+                    if (typeof loadBlogs === 'function') {
+                        loadBlogs();
+                    } else {
+                        console.error('loadBlogs function not found');
+                        document.getElementById('blogsList').innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Blog module not loaded. Check console.</p>
+            </div>
+        `;
+                    }
+                }
+            </script>
         </div>
     </div>
 
@@ -760,8 +780,8 @@
     </div>
 
     <!-- SCRIPTS (Order is important) -->
-    <script src="js/admin.js"></script>
     <script src="js/admin-blogs.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 
 </html>
