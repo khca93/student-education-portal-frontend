@@ -7,8 +7,6 @@
     <title>Admin Dashboard - Student Education Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
-    <script src="https://cdn.tiny.cloud/1/mh9q17fql7uesni1kyxuhg4nxl07ss54vttsap3qqcrh6e6d/tinymce/8/tinymce.min.js"
-        referrerpolicy="origin" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -677,72 +675,6 @@
                 </form>
             </div>
         </div>
-    </div>
-
-    <div id="blogEditorModal" class="modal blog-editor-modal" role="dialog" aria-modal="true" aria-labelledby="blogEditorHeading">
-        <div class="modal-content blog-editor-shell">
-            <div class="blog-editor-topbar">
-                <div><span class="blog-editor-kicker">KNOWLEDGE HUNT · EDITOR</span><h2 id="blogEditorHeading">New article</h2></div>
-                <div class="blog-editor-top-actions">
-                    <span id="blogSaveStatus" class="blog-save-status" role="status">Unsaved changes</span>
-                    <button type="button" class="btn btn-outline" onclick="toggleWritingMode()" aria-label="Toggle distraction-free writing mode"><i class="fas fa-expand"></i> Focus</button>
-                    <button type="button" class="close-modal" onclick="closeBlogEditor()" aria-label="Close editor">&times;</button>
-                </div>
-            </div>
-            <form id="blogEditorForm" onsubmit="event.preventDefault(); saveBlog('published');">
-                <input type="hidden" id="blogId">
-                <div class="blog-editor-layout">
-                    <main class="blog-writing-column">
-                        <div class="blog-document">
-                            <input id="blogTitle" class="blog-title-input" maxlength="180" placeholder="Article title" aria-label="Article title" required>
-                            <input id="blogSubtitle" class="blog-subtitle-input" maxlength="240" placeholder="Subtitle or deck (optional)" aria-label="Article subtitle">
-                            <div class="blog-editor-divider"></div>
-                            <textarea id="blogContent" aria-label="Article content"></textarea>
-                            <div class="blog-writing-stats"><span id="blogWordCount">0 words</span><span id="blogCharCount">0 characters</span><span id="blogReadTime">1 min read</span><span id="blogReadability">Readability: —</span></div>
-                        </div>
-                        <div class="blog-editor-footer">
-                            <button type="button" class="btn btn-outline" onclick="saveBlog('draft')"><i class="fas fa-file-alt"></i> Save draft</button>
-                            <button type="button" class="btn btn-outline" onclick="previewBlog()"><i class="fas fa-eye"></i> Preview</button>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Publish</button>
-                        </div>
-                        <p id="blogMessage" class="blog-editor-message" role="status"></p>
-                    </main>
-                    <aside class="blog-settings-column">
-                        <section class="blog-settings-card"><h3>Article details</h3>
-                            <label for="blogCategory">Category</label><input id="blogCategory" class="form-control" maxlength="80" placeholder="Education">
-                            <label for="blogTags">Tags</label><input id="blogTags" class="form-control" placeholder="comma separated">
-                            <label for="blogAuthor">Author</label><input id="blogAuthor" class="form-control" maxlength="120" placeholder="Author name">
-                            <label for="blogPublishedAt">Publication date</label><input id="blogPublishedAt" class="form-control" type="datetime-local">
-                            <label class="blog-featured-toggle"><input id="blogFeatured" type="checkbox"> Feature this article</label>
-                            <label for="blogExcerpt">Excerpt</label><textarea id="blogExcerpt" class="form-control" rows="3" maxlength="320" placeholder="Short summary for article cards"></textarea>
-                        </section>
-                        <section class="blog-settings-card"><h3>Featured image</h3>
-                            <label for="blogImageUrl">Image URL</label><input id="blogImageUrl" type="url" class="form-control" placeholder="https://…">
-                            <label for="blogImageFile">Or upload (JPG, PNG, WebP · max 8 MB)</label><input id="blogImageFile" type="file" class="form-control" accept="image/jpeg,image/png,image/webp">
-                            <div id="blogFeaturedImagePreview" class="blog-featured-image-preview" hidden><img id="blogFeaturedImagePreviewImg" alt=""><span>Featured image preview</span></div>
-                            <label for="blogImageAlt">Alternative text</label><input id="blogImageAlt" class="form-control" maxlength="240" placeholder="Describe the image">
-                            <label for="blogImageCaption">Caption</label><input id="blogImageCaption" class="form-control" maxlength="320" placeholder="Optional image caption">
-                        </section>
-                        <details class="blog-settings-card" open><summary>SEO and sharing</summary>
-                            <label for="blogSlug">URL slug</label><input id="blogSlug" class="form-control" maxlength="160" placeholder="generated-from-title">
-                            <label for="blogMetaTitle">SEO title</label><input id="blogMetaTitle" class="form-control" maxlength="160"><small id="blogMetaTitleCount" class="blog-character-count">0 / 160</small>
-                            <label for="blogMetaDescription">Meta description</label><textarea id="blogMetaDescription" class="form-control" rows="3" maxlength="320"></textarea><small id="blogMetaDescriptionCount" class="blog-character-count">0 / 320</small>
-                            <label for="blogFocusKeyword">Focus keyword</label><input id="blogFocusKeyword" class="form-control" maxlength="120">
-                            <label for="blogCanonicalUrl">Canonical URL (optional)</label><input id="blogCanonicalUrl" type="url" class="form-control" maxlength="500" placeholder="https://…">
-                            <label for="blogSocialTitle">Social title</label><input id="blogSocialTitle" class="form-control" maxlength="160">
-                            <label for="blogSocialDescription">Social description</label><textarea id="blogSocialDescription" class="form-control" rows="2" maxlength="320"></textarea>
-                            <label for="blogSocialImage">Social image URL</label><input id="blogSocialImage" type="url" class="form-control" maxlength="1000" placeholder="https://…">
-                            <div id="blogSearchPreview" class="blog-search-preview" aria-live="polite"></div>
-                            <ul id="blogSeoChecks" class="blog-seo-checks"></ul>
-                        </details>
-                    </aside>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="blogPreviewModal" class="modal blog-preview-modal" role="dialog" aria-modal="true" aria-label="Blog preview">
-        <div class="modal-content"><div class="modal-header"><h3>Article preview</h3><button class="close-modal" onclick="hideModal('blogPreviewModal')" aria-label="Close preview">&times;</button></div><iframe id="blogPreviewFrame" title="Article preview" sandbox=""></iframe></div>
     </div>
 
     <!-- SCRIPTS (Order is important) -->

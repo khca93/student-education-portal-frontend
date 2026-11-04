@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Blog editor - Student Education Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://cdn.tiny.cloud/1/mh9q17fql7uesni1kyxuhg4nxl07ss54vttsap3qqcrh6e6d/tinymce/8/tinymce.min.js"
+        referrerpolicy="origin" crossorigin="anonymous"></script>
+</head>
+
+<body class="blog-editor-page">
+    <header class="blog-editor-topbar">
+        <div class="blog-editor-title-group">
+            <a href="dashboard.html#blogs" class="btn btn-outline" aria-label="Back to blogs"><i class="fas fa-arrow-left"></i> <span class="blog-btn-label">Blogs</span></a>
+            <div><span class="blog-editor-kicker">KNOWLEDGE HUNT · EDITOR</span><h1 id="blogEditorHeading">New article</h1></div>
+        </div>
+        <div class="blog-editor-top-actions">
+            <span id="blogSaveStatus" class="blog-save-status" role="status">Loading…</span>
+            <button type="button" class="btn btn-outline blog-icon-btn" onclick="openHistory()" title="History" aria-label="Version history"><i class="fas fa-clock-rotate-left"></i></button>
+            <button type="button" class="btn btn-outline blog-icon-btn" onclick="openMedia()" title="Media library" aria-label="Media library"><i class="fas fa-images"></i></button>
+            <button type="button" class="btn btn-outline blog-icon-btn" onclick="toggleWritingMode()" title="Focus mode" aria-label="Toggle distraction-free writing mode"><i class="fas fa-expand"></i></button>
+            <button type="button" class="btn btn-outline blog-icon-btn" onclick="toggleSettings()" title="Settings panel" aria-label="Show or hide settings panel" aria-controls="blogSettingsPanel"><i class="fas fa-sliders"></i></button>
+            <button type="button" class="btn btn-outline blog-icon-btn" onclick="showModal('blogHelpModal')" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">?</button>
+            <button type="button" class="btn btn-outline" onclick="previewBlog()"><i class="fas fa-eye"></i> <span class="blog-btn-label">Preview</span></button>
+            <button type="button" class="btn btn-outline" onclick="saveBlog('draft')"><i class="fas fa-file-alt"></i> <span class="blog-btn-label">Save draft</span></button>
+            <button type="button" class="btn btn-primary" onclick="saveBlog('published')"><i class="fas fa-paper-plane"></i> <span id="blogPublishLabel">Publish</span></button>
+        </div>
+    </header>
+
+    <form id="blogEditorForm" onsubmit="event.preventDefault();">
+        <input type="hidden" id="blogId">
+        <div class="blog-editor-layout">
+            <main class="blog-writing-column">
+                <p id="blogMessage" class="blog-editor-message" role="status"></p>
+                <div class="blog-document">
+                    <input id="blogTitle" class="blog-title-input" maxlength="180" placeholder="Article title" aria-label="Article title" required>
+                    <input id="blogSubtitle" class="blog-subtitle-input" maxlength="240" placeholder="Subtitle or deck (optional)" aria-label="Article subtitle">
+                    <div class="blog-editor-divider"></div>
+                    <textarea id="blogContent" aria-label="Article content"></textarea>
+                    <div class="blog-writing-stats"><span id="blogWordCount">0 words</span><span id="blogCharCount">0 characters</span><span id="blogReadTime">1 min read</span><span id="blogReadability">Readability: —</span></div>
+                </div>
+            </main>
+            <aside class="blog-settings-column" id="blogSettingsPanel">
+                <details class="blog-settings-card" open><summary>Details</summary>
+                    <label for="blogCategory">Category</label><input id="blogCategory" class="form-control" maxlength="80" placeholder="Education">
+                    <label for="blogTags">Tags</label><input id="blogTags" class="form-control" placeholder="comma separated">
+                    <label for="blogAuthor">Author</label><input id="blogAuthor" class="form-control" maxlength="120" placeholder="Author name">
+                    <label for="blogPublishedAt">Publication date (future date = scheduled)</label><input id="blogPublishedAt" class="form-control" type="datetime-local">
+                    <small id="blogScheduleNote" class="blog-schedule-note" role="status"></small>
+                    <label class="blog-featured-toggle"><input id="blogFeatured" type="checkbox"> Feature this article</label>
+                    <label for="blogExcerpt">Excerpt</label><textarea id="blogExcerpt" class="form-control" rows="3" maxlength="320" placeholder="Short summary for article cards"></textarea>
+                </details>
+                <details class="blog-settings-card" open><summary>Featured image</summary>
+                    <label for="blogImageUrl">Image URL</label><input id="blogImageUrl" type="url" class="form-control" placeholder="https://…">
+                    <label for="blogImageFile">Or upload (JPG, PNG, WebP · max 8 MB)</label><input id="blogImageFile" type="file" class="form-control" accept="image/jpeg,image/png,image/webp">
+                    <button type="button" class="btn btn-outline blog-media-pick" onclick="openMedia()"><i class="fas fa-images"></i> Choose from media library</button>
+                    <div id="blogFeaturedImagePreview" class="blog-featured-image-preview" hidden><img id="blogFeaturedImagePreviewImg" alt=""><span>Featured image preview</span></div>
+                    <label for="blogImageAlt">Alternative text</label><input id="blogImageAlt" class="form-control" maxlength="240" placeholder="Describe the image">
+                    <label for="blogImageCaption">Caption</label><input id="blogImageCaption" class="form-control" maxlength="320" placeholder="Optional image caption">
+                </details>
+                <details class="blog-settings-card" open><summary>SEO</summary>
+                    <label for="blogSlug">URL slug</label><input id="blogSlug" class="form-control" maxlength="160" placeholder="generated-from-title">
+                    <label for="blogMetaTitle">SEO title</label><input id="blogMetaTitle" class="form-control" maxlength="160"><small id="blogMetaTitleCount" class="blog-character-count">0 / 160</small>
+                    <label for="blogMetaDescription">Meta description</label><textarea id="blogMetaDescription" class="form-control" rows="3" maxlength="320"></textarea><small id="blogMetaDescriptionCount" class="blog-character-count">0 / 320</small>
+                    <label for="blogFocusKeyword">Focus keyword</label><input id="blogFocusKeyword" class="form-control" maxlength="120">
+                    <label for="blogCanonicalUrl">Canonical URL (optional)</label><input id="blogCanonicalUrl" type="url" class="form-control" maxlength="500" placeholder="https://…">
+                    <div id="blogSearchPreview" class="blog-search-preview" aria-live="polite"></div>
+                    <ul id="blogSeoChecks" class="blog-seo-checks"></ul>
+                </details>
+                <details class="blog-settings-card"><summary>Social</summary>
+                    <label for="blogSocialTitle">Social title</label><input id="blogSocialTitle" class="form-control" maxlength="160">
+                    <label for="blogSocialDescription">Social description</label><textarea id="blogSocialDescription" class="form-control" rows="2" maxlength="320"></textarea>
+                    <label for="blogSocialImage">Social image URL</label><input id="blogSocialImage" type="url" class="form-control" maxlength="1000" placeholder="https://…">
+                </details>
+            </aside>
+        </div>
+    </form>
+
+    <div id="blogPreviewModal" class="modal blog-preview-modal" role="dialog" aria-modal="true" aria-label="Blog preview">
+        <div class="modal-content"><div class="modal-header"><h3>Article preview</h3>
+            <div class="blog-device-toggle" role="group" aria-label="Preview size">
+                <button type="button" class="btn btn-outline" data-device="desktop" aria-pressed="true" onclick="setPreviewDevice('desktop')"><i class="fas fa-desktop"></i> Desktop</button>
+                <button type="button" class="btn btn-outline" data-device="mobile" aria-pressed="false" onclick="setPreviewDevice('mobile')"><i class="fas fa-mobile-screen"></i> Mobile</button>
+            </div>
+            <button class="close-modal" onclick="hideModal('blogPreviewModal')" aria-label="Close preview">&times;</button></div>
+            <div class="blog-preview-stage"><iframe id="blogPreviewFrame" title="Article preview" sandbox=""></iframe></div></div>
+    </div>
+
+    <div id="blogMediaModal" class="modal blog-preview-modal" role="dialog" aria-modal="true" aria-label="Media library">
+        <div class="modal-content"><div class="modal-header"><h3 id="blogMediaHeading">Media library</h3><button class="close-modal" onclick="hideModal('blogMediaModal')" aria-label="Close media library">&times;</button></div>
+            <div class="blog-panel-body"><div id="blogMediaGrid" class="blog-media-grid"></div>
+                <button type="button" id="blogMediaMore" class="btn btn-outline" onclick="loadMedia()" hidden>Load more</button></div></div>
+    </div>
+
+    <div id="blogHistoryModal" class="modal blog-preview-modal" role="dialog" aria-modal="true" aria-label="Version history">
+        <div class="modal-content"><div class="modal-header"><h3>Version history</h3><button class="close-modal" onclick="hideModal('blogHistoryModal')" aria-label="Close history">&times;</button></div>
+            <div class="blog-history-layout"><ul id="blogHistoryList" class="blog-history-list"></ul><iframe id="blogHistoryFrame" title="Version preview" sandbox=""></iframe></div></div>
+    </div>
+
+    <div id="blogHelpModal" class="modal" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+        <div class="modal-content"><div class="modal-header"><h3>Keyboard shortcuts</h3><button class="close-modal" onclick="hideModal('blogHelpModal')" aria-label="Close">&times;</button></div>
+            <div class="blog-panel-body"><table class="blog-shortcuts">
+                <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save (draft stays draft, published article is updated)</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td><td>Bold / italic / underline</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Insert link</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Undo / redo</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Find and replace (inside the article)</td></tr>
+                <tr><td><kbd>##</kbd> + space</td><td>Heading 2 (<kbd>###</kbd> for heading 3)</td></tr>
+                <tr><td><kbd>*</kbd> + space / <kbd>1.</kbd> + space</td><td>Bullet / numbered list</td></tr>
+                <tr><td>Toolbar <strong>Blocks</strong></td><td>Note, tip, warning, FAQ, button link, table of contents</td></tr>
+            </table></div></div>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script src="js/blog-editor.js"></script>
+</body>
+
+</html>

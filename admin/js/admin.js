@@ -1387,13 +1387,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Admin token found, dashboard allowed');
 
-    // Initialize TinyMCE for blogs if functions exist
-    if (typeof initMainTinyMCE === 'function') {
-        setTimeout(() => {
-            initMainTinyMCE();
-        }, 1000);
-    }
-
     const editPaperPdfInput = document.getElementById('editPaperPdf');
     if (editPaperPdfInput) {
         editPaperPdfInput.addEventListener('change', function () {
@@ -1485,7 +1478,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     setTimeout(() => {
-        showSection('dashboard');
+        showSection(window.location.hash === '#blogs' ? 'blogs' : 'dashboard');
     }, 300);
 });
 
