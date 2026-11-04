@@ -587,77 +587,32 @@ if (document.readyState === 'loading') {
 }
 
 
-async function loadFeaturedBlog(){
-
+async function loadFeaturedBlog() {
     const container = document.getElementById('featuredBlog');
-
-    // 🔒 Important safety check
-    if(!container) return;
-
+    if (!container) return;
     try {
-
-        const res = await fetch(API_URL + '/api/blogs/featured');
-        const data = await res.json();
-
-        if(!data.success || !data.blog){
-            container.innerHTML = "<p style='text-align:center;'>No blog available.</p>";
-            return;
+        const response = await fetch(API_URL + '/api/blogs/featured');
+        const data = await response.json();
+        if (!data.success || !data.blog) {
+            const empty = document.createElement('p'); empty.textContent = 'No blog available.'; empty.style.textAlign = 'center'; container.replaceChildren(empty); return;
         }
-
         const blog = data.blog;
-
-        const previewText = blog.content
-            .replace(/<[^>]*>/g, '')
-            .substring(0, 200) + "...";
-
-        container.innerHTML = `
-            <div style="
-                display:flex;
-                flex-wrap:wrap;
-                background:white;
-                border-radius:12px;
-                box-shadow:0 5px 15px rgba(0,0,0,0.08);
-                overflow:hidden;
-            ">
-
-                ${blog.image ? `
-                    <div style="flex:1; min-width:300px;">
-                        <img src="${blog.image}" 
-                             style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                ` : ""}
-
-                <div style="flex:1; padding:30px; min-width:300px;">
-                    <div style="color:#2563eb; font-weight:bold; margin-bottom:10px;">
-                        ${blog.category || "General"}
-                    </div>
-
-                    <h3 style="margin-bottom:15px;">
-                        ${blog.title}
-                    </h3>
-
-                    <p style="color:#555; margin-bottom:20px;">
-                        ${previewText}
-                    </p>
-
-                    <a href="blog.html?slug=${blog.slug}" 
-                       style="
-                        display:inline-block;
-                        padding:10px 20px;
-                        background:#2563eb;
-                        color:white;
-                        border-radius:8px;
-                        text-decoration:none;
-                       ">
-                       Read Full Article →
-                    </a>
-                </div>
-            </div>
-        `;
-
-    } catch (err) {
-        console.error("Featured blog error:", err);
-        container.innerHTML = "<p style='text-align:center;'>Failed to load blog.</p>";
+        const card = document.createElement('article');
+        card.style.cssText = 'display:flex;flex-wrap:wrap;background:white;border-radius:12px;box-shadow:0 5px 15px rgba(0,0,0,.08);overflow:hidden';
+        if (blog.image) {
+            const imageWrap = document.createElement('div'); imageWrap.style.cssText = 'flex:1;min-width:300px';
+            const image = document.createElement('img'); image.src = blog.image; image.alt = blog.imageAlt || ''; image.style.cssText = 'width:100%;height:100%;object-fit:cover';
+            imageWrap.appendChild(image); card.appendChild(imageWrap);
+        }
+        const content = document.createElement('div'); content.style.cssText = 'flex:1;padding:30px;min-width:300px';
+        const category = document.createElement('div'); category.textContent = blog.category || 'General'; category.style.cssText = 'color:#2563eb;font-weight:bold;margin-bottom:10px';
+        const heading = document.createElement('h3'); heading.textContent = blog.title || ''; heading.style.marginBottom = '15px';
+        const summary = document.createElement('p'); summary.textContent = blog.excerpt || (blog.content || '').replace(/<[^>]*>/g, '').substring(0, 200) + '…'; summary.style.cssText = 'color:#555;margin-bottom:20px';
+        const link = document.createElement('a'); link.href = `blog.html?slug=${encodeURIComponent(blog.slug)}`; link.textContent = 'Read full article'; link.style.cssText = 'display:inline-block;padding:10px 20px;background:#2563eb;color:white;border-radius:8px;text-decoration:none';
+        content.append(category, heading, summary, link); card.appendChild(content); container.replaceChildren(card);
+    } catch (error) {
+        console.error('Featured blog error:', error);
+        const message = document.createElement('p'); message.textContent = 'Failed to load blog.'; message.style.textAlign = 'center'; container.replaceChildren(message);
     }
 }
 console.log('Main.js loaded successfully');

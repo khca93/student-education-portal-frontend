@@ -2,269 +2,182 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Blogs - Student Education Portal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6110723458840814"
+        crossorigin="anonymous"></script>
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/common.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogs - Student Education Portal</title>
+    <meta name="description" content="Study tips, exam updates and career guidance articles from Knowledge Hunt.">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="css/header.css" rel="stylesheet">
+    <link href="css/footer.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background: #f1f5f9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
-            color: #1e293b;
-        }
+        body { background: #f1f5f9; }
+        .blogs-hero { padding: 60px 0 90px; text-align: center; }
+        .blogs-hero .container { position: relative; z-index: 1; }
 
         .filters {
-            text-align: center;
-            margin-bottom: 30px;
+            display: flex; gap: 12px; flex-wrap: wrap;
+            background: #fff; border-radius: 14px; padding: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+            margin: -50px auto 30px; position: relative; z-index: 2;
         }
-
-        .filters input,
-        .filters select {
-            padding: 12px;
-            margin: 0 5px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
+        .search-box { flex: 1 1 260px; position: relative; }
+        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .filters input, .filters select {
+            width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 10px;
+            font: inherit; font-size: 15px; background: #fff;
         }
+        .filters input { padding-left: 40px; }
+        .filters select { flex: 0 1 220px; }
+        .filters input:focus, .filters select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
 
-        .filters input {
-            width: 300px;
-        }
-
-        .filters select {
-            width: 200px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
         .card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            background: #fff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); color: inherit; text-decoration: none;
+            transition: transform 0.25s, box-shadow 0.25s;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12); }
+        .card:focus-visible { outline: 3px solid #4f46e5; outline-offset: 3px; }
+        .card-image, .blog-image-placeholder { width: 100%; height: 190px; object-fit: cover; }
+        .blog-image-placeholder {
+            display: grid; place-items: center; color: #fff; font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
         }
-
-        .card-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .card-content {
-            padding: 20px;
-            flex: 1;
-        }
-
+        .card-content { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
         .card-category {
-            font-size: 12px;
-            color: #4f46e5;
-            margin-bottom: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
+            align-self: flex-start; font-size: 12px; font-weight: 600; color: #4f46e5; background: #eef2ff;
+            padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase;
         }
+        .card-title { font-size: 18px; font-weight: 700; color: #1e293b; line-height: 1.4; margin-bottom: 8px; }
+        .card-excerpt { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 16px; flex: 1; }
+        .card-meta { display: flex; gap: 16px; font-size: 13px; color: #64748b; }
+        .card-meta i { margin-right: 4px; }
 
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #1e293b;
-            line-height: 1.4;
-        }
-
-        .card-date {
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 15px;
-        }
-
-        .card-excerpt {
-            font-size: 14px;
-            color: #475569;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .read-more {
-            color: #4f46e5;
-            font-weight: 600;
-            font-size: 14px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .read-more:hover {
-            text-decoration: underline;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 40px;
-        }
-
+        .pagination { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 40px 0 60px; }
         .pagination button {
-            padding: 8px 16px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
+            min-width: 40px; padding: 8px 14px; border: 1px solid #e2e8f0; background: #fff;
+            border-radius: 8px; cursor: pointer; font: inherit;
         }
+        .pagination button:hover:not(:disabled) { background: #eef2ff; }
+        .pagination button.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #64748b; }
 
-        .pagination button:hover {
-            background: #f1f5f9;
-        }
-
-        .pagination button.active {
-            background: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 60px;
-            color: #64748b;
-            font-size: 16px;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 20px;
-            }
-
-            .filters input {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .filters select {
-                width: 100%;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 600px) {
+            .blogs-hero { padding: 40px 0 80px; }
+            .filters select { flex-basis: 100%; }
         }
     </style>
 </head>
 
 <body>
+    <div id="header-container"></div>
 
-    <div class="container">
-        <h1><i class="fas fa-blog"></i> Latest Blogs</h1>
+    <section class="hero-section blogs-hero">
+        <div class="container">
+            <h1 class="hero-title"><i class="fas fa-blog"></i> Latest Blogs</h1>
+            <p class="hero-description">Study tips, exam updates and career guidance for students.</p>
+        </div>
+    </section>
 
+    <main class="container">
         <div class="filters">
-            <input type="text" id="searchInput" placeholder="Search blogs..." onkeyup="handleSearch(event)">
-            <select id="categoryFilter" onchange="changeCategory()">
+            <div class="search-box">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="searchInput" placeholder="Search blogs..." aria-label="Search blogs">
+            </div>
+            <select id="categoryFilter" aria-label="Filter by category">
                 <option value="all">All Categories</option>
             </select>
         </div>
 
         <div class="grid" id="blogGrid">
-            <div class="loading">Loading blogs...</div>
+            <div class="empty">Loading blogs...</div>
         </div>
 
-        <div class="pagination" id="pagination"></div>
-    </div>
+        <nav class="pagination" id="pagination" aria-label="Blog pages"></nav>
+    </main>
+
+    <div id="footer-container"></div>
 
     <script>
-        const API_BASE = "https://student-education-portal-backend.onrender.com";
+        const API_BASE = location.hostname === "localhost"
+            ? "http://localhost:5000"
+            : "https://student-education-portal-backend.onrender.com";
         let currentPage = 1;
         let totalPages = 1;
         let currentCategory = "all";
         let currentSearch = "";
 
-        async function loadBlogs(page = 1) {
-            try {
-                const res = await fetch(
-                    API_BASE + '/api/blogs?page=' + page +
-                    '&category=' + currentCategory +
-                    '&search=' + currentSearch
-                );
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined) node.textContent = text; // textContent escapes API text
+            return node;
+        }
 
+        // DOMParser does not run scripts; it turns HTML + entities (&nbsp;) into plain text.
+        function plainText(html) {
+            return new DOMParser().parseFromString(html || '', 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+        }
+
+        async function loadBlogs(page = 1) {
+            const grid = document.getElementById('blogGrid');
+            const params = new URLSearchParams({ page, category: currentCategory, search: currentSearch });
+            try {
+                const res = await fetch(API_BASE + '/api/blogs?' + params);
                 const data = await res.json();
-                const grid = document.getElementById('blogGrid');
 
                 if (!data.success || !data.blogs || data.blogs.length === 0) {
-                    grid.innerHTML = "<div class='empty'>📝 No blogs found. Check back later!</div>";
-                    document.getElementById('pagination').innerHTML = "";
+                    grid.replaceChildren(el('div', 'empty', 'No blogs found. Check back later!'));
+                    document.getElementById('pagination').replaceChildren();
                     return;
                 }
 
                 currentPage = data.currentPage;
                 totalPages = data.totalPages;
 
-                let html = "";
+                grid.replaceChildren(...data.blogs.map(blog => {
+                    const card = el('a', 'card');
+                    card.href = 'blog.html?slug=' + encodeURIComponent(blog.slug);
+                    if (blog.image) {
+                        const image = el('img', 'card-image');
+                        image.src = blog.image;
+                        image.alt = blog.imageAlt || '';
+                        image.loading = 'lazy';
+                        card.appendChild(image);
+                    } else {
+                        card.appendChild(el('div', 'blog-image-placeholder', 'Knowledge Hunt'));
+                    }
+                    const date = new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const excerpt = plainText(blog.excerpt) || plainText(blog.content).substring(0, 120) + '…';
+                    const meta = el('div', 'card-meta');
+                    const dateEl = el('span', '', ' ' + date);
+                    dateEl.prepend(el('i', 'far fa-calendar'));
+                    const viewsEl = el('span', '', ' ' + (blog.views || 0) + ' views');
+                    viewsEl.prepend(el('i', 'far fa-eye'));
+                    meta.append(dateEl, viewsEl);
 
-                data.blogs.forEach(blog => {
-                    const date = new Date(blog.createdAt).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-                    
-                    const excerpt = blog.content.replace(/<[^>]*>/g, '').substring(0, 120) + "...";
-
-                    html += `
-                        <div class="card" onclick="openBlog('${blog.slug}')">
-                            ${blog.image ? 
-                                `<img src="${blog.image}" class="card-image" alt="${blog.title}">` : 
-                                `<div style="height:200px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#94a3b8;">
-                                    <i class="fas fa-blog" style="font-size:48px;"></i>
-                                </div>`
-                            }
-                            <div class="card-content">
-                                <div class="card-category">${blog.category || 'General'}</div>
-                                <h3 class="card-title">${blog.title}</h3>
-                                <div class="card-date">${date} | 👁 ${blog.views || 0} views</div>
-                                <p class="card-excerpt">${excerpt}</p>
-                                <span class="read-more">Read More <i class="fas fa-arrow-right"></i></span>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                grid.innerHTML = html;
+                    const content = el('div', 'card-content');
+                    content.append(
+                        el('span', 'card-category', blog.category || 'General'),
+                        el('h3', 'card-title', blog.title || ''),
+                        el('p', 'card-excerpt', excerpt),
+                        meta
+                    );
+                    card.appendChild(content);
+                    return card;
+                }));
                 renderPagination();
-
             } catch (err) {
                 console.error("Load error:", err);
-                document.getElementById('blogGrid').innerHTML = "<div class='empty'>❌ Failed to load blogs. Please try again.</div>";
+                grid.replaceChildren(el('div', 'empty', 'Failed to load blogs. Please try again.'));
             }
         }
 
@@ -272,20 +185,11 @@
             try {
                 const res = await fetch(API_BASE + '/api/blogs?page=1&limit=100');
                 const data = await res.json();
-
                 if (!data.success) return;
-
                 const select = document.getElementById('categoryFilter');
-                const categories = new Set();
-
-                data.blogs.forEach(blog => {
-                    if (blog.category) categories.add(blog.category);
-                });
-
-                Array.from(categories).sort().forEach(cat => {
-                    const option = document.createElement('option');
+                [...new Set(data.blogs.map(b => b.category).filter(Boolean))].sort().forEach(cat => {
+                    const option = el('option', '', cat);
                     option.value = cat;
-                    option.textContent = cat;
                     select.appendChild(option);
                 });
             } catch (err) {
@@ -293,48 +197,44 @@
             }
         }
 
-        function handleSearch(event) {
-            currentSearch = document.getElementById('searchInput').value.trim();
-            loadBlogs(1);
-        }
+        let searchTimer;
+        document.getElementById('searchInput').addEventListener('input', e => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentSearch = e.target.value.trim();
+                loadBlogs(1);
+            }, 400);
+        });
 
-        function changeCategory() {
-            currentCategory = document.getElementById('categoryFilter').value;
+        document.getElementById('categoryFilter').addEventListener('change', e => {
+            currentCategory = e.target.value;
             loadBlogs(1);
+        });
+
+        function pageButton(label, page, active) {
+            const btn = el('button', active ? 'active' : '', label);
+            btn.type = 'button';
+            if (page) btn.onclick = () => { loadBlogs(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+            else btn.disabled = true;
+            if (active) btn.setAttribute('aria-current', 'page');
+            return btn;
         }
 
         function renderPagination() {
-            const pagination = document.getElementById('pagination');
-            let buttons = "";
-
-            if (currentPage > 1) {
-                buttons += `<button onclick="loadBlogs(${currentPage - 1})">← Previous</button>`;
-            }
-
+            const buttons = [];
+            if (currentPage > 1) buttons.push(pageButton('← Previous', currentPage - 1));
             for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-                    buttons += `<button onclick="loadBlogs(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
-                } else if (i === currentPage - 3 || i === currentPage + 3) {
-                    buttons += `<button disabled>...</button>`;
-                }
+                if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) buttons.push(pageButton(String(i), i, i === currentPage));
+                else if (Math.abs(i - currentPage) === 3) buttons.push(pageButton('…'));
             }
-
-            if (currentPage < totalPages) {
-                buttons += `<button onclick="loadBlogs(${currentPage + 1})">Next →</button>`;
-            }
-
-            pagination.innerHTML = buttons;
+            if (currentPage < totalPages) buttons.push(pageButton('Next →', currentPage + 1));
+            document.getElementById('pagination').replaceChildren(...(totalPages > 1 ? buttons : []));
         }
 
-        function openBlog(slug) {
-            window.location.href = "blog.html?slug=" + slug;
-        }
-
-        // Load on page load
         loadCategories();
         loadBlogs();
     </script>
-
+    <script src="js/load-components.js"></script>
 </body>
 
 </html>

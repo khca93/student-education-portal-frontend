@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6110723458840814"
+    crossorigin="anonymous"></script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -9,62 +12,114 @@
   <meta name="description" content="Student Education Portal Blog">
 
   <!-- Open Graph -->
-  <meta property="og:title" id="ogTitle">
-  <meta property="og:description" id="ogDescription">
-  <meta property="og:image" id="ogImage">
+  <meta property="og:title" id="ogTitle" content="">
+  <meta property="og:description" id="ogDescription" content="">
+  <meta property="og:image" id="ogImage" content="">
   <meta property="og:type" content="article">
-  <meta property="og:url" id="ogUrl">
+  <meta property="og:url" id="ogUrl" content="">
+  <meta property="og:image:alt" id="ogImageAlt" content="">
+  <link rel="canonical" id="canonicalLink" href="">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" id="twitterTitle">
-  <meta name="twitter:description" id="twitterDescription">
-  <meta name="twitter:image" id="twitterImage">
+  <meta name="twitter:title" id="twitterTitle" content="">
+  <meta name="twitter:description" id="twitterDescription" content="">
+  <meta name="twitter:image" id="twitterImage" content="">
 
-  <!-- External CSS -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/common.css">
-  <link rel="stylesheet" href="css/blog.css"> 
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="css/header.css" rel="stylesheet">
+  <link href="css/footer.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/blog.css" rel="stylesheet">
+
+  <style>
+    body { background: #f1f5f9; }
+    .blog-page { padding: 40px 20px 60px; }
+    .blog-container { overflow: hidden; }
+    .back-link { display: inline-block; margin-bottom: 18px; color: #4f46e5; text-decoration: none; font-weight: 500; }
+    .blog-category {
+      display: inline-block; font-size: 12px; font-weight: 600; color: #4f46e5; background: #eef2ff;
+      padding: 4px 12px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .blog-category:empty { display: none; }
+    #blogTitle { font-family: 'Poppins', sans-serif; font-size: 2rem; line-height: 1.3; color: #1e293b; }
+    .meta { display: flex; flex-wrap: wrap; gap: 16px; }
+    .meta i { margin-right: 5px; color: #94a3b8; }
+    .main-blog-image { margin: 0; max-height: 480px; object-fit: cover; }
+    .blog-content::after { content: ''; display: block; clear: both; }
+    .like-section { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 30px 0; padding: 18px 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .like-section button {
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px;
+      border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font: inherit; font-size: 14px;
+    }
+    .like-section button:hover { background: #eef2ff; border-color: #c7d2fe; }
+    #likeCount { color: #64748b; font-size: 14px; margin-right: auto; }
+    .section-heading { font-size: 1.3rem; color: #1e293b; margin: 30px 0 14px; }
+    .single-comment { background: #f8fafc; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+    .single-comment small { color: #64748b; margin-left: 8px; }
+    .single-comment p { margin: 6px 0 0; color: #334155; white-space: pre-line; }
+    .related-card { color: inherit; text-decoration: none; display: block; }
+    .related-card h4, .related-card p { padding: 0 15px; }
+    .related-card h4 { margin: 12px 0 6px; color: #1e293b; }
+    .related-card p { color: #64748b; font-size: 14px; margin-bottom: 15px; }
+    .blog-error { text-align: center; padding: 40px 0; color: #64748b; }
+
+    @media (max-width: 600px) {
+      .blog-page { padding: 20px 12px 40px; }
+      .blog-container { padding: 20px; }
+      #blogTitle { font-size: 1.5rem; }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="header-container"></div>
 
-  <div class="blog-container">
+  <main class="blog-page">
+    <article class="blog-container" id="blogArticle">
+      <a href="blogs.html" class="back-link"><i class="fas fa-arrow-left"></i> All Blogs</a>
+      <div><span class="blog-category" id="blogCategory"></span></div>
+      <h1 id="blogTitle">Loading…</h1>
+      <p id="blogSubtitle" class="blog-subtitle" hidden></p>
+      <div class="meta" id="blogMeta"></div>
+      <div id="blogTags" class="blog-tag-list" aria-label="Article tags"></div>
 
-    <h1 id="blogTitle"></h1>
-    <div class="meta" id="blogMeta"></div>
-    <div class="like-section">
-      <button onclick="likeBlog()">👍 Like</button>
-      <span id="likeCount"></span>
+      <!-- Blog Main Image -->
+      <div id="blogImageContainer"></div>
 
-      <button onclick="shareWhatsApp()">📲 WhatsApp</button>
-      <button onclick="shareFacebook()">📘 Facebook</button>
-      <button onclick="copyLink()">🔗 Copy Link</button>
-    </div>
-    <!-- Blog Main Image -->
-    <div id="blogImageContainer"></div>
+      <!-- Blog Content -->
+      <div class="content blog-content" id="blogContent"></div>
 
-    <!-- Blog Content -->
-    <div class="content" id="blogContent"></div>
-    <h3>Comments</h3>
+      <div class="like-section">
+        <button type="button" onclick="likeBlog()"><i class="far fa-thumbs-up"></i> Like</button>
+        <span id="likeCount"></span>
+        <button type="button" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+        <button type="button" onclick="shareFacebook()"><i class="fab fa-facebook"></i> Facebook</button>
+        <button type="button" onclick="copyLink()"><i class="fas fa-link"></i> Copy Link</button>
+      </div>
 
-    <div id="commentsContainer"></div>
+      <h3 class="section-heading">Comments</h3>
+      <div id="commentsContainer"></div>
 
-    <div class="comment-form">
-      <input type="text" id="commentName" placeholder="Your Name">
-      <textarea id="commentMessage" placeholder="Write your comment..."></textarea>
-      <button onclick="submitComment()">Post Comment</button>
-    </div>
-    <hr>
+      <div class="comment-form">
+        <input type="text" id="commentName" placeholder="Your Name" aria-label="Your name">
+        <textarea id="commentMessage" placeholder="Write your comment..." aria-label="Comment"></textarea>
+        <button type="button" onclick="submitComment()">Post Comment</button>
+      </div>
 
-    <h3>Related Articles</h3>
-    <div id="relatedBlogs"></div>
+      <h3 class="section-heading">Related Articles</h3>
+      <div id="relatedBlogs"></div>
+    </article>
+  </main>
 
-  </div>
+  <div id="footer-container"></div>
 
   <script>
 
-    const API_BASE = "https://student-education-portal-backend.onrender.com";
+    const API_BASE = location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://student-education-portal-backend.onrender.com";
     let currentBlogId = null;
 
     function getSlug() {
@@ -72,21 +127,33 @@
       return params.get('slug');
     }
 
+    // Show errors inside the article only, so header/footer stay.
+    function showError(text) {
+      const msg = document.createElement('p');
+      msg.className = 'blog-error';
+      msg.textContent = text + ' ';
+      const back = document.createElement('a');
+      back.href = 'blogs.html';
+      back.textContent = 'See all blogs';
+      msg.appendChild(back);
+      document.getElementById('blogArticle').replaceChildren(msg);
+    }
+
     async function loadBlog() {
 
       const slug = getSlug();
       if (!slug) {
-        document.body.innerHTML = "Blog not found";
+        showError("Blog not found.");
         return;
       }
 
       try {
 
-        const res = await fetch(API_BASE + '/api/blogs/' + slug);
+        const res = await fetch(API_BASE + '/api/blogs/' + encodeURIComponent(slug));
         const data = await res.json();
 
         if (!data.success) {
-          document.body.innerHTML = "Blog not found";
+          showError("Blog not found.");
           return;
         }
 
@@ -97,60 +164,71 @@
 
         // ===== SEO =====
         const plainText = blog.content.replace(/<[^>]*>/g, '');
-        const description = blog.metaDescription || plainText.substring(0, 150);
+        const description = blog.metaDescription || blog.excerpt || plainText.substring(0, 150);
         const title = blog.metaTitle || blog.title + " | Student Education Portal";
+        const socialTitle = blog.socialTitle || title;
+        const socialDescription = blog.socialDescription || description;
+        const socialImage = blog.socialImage || blog.image || '';
 
         document.title = title;
         document.querySelector('meta[name="description"]').setAttribute("content", description);
 
-        document.getElementById('ogTitle').setAttribute("content", title);
-        document.getElementById('ogDescription').setAttribute("content", description);
+        document.getElementById('ogTitle').setAttribute("content", socialTitle);
+        document.getElementById('ogDescription').setAttribute("content", socialDescription);
         document.getElementById('ogUrl').setAttribute("content", window.location.href);
 
-        document.getElementById('twitterTitle').setAttribute("content", title);
-        document.getElementById('twitterDescription').setAttribute("content", description);
+        document.getElementById('twitterTitle').setAttribute("content", socialTitle);
+        document.getElementById('twitterDescription').setAttribute("content", socialDescription);
+        document.getElementById('canonicalLink').href = blog.canonicalUrl || window.location.href;
+        if (socialImage) {
+          document.getElementById('ogImage').setAttribute("content", socialImage);
+          document.getElementById('twitterImage').setAttribute("content", socialImage);
+          document.getElementById('ogImageAlt').setAttribute("content", blog.imageAlt || blog.title || '');
+        }
 
         if (blog.image) {
-          document.getElementById('ogImage').setAttribute("content", blog.image);
-          document.getElementById('twitterImage').setAttribute("content", blog.image);
-
-          document.getElementById('blogImageContainer').innerHTML =
-            `<img src="${blog.image}" class="main-blog-image">`;
+          const figure = document.createElement('figure');
+          const image = document.createElement('img');
+          image.src = blog.image; image.alt = blog.imageAlt || blog.title || ''; image.className = 'main-blog-image';
+          figure.appendChild(image);
+          if (blog.imageCaption) { const caption = document.createElement('figcaption'); caption.textContent = blog.imageCaption; figure.appendChild(caption); }
+          document.getElementById('blogImageContainer').replaceChildren(figure);
         }
 
-        document.getElementById('blogTitle').innerText = blog.title;
+        document.getElementById('blogCategory').textContent = blog.category || 'General';
+        document.getElementById('blogTitle').textContent = blog.title;
 
-        document.getElementById('blogMeta').innerHTML =
-          "Category: " + (blog.category || 'General') +
-          " | " +
-          new Date(blog.createdAt).toLocaleDateString('en-IN') +
-          " | 👁 " + (blog.views || 0) + " Views";
+        const meta = document.getElementById('blogMeta');
+        const metaItem = (icon, text) => {
+          const span = document.createElement('span');
+          const i = document.createElement('i'); i.className = icon;
+          span.append(i, text);
+          return span;
+        };
+        meta.replaceChildren(
+          ...(blog.authorName ? [metaItem('far fa-user', blog.authorName)] : []),
+          metaItem('far fa-calendar', new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })),
+          metaItem('far fa-eye', (blog.views || 0) + ' views')
+        );
+        const subtitle = document.getElementById('blogSubtitle');
+        subtitle.textContent = blog.subtitle || '';
+        subtitle.hidden = !blog.subtitle;
+        const tags = document.getElementById('blogTags');
+        tags.replaceChildren();
+        (blog.tags || []).forEach(tag => { const chip = document.createElement('span'); chip.className = 'blog-tag'; chip.textContent = tag; tags.appendChild(chip); });
 
         // LIKE COUNT SHOW
-        const likeEl = document.getElementById('likeCount');
-        if (likeEl) {
-          likeEl.innerText = (blog.likes || 0) + " Likes";
-        }
-        // YOUTUBE EMBED
-        let processedContent = blog.content
-          .replace(
-            /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g,
-            `<iframe src="https://www.youtube.com/embed/$1"
-            frameborder="0" allowfullscreen class="youtube-embed"></iframe>`
-          )
-          .replace(
-            /https:\/\/youtu\.be\/([a-zA-Z0-9_-]+)/g,
-            `<iframe src="https://www.youtube.com/embed/$1"
-            frameborder="0" allowfullscreen class="youtube-embed"></iframe>`
-          );
+        document.getElementById('likeCount').textContent = (blog.likes || 0) + " Likes";
 
-        document.getElementById('blogContent').innerHTML = processedContent;
+        // Admin-written HTML, sanitized by the API (includes allow-listed YouTube embeds).
+        document.getElementById('blogContent').innerHTML = blog.content;
 
         renderComments(blog.comments);
         loadRelatedBlogs(blog.slug);
 
       } catch (err) {
-        document.body.innerHTML = "Failed to load blog";
+        console.error("Blog load error", err);
+        showError("Failed to load blog. Please try again.");
       }
     }
 
@@ -170,8 +248,7 @@
         const data = await res.json();
 
         if (data.success) {
-          document.getElementById('likeCount').innerText =
-            data.likes + " Likes";
+          document.getElementById('likeCount').textContent = data.likes + " Likes";
         }
 
       } catch (err) {
@@ -182,28 +259,26 @@
 
     // ================= COMMENTS =================
 
+    // Comments are visitor input: build with textContent only, never innerHTML.
     function renderComments(comments) {
 
       const container = document.getElementById('commentsContainer');
 
       if (!comments || comments.length === 0) {
-        container.innerHTML = "<p>No comments yet.</p>";
+        const empty = document.createElement('p');
+        empty.textContent = 'No comments yet.';
+        container.replaceChildren(empty);
         return;
       }
 
-      let html = "";
-
+      container.replaceChildren();
       comments.forEach(c => {
-        html += `
-      <div class="single-comment">
-        <strong>${c.name}</strong>
-        <small>${new Date(c.createdAt).toLocaleDateString('en-IN')}</small>
-        <p>${c.message}</p>
-      </div>
-    `;
+        const item = document.createElement('div'); item.className = 'single-comment';
+        const name = document.createElement('strong'); name.textContent = c.name || 'Reader';
+        const date = document.createElement('small'); date.textContent = new Date(c.createdAt).toLocaleDateString('en-IN');
+        const message = document.createElement('p'); message.textContent = c.message || '';
+        item.append(name, date, message); container.appendChild(item);
       });
-
-      container.innerHTML = html;
     }
 
 
@@ -211,37 +286,29 @@
 
     async function loadRelatedBlogs(slug) {
 
-      const res = await fetch(API_BASE + '/api/blogs/related/' + slug);
-      const data = await res.json();
       const container = document.getElementById('relatedBlogs');
+      const none = () => { const p = document.createElement('p'); p.textContent = 'No related articles found.'; container.replaceChildren(p); };
 
-      if (!data.success || data.blogs.length === 0) {
-        container.innerHTML = "<p>No related articles found.</p>";
-        return;
+      try {
+        const res = await fetch(API_BASE + '/api/blogs/related/' + encodeURIComponent(slug));
+        const data = await res.json();
+
+        if (!data.success || data.blogs.length === 0) return none();
+
+        const grid = document.createElement('div'); grid.className = 'related-grid';
+        data.blogs.forEach(blog => {
+          const card = document.createElement('a'); card.className = 'related-card'; card.href = `blog.html?slug=${encodeURIComponent(blog.slug)}`;
+          if (blog.image) { const image = document.createElement('img'); image.src = blog.image; image.alt = blog.imageAlt || ''; image.className = 'related-image'; image.loading = 'lazy'; card.appendChild(image); }
+          const heading = document.createElement('h4'); heading.textContent = blog.title || '';
+          const text = new DOMParser().parseFromString(blog.excerpt || blog.content || '', 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+          const preview = document.createElement('p'); preview.textContent = text.substring(0, 100) + '…';
+          card.append(heading, preview); grid.appendChild(card);
+        });
+        container.replaceChildren(grid);
+      } catch (err) {
+        console.error("Related error", err);
+        none();
       }
-
-      let html = "<div class='related-grid'>";
-
-      data.blogs.forEach(blog => {
-
-        const preview =
-          blog.content.replace(/<[^>]*>/g, '').substring(0, 100) + "...";
-
-        html += `
-      <div class="related-card" onclick="openRelated('${blog.slug}')">
-        ${blog.image ? `<img src="${blog.image}" class="related-image">` : ""}
-        <h4>${blog.title}</h4>
-        <p>${preview}</p>
-      </div>
-    `;
-      });
-
-      html += "</div>";
-      container.innerHTML = html;
-    }
-
-    function openRelated(slug) {
-      window.location.href = "blog.html?slug=" + slug;
     }
 
     loadBlog();
@@ -294,7 +361,7 @@
     }
 
   </script>
-
+  <script src="js/load-components.js"></script>
 </body>
 
 </html>

@@ -10,3 +10,20 @@ Thumbs.db
 # node / logs (safe)
 node_modules/
 *.log
+
+# environment files may contain credentials; do not assume example files are safe
+.env
+.env.*
+*.env
+
+# archives and generated output
+*.zip
+*.tar
+*.tar.gz
+*.7z
+dist/
+build/
+coverage/
+
+# personal notes
+my data.txt
