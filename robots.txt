@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://student-education-portal-backend.onrender.com/sitemap.xml

@@ -85,6 +85,7 @@
         if (!container) return;
         if (!token()) { container.textContent = 'Admin session missing. Sign in again.'; return; }
         container.textContent = 'Loading articles…';
+        loadPendingComments();
         try {
             const response = await fetch(`${apiBase()}/api/blogs/admin/all`, { headers: { Authorization: `Bearer ${token()}` } });
             const data = await response.json();
@@ -93,6 +94,46 @@
         } catch (error) {
             container.textContent = error.message || 'Failed to load articles.';
         }
+    }
+
+    // Visitor comments: built with textContent only, never innerHTML.
+    async function loadPendingComments() {
+        const container = byId('pendingComments');
+        if (!container) return;
+        container.textContent = 'Loading comments…';
+        try {
+            const response = await fetch(`${apiBase()}/api/blogs/admin/comments`, { headers: { Authorization: `Bearer ${token()}` } });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Could not load comments');
+            container.replaceChildren();
+            if (!data.comments.length) { container.textContent = 'No comments waiting.'; return; }
+            data.comments.forEach((comment) => {
+                const item = document.createElement('div');
+                item.style.cssText = 'background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:10px';
+                const head = document.createElement('strong'); head.textContent = `${comment.name} on “${comment.blogTitle}”`;
+                const date = document.createElement('small'); date.textContent = ' ' + new Date(comment.createdAt).toLocaleString('en-IN');
+                const text = document.createElement('p'); text.textContent = comment.message; text.style.cssText = 'margin:6px 0 10px;white-space:pre-line';
+                const approve = document.createElement('button'); approve.type = 'button'; approve.className = 'btn btn-edit'; approve.textContent = 'Approve';
+                approve.addEventListener('click', () => moderateComment(comment, 'PUT', '/approve'));
+                const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'btn btn-delete'; remove.textContent = 'Delete';
+                remove.addEventListener('click', () => confirm('Delete this comment?') && moderateComment(comment, 'DELETE', ''));
+                item.append(head, date, text, approve, ' ', remove);
+                container.appendChild(item);
+            });
+        } catch (error) {
+            container.textContent = error.message || 'Failed to load comments.';
+        }
+    }
+
+    async function moderateComment(comment, method, suffix) {
+        try {
+            const url = `${apiBase()}/api/blogs/admin/comments/${encodeURIComponent(comment.blogId)}/${encodeURIComponent(comment._id)}${suffix}`;
+            const response = await fetch(url, { method, headers: { Authorization: `Bearer ${token()}` } });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Action failed');
+            showAlert(method === 'PUT' ? 'Comment approved.' : 'Comment deleted.', 'success');
+            loadPendingComments();
+        } catch (error) { showAlert(error.message || 'Action failed.', 'error'); }
     }
 
     function renderBlogList(blogs) {

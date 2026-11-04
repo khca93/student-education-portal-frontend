@@ -607,7 +607,7 @@ async function loadFeaturedBlog() {
         const content = document.createElement('div'); content.style.cssText = 'flex:1;padding:30px;min-width:300px';
         const category = document.createElement('div'); category.textContent = blog.category || 'General'; category.style.cssText = 'color:#2563eb;font-weight:bold;margin-bottom:10px';
         const heading = document.createElement('h3'); heading.textContent = blog.title || ''; heading.style.marginBottom = '15px';
-        const summary = document.createElement('p'); summary.textContent = blog.excerpt || (blog.content || '').replace(/<[^>]*>/g, '').substring(0, 200) + '…'; summary.style.cssText = 'color:#555;margin-bottom:20px';
+        const summary = document.createElement('p'); summary.textContent = new DOMParser().parseFromString(blog.excerpt || '', 'text/html').body.textContent; summary.style.cssText = 'color:#555;margin-bottom:20px';
         const link = document.createElement('a'); link.href = `blog.html?slug=${encodeURIComponent(blog.slug)}`; link.textContent = 'Read full article'; link.style.cssText = 'display:inline-block;padding:10px 20px;background:#2563eb;color:white;border-radius:8px;text-decoration:none';
         content.append(category, heading, summary, link); card.appendChild(content); container.replaceChildren(card);
     } catch (error) {

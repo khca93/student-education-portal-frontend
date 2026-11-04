@@ -156,7 +156,7 @@
                         card.appendChild(el('div', 'blog-image-placeholder', 'Knowledge Hunt'));
                     }
                     const date = new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const excerpt = plainText(blog.excerpt) || plainText(blog.content).substring(0, 120) + '…';
+                    const excerpt = plainText(blog.excerpt);
                     const meta = el('div', 'card-meta');
                     const dateEl = el('span', '', ' ' + date);
                     dateEl.prepend(el('i', 'far fa-calendar'));
@@ -183,11 +183,11 @@
 
         async function loadCategories() {
             try {
-                const res = await fetch(API_BASE + '/api/blogs?page=1&limit=100');
+                const res = await fetch(API_BASE + '/api/blogs/categories');
                 const data = await res.json();
                 if (!data.success) return;
                 const select = document.getElementById('categoryFilter');
-                [...new Set(data.blogs.map(b => b.category).filter(Boolean))].sort().forEach(cat => {
+                data.categories.forEach(cat => {
                     const option = el('option', '', cat);
                     option.value = cat;
                     select.appendChild(option);

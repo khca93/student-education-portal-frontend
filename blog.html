@@ -92,7 +92,7 @@
       <div class="content blog-content" id="blogContent"></div>
 
       <div class="like-section">
-        <button type="button" onclick="likeBlog()"><i class="far fa-thumbs-up"></i> Like</button>
+        <button type="button" id="likeButton" onclick="likeBlog()"><i class="far fa-thumbs-up"></i> Like</button>
         <span id="likeCount"></span>
         <button type="button" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
         <button type="button" onclick="shareFacebook()"><i class="fab fa-facebook"></i> Facebook</button>
@@ -219,6 +219,7 @@
 
         // LIKE COUNT SHOW
         document.getElementById('likeCount').textContent = (blog.likes || 0) + " Likes";
+        if (localStorage.getItem('liked:' + currentBlogId)) document.getElementById('likeButton').disabled = true;
 
         // Admin-written HTML, sanitized by the API (includes allow-listed YouTube embeds).
         document.getElementById('blogContent').innerHTML = blog.content;
@@ -237,7 +238,9 @@
 
     async function likeBlog() {
 
-      if (!currentBlogId) return;
+      if (!currentBlogId || localStorage.getItem('liked:' + currentBlogId)) return;
+      const button = document.getElementById('likeButton');
+      button.disabled = true;
 
       try {
 
@@ -249,10 +252,12 @@
 
         if (data.success) {
           document.getElementById('likeCount').textContent = data.likes + " Likes";
-        }
+          localStorage.setItem('liked:' + currentBlogId, '1');
+        } else button.disabled = false;
 
       } catch (err) {
         console.error("Like error", err);
+        button.disabled = false;
       }
     }
 
@@ -300,7 +305,7 @@
           const card = document.createElement('a'); card.className = 'related-card'; card.href = `blog.html?slug=${encodeURIComponent(blog.slug)}`;
           if (blog.image) { const image = document.createElement('img'); image.src = blog.image; image.alt = blog.imageAlt || ''; image.className = 'related-image'; image.loading = 'lazy'; card.appendChild(image); }
           const heading = document.createElement('h4'); heading.textContent = blog.title || '';
-          const text = new DOMParser().parseFromString(blog.excerpt || blog.content || '', 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+          const text = new DOMParser().parseFromString(blog.excerpt || '', 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
           const preview = document.createElement('p'); preview.textContent = text.substring(0, 100) + '…';
           card.append(heading, preview); grid.appendChild(card);
         });
@@ -321,6 +326,7 @@
         alert("Name and message required");
         return;
       }
+      if (!currentBlogId) return;
 
       try {
 
@@ -339,24 +345,26 @@
           document.getElementById('commentName').value = '';
           document.getElementById('commentMessage').value = '';
         }
+        alert(data.message || (data.success ? "Comment sent" : "Failed to post comment"));
 
       } catch (err) {
         alert("Failed to post comment");
       }
     }
 
+    // Backend page with real OG tags; it redirects visitors back to this page.
+    const shareUrl = () => API_BASE + '/share/' + encodeURIComponent(getSlug() || '');
+
     function shareWhatsApp() {
-      const url = encodeURIComponent(window.location.href);
-      window.open(`https://wa.me/?text=${url}`, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl())}`, '_blank');
     }
 
     function shareFacebook() {
-      const url = encodeURIComponent(window.location.href);
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl())}`, '_blank');
     }
 
     function copyLink() {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(shareUrl());
       alert("Link copied!");
     }
 
