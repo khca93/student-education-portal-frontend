@@ -143,8 +143,13 @@ jobs:
 
               ftp.cwd(remote_root)
 
+              # Login nantar jo folder milto (/exampaper) to base mhanun lakshat theva
+              remote_base = ftp.pwd()
+              print(f"FTP base directory: {remote_base}")
+
               def ensure_remote_dir(relative_dir):
-                  ftp.cwd(".")
+                  # Pratyek file adhi base folder la parat ja
+                  ftp.cwd(remote_base)
 
                   if not relative_dir or relative_dir == ".":
                       return
@@ -181,7 +186,7 @@ jobs:
 
               print("--------------------------------")
               print("FTP deployment completed.")
-              print("Destination: /exampaper")
+              print(f"Destination: {remote_base}")
               print(f"Files uploaded: {uploaded}")
               print("Remote files were not deleted.")
               print("--------------------------------")
