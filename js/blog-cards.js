@@ -67,8 +67,8 @@ const BlogCards = (() => {
     return a;
   };
 
-  function card(blog, { featuredAbove = false } = {}) {
-    const a = link(blog, 'bc-card');
+  function card(blog, { featuredAbove = false, readMore = false } = {}) {
+    const a = link(blog, 'bc-card' + (readMore ? ' homepage-blog-card' : ''));
     const body = el('div', 'bc-body');
     const tags = el('div', 'bc-tags');
     if (featuredAbove) tags.append(el('span', 'bc-label', 'Featured above'));
@@ -79,6 +79,7 @@ const BlogCards = (() => {
       el('p', 'bc-excerpt', plainText(blog.excerpt)),
       meta(blog)
     );
+    if (readMore) body.append(el('span', 'bc-more', 'Read more'));
     a.append(media(blog), body);
     return a;
   }

@@ -79,6 +79,15 @@
 .bc-all a { color: var(--bl-brand); font-weight: 600; text-decoration: none; padding: 8px 4px; }
 .bc-all a:hover { text-decoration: underline; }
 
+.homepage-blog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.homepage-blog-grid .bc-all { grid-column: 1 / -1; }
+@media (max-width: 860px) {
+  .homepage-blog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .homepage-blog-grid { grid-template-columns: 1fr; }
+}
+
 /* ================= BLOGS LIST PAGE ================= */
 .blogs-page { background: #f1f5f9; font-family: var(--bl-font); }
 .blogs-hero { padding: 64px 0 72px; text-align: center; }

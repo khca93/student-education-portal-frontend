@@ -277,7 +277,7 @@ function init() {
             link.classList.add('active');
         }
     });
-    loadFeaturedBlog();
+    loadHomepageBlogs();
 }
 
 
@@ -518,7 +518,7 @@ function openCategory(categorySlug) {
         "12th-hsc-science": "12th HSC",
         "12th-cbse": "12th CBSE",
         "competitive": "Competitive",
-        "govt-exams": "Competitive"
+        "govt-exams": "Government Exams"
     };
 
     const actualCategory = categoryMap[categorySlug];
@@ -587,7 +587,7 @@ if (document.readyState === 'loading') {
 }
 
 
-async function loadFeaturedBlog() {
+async function loadHomepageBlogs() {
     const container = document.getElementById('featuredBlog');
     if (!container) return;
     // Same card as the featured one on blogs.html (js/blog-cards.js).
@@ -597,17 +597,29 @@ async function loadFeaturedBlog() {
         wrap.appendChild(link); return wrap;
     };
     try {
-        // The homepage should show the newest public post. The blog index has
-        // its own curated featured slot and continues using /featured.
-        const response = await fetch(API_URL + '/api/blogs?limit=1');
+        const response = await fetch(API_URL + '/api/blogs?limit=3');
         const data = await response.json();
-        const blog = data.blogs?.[0];
-        if (!data.success || !blog) {
-            const empty = document.createElement('p'); empty.textContent = 'No blog available.'; empty.style.textAlign = 'center'; container.replaceChildren(empty); return;
+        const now = Date.now();
+        const blogs = (Array.isArray(data.blogs) ? data.blogs : [])
+            .filter(blog => blog && blog.slug && (!blog.status || blog.status === 'published'))
+            .filter(blog => {
+                const publishedAt = blog.publishedAt ? Date.parse(blog.publishedAt) : NaN;
+                return Number.isNaN(publishedAt) || publishedAt <= now;
+            })
+            .filter((blog, index, items) => items.findIndex(item => item.slug === blog.slug) === index)
+            .sort((a, b) => {
+                const dateA = Date.parse(a.publishedAt || '') || Date.parse(a.createdAt || '') || 0;
+                const dateB = Date.parse(b.publishedAt || '') || Date.parse(b.createdAt || '') || 0;
+                return dateB - dateA;
+            })
+            .slice(0, 3);
+        if (!data.success || !blogs.length) {
+            const empty = document.createElement('p'); empty.textContent = 'No published blogs are available yet.'; empty.style.textAlign = 'center'; container.replaceChildren(empty, allLink()); return;
         }
-        container.replaceChildren(BlogCards.featured(blog), allLink());
+        container.classList.add('homepage-blog-grid');
+        container.replaceChildren(...blogs.map(blog => BlogCards.card(blog, { readMore: true })), allLink());
     } catch (error) {
-        console.error('Featured blog error:', error);
+        console.error('Homepage blogs error:', error);
         const message = document.createElement('p'); message.textContent = 'Failed to load blog.'; message.style.textAlign = 'center'; container.replaceChildren(message, allLink());
     }
 }
