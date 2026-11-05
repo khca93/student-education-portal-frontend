@@ -144,26 +144,24 @@ jobs:
 
               ftp.cwd(remote_root)
 
-              def ensure_remote_dir(relative_dir):
-                  if not relative_dir or relative_dir == ".":
-                      return
-
-                  ftp.cwd(remote_root)
-
-                  parts = relative_dir.split("/")
-
-                  for part in parts:
-                      if not part or part == ".":
-                          continue
-
-                      if part == "..":
-                          raise ValueError("Unsafe remote path")
-
-                      try:
-                          ftp.cwd(part)
-                      except ftplib.error_perm:
-                          ftp.mkd(part)
-                          ftp.cwd(part)
+             def ensure_remote_dir(relative_dir):
+                ftp.cwd(".")
+            
+                if not relative_dir or relative_dir == ".":
+                    return
+            
+                for part in relative_dir.split("/"):
+                    if not part or part == ".":
+                        continue
+            
+                    if part == "..":
+                        raise ValueError("Unsafe remote path")
+            
+                    try:
+                        ftp.cwd(part)
+                    except ftplib.error_perm:
+                        ftp.mkd(part)
+                        ftp.cwd(part)
 
               uploaded = 0
 
