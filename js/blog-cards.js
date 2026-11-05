@@ -67,11 +67,14 @@ const BlogCards = (() => {
     return a;
   };
 
-  function card(blog) {
+  function card(blog, { featuredAbove = false } = {}) {
     const a = link(blog, 'bc-card');
     const body = el('div', 'bc-body');
+    const tags = el('div', 'bc-tags');
+    if (featuredAbove) tags.append(el('span', 'bc-label', 'Featured above'));
+    tags.append(el('span', 'bc-tag', blog.category || 'General'));
     body.append(
-      el('span', 'bc-tag', blog.category || 'General'),
+      tags,
       el('h3', 'bc-title', blog.title || ''),
       el('p', 'bc-excerpt', plainText(blog.excerpt)),
       meta(blog)

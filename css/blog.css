@@ -97,6 +97,7 @@
 .blogs-featured { margin-bottom: 36px; }
 .blogs-featured:empty { display: none; }
 .blogs-featured .bc-skeleton { display: grid; grid-template-columns: 1.15fr 1fr; min-height: 320px; }
+.blog-grid-heading { margin: 0 0 18px; color: var(--bl-ink); font-size: 1.35rem; }
 .blog-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; scroll-margin-top: 96px; }
 .blog-chip {
   padding: 8px 16px; border-radius: 999px; border: 1px solid var(--bl-line); background: #fff; color: var(--bl-text);

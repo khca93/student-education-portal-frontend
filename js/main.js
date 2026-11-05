@@ -597,12 +597,15 @@ async function loadFeaturedBlog() {
         wrap.appendChild(link); return wrap;
     };
     try {
-        const response = await fetch(API_URL + '/api/blogs/featured');
+        // The homepage should show the newest public post. The blog index has
+        // its own curated featured slot and continues using /featured.
+        const response = await fetch(API_URL + '/api/blogs?limit=1');
         const data = await response.json();
-        if (!data.success || !data.blog) {
+        const blog = data.blogs?.[0];
+        if (!data.success || !blog) {
             const empty = document.createElement('p'); empty.textContent = 'No blog available.'; empty.style.textAlign = 'center'; container.replaceChildren(empty); return;
         }
-        container.replaceChildren(BlogCards.featured(data.blog), allLink());
+        container.replaceChildren(BlogCards.featured(blog), allLink());
     } catch (error) {
         console.error('Featured blog error:', error);
         const message = document.createElement('p'); message.textContent = 'Failed to load blog.'; message.style.textAlign = 'center'; container.replaceChildren(message, allLink());

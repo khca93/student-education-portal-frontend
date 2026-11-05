@@ -15,7 +15,7 @@
     <link href="css/header.css?v=20261105" rel="stylesheet">
     <link href="css/footer.css?v=20261105" rel="stylesheet">
     <link href="css/main.css?v=20261105" rel="stylesheet">
-    <link href="css/blog.css?v=20261105" rel="stylesheet">
+    <link href="css/blog.css?v=20261105-2" rel="stylesheet">
 </head>
 
 <body class="blogs-page">
@@ -37,6 +37,7 @@
 
         <div class="blog-chips" id="categoryChips" role="group" aria-label="Filter by category"></div>
 
+        <h2 id="blogGridHeading" class="blog-grid-heading">All published articles</h2>
         <div class="bc-grid" id="blogGrid" aria-live="polite" aria-busy="true"></div>
 
         <nav class="blog-pagination" id="pagination" aria-label="Blog pages"></nav>
@@ -44,7 +45,7 @@
 
     <div id="footer-container"></div>
 
-    <script src="js/blog-cards.js?v=20261105"></script>
+    <script src="js/blog-cards.js?v=20261105-2"></script>
     <script>
         const API_BASE = location.hostname === "localhost"
             ? "http://localhost:5000"
@@ -98,6 +99,7 @@
 
         async function loadBlogs(page = 1) {
             const grid = document.getElementById('blogGrid');
+            document.getElementById('blogGridHeading').textContent = filtered() ? 'Articles matching your filters' : 'All published articles';
             const id = ++requestId; // ignore answers that arrive after a newer search
             grid.setAttribute('aria-busy', 'true');
             grid.replaceChildren(...BlogCards.skeleton(6));
@@ -119,10 +121,10 @@
                 currentPage = data.currentPage;
                 totalPages = data.totalPages;
 
-                // The featured article is already shown big above the grid on the unfiltered first page.
-                const featuredShown = !filtered() && currentPage === 1 && featuredSlug;
-                const blogs = featuredShown ? data.blogs.filter(b => b.slug !== featuredSlug) : data.blogs;
-                grid.replaceChildren(...blogs.map(BlogCards.card));
+                // Keep every API result in the grid, including the article featured above it.
+                grid.replaceChildren(...data.blogs.map((blog) => BlogCards.card(blog, {
+                    featuredAbove: !filtered() && currentPage === 1 && blog.slug === featuredSlug
+                })));
                 renderPagination();
             } catch (err) {
                 if (id !== requestId) return;
@@ -199,7 +201,7 @@
 
         loadCategories();
         document.getElementById('blogGrid').replaceChildren(...BlogCards.skeleton(6));
-        // Grid waits for the featured slug so the same article is not shown twice.
+        // Resolve the featured article before rendering its regular grid card label.
         loadFeatured().finally(() => loadBlogs());
     </script>
     <script src="js/load-components.js?v=20261105"></script>
