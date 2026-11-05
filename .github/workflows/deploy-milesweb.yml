@@ -1,6 +1,10 @@
+
 name: Deploy frontend to MilesWeb
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -12,54 +16,64 @@ concurrency:
 
 jobs:
   deploy:
-    name: Upload frontend files (no remote deletions)
+    name: Upload frontend files
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+
     steps:
+      - name: Checkout frontend repository
+        uses: actions/checkout@v4
+
       - name: Check deployment configuration
         shell: bash
         env:
-          FTP_SERVER: ${{ secrets.MILESWEB_FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.MILESWEB_FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.MILESWEB_FTP_PASSWORD }}
-          FTP_PROTOCOL: ${{ vars.MILESWEB_FTP_PROTOCOL }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PROTOCOL: ${{ secrets.MILESWEB_FTP_PROTOCOL }}
           FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+
         run: |
           set -euo pipefail
-          if [[ -z "$FTP_SERVER_DIR" ]]; then
-            echo "::error::MILESWEB_FTP_SERVER_DIR is not configured. Set the verified FTP-restricted document-root path before deployment."
-            exit 1
-          fi
+
           if [[ -z "$FTP_SERVER" || -z "$FTP_USERNAME" || -z "$FTP_PASSWORD" ]]; then
-            echo "::error::MilesWeb FTP server or credentials are missing from GitHub Actions secrets."
+            echo "::error::FTP credentials are missing."
             exit 1
           fi
+
+          if [[ -z "$FTP_SERVER_DIR" ]]; then
+            echo "::error::FTP server directory is missing."
+            exit 1
+          fi
+
           if [[ "$FTP_PROTOCOL" != "ftpes" && "$FTP_PROTOCOL" != "ftps" ]]; then
-            echo "::error::Set MILESWEB_FTP_PROTOCOL to ftpes (explicit TLS) or ftps (implicit TLS); unencrypted FTP is not allowed."
+            echo "::error::Invalid FTP protocol. Use ftpes or ftps."
             exit 1
           fi
+
           if [[ "$FTP_SERVER" == *"/"* || "$FTP_SERVER" == *"@"* || "$FTP_SERVER" == *"?"* || "$FTP_SERVER" == *"#"* ]]; then
-            echo "::error::MILESWEB_FTP_SERVER must contain only the FTP hostname (and optional port), without a scheme or path."
+            echo "::error::Invalid FTP server hostname."
             exit 1
           fi
+
           if [[ "$FTP_SERVER_DIR" == /* || "$FTP_SERVER_DIR" == *"\\"* || "/$FTP_SERVER_DIR/" == *"/../"* ]]; then
-            echo "::error::MILESWEB_FTP_SERVER_DIR must be a verified relative path within the FTP account, without parent-directory segments."
+            echo "::error::Invalid FTP relative directory."
             exit 1
           fi
 
-      - name: Check out frontend repository
-        uses: actions/checkout@v4
+          echo "FTP configuration validation successful."
 
-      - name: Upload tracked website files without deleting remote files
+      - name: Upload tracked website files
         shell: bash
         env:
-           FTP_SERVER: ${{ secrets.FTP_SERVER }}
-           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-           FTP_PROTOCOL: ftps  
-           FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }} 
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PROTOCOL: ${{ secrets.MILESWEB_FTP_PROTOCOL }}
+          FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+
         run: |
           set -euo pipefail
+
           python3 - <<'PY'
           import os
           import subprocess
@@ -67,42 +81,106 @@ jobs:
 
           protocol = os.environ["FTP_PROTOCOL"]
           server = os.environ["FTP_SERVER"]
+          username = os.environ["FTP_USERNAME"]
+          password = os.environ["FTP_PASSWORD"]
+
           remote_dir = os.environ["FTP_SERVER_DIR"].strip("/")
+
           if remote_dir == ".":
               remote_dir = ""
-          encoded_remote_dir = "/".join(quote(part, safe="") for part in remote_dir.split("/") if part)
 
-          tracked = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
-          excluded_dirs = (".github/", "uploads/", "node_modules/", "dist/", "build/", "coverage/")
-          archive_suffixes = (".zip", ".tar", ".tar.gz", ".7z")
+          encoded_remote_dir = "/".join(
+              quote(part, safe="")
+              for part in remote_dir.split("/")
+              if part
+          )
+
+          tracked = subprocess.check_output(
+              ["git", "ls-files", "-z"]
+          ).decode().split("\0")
+
+          excluded_dirs = (
+              ".github/",
+              "uploads/",
+              "node_modules/",
+              "dist/",
+              "build/",
+              "coverage/",
+          )
+
+          archive_suffixes = (
+              ".zip",
+              ".tar",
+              ".tar.gz",
+              ".7z",
+          )
+
+          scheme = "ftps" if protocol == "ftps" else "ftp"
 
           for path in filter(None, tracked):
+
               normalized = path.replace("\\", "/")
               lower = normalized.lower()
               name = lower.rsplit("/", 1)[-1]
-              if normalized == ".gitignore" or normalized.startswith(excluded_dirs):
+
+              if normalized == ".gitignore":
                   continue
+
+              if normalized.startswith(excluded_dirs):
+                  continue
+
               if name == ".env" or name.startswith(".env.") or name.endswith(".env"):
                   continue
-              if lower.endswith(archive_suffixes) or lower.endswith((".pdf", ".log")):
+
+              if lower.endswith(archive_suffixes):
+                  continue
+
+              if lower.endswith((".pdf", ".log")):
                   continue
 
               relative = quote(normalized, safe="/")
               encoded_parent = os.path.dirname(relative)
-              target_dir = "/".join(part for part in (encoded_remote_dir, encoded_parent) if part)
-              scheme = "ftps" if protocol == "ftps" else "ftp"
-              target = f"{scheme}://{server}/{target_dir + '/' if target_dir else ''}{os.path.basename(relative)}"
-              curl_options = ["curl", "--fail", "--silent", "--show-error", "--ftp-create-dirs"]
+
+              target_dir = "/".join(
+                  part for part in (
+                      encoded_remote_dir,
+                      encoded_parent
+                  ) if part
+              )
+
+              filename = relative.rsplit("/", 1)[-1]
+
+              target = (
+                  f"{scheme}://{server}/"
+                  f"{target_dir + '/' if target_dir else ''}"
+                  f"{filename}"
+              )
+
+              curl_options = [
+                  "curl",
+                  "--fail",
+                  "--silent",
+                  "--show-error",
+                  "--ftp-create-dirs",
+                  "--ftp-pasv",
+              ]
+
               if protocol == "ftpes":
                   curl_options.append("--ssl-reqd")
+
               subprocess.run(
                   curl_options + [
                       "--user",
-                      f"{os.environ['FTP_USERNAME']}:{os.environ['FTP_PASSWORD']}",
-                      "--upload-file", path, target,
+                      f"{username}:{password}",
+                      "--upload-file",
+                      path,
+                      target,
                   ],
                   check=True,
               )
 
-          print("Upload-only deployment completed; no remote listing or deletion command was issued.")
+              print(f"Uploaded: {normalized}")
+
+          print("Deployment completed successfully.")
+          print("No remote files were deleted.")
           PY
