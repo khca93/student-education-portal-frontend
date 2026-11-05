@@ -56,8 +56,8 @@ jobs:
            FTP_SERVER: ${{ secrets.FTP_SERVER }}
            FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
            FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-           FTP_PROTOCOL: ftps
-           FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+           FTP_PROTOCOL: ftps  
+           FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }} 
         run: |
           set -euo pipefail
           python3 - <<'PY'
