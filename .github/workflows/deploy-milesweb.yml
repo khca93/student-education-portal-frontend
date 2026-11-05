@@ -23,7 +23,7 @@ jobs:
           FTP_USERNAME: ${{ secrets.MILESWEB_FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.MILESWEB_FTP_PASSWORD }}
           FTP_PROTOCOL: ${{ vars.MILESWEB_FTP_PROTOCOL }}
-          FTP_SERVER_DIR: ${{ vars.MILESWEB_FTP_SERVER_DIR }}
+          FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
         run: |
           set -euo pipefail
           if [[ -z "$FTP_SERVER_DIR" ]]; then
