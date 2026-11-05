@@ -25,11 +25,11 @@ jobs:
       - name: Validate FTP configuration
         shell: bash
         env:
-          FTP_SERVER: ${{ secrets.MILESWEB_FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.MILESWEB_FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.MILESWEB_FTP_PASSWORD }}
-          FTP_PROTOCOL: ${{ secrets.MILESWEB_FTP_PROTOCOL }}
-          FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+         FTP_SERVER: ${{ secrets.FTP_SERVER }}
+         FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+         FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+         FTP_PROTOCOL: ${{ secrets.MILESWEB_FTP_PROTOCOL }}
+         FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
         run: |
           set -euo pipefail
 
@@ -63,10 +63,10 @@ jobs:
       - name: Upload frontend files to MilesWeb
         shell: bash
         env:
-          FTP_SERVER: ${{ secrets.MILESWEB_FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.MILESWEB_FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.MILESWEB_FTP_PASSWORD }}
-          FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+           FTP_SERVER: ${{ secrets.FTP_SERVER }}
+           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+           FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
         run: |
           set -euo pipefail
 
