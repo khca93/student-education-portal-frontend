@@ -1,0 +1,108 @@
+name: Deploy frontend to MilesWeb
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: milesweb-frontend-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload frontend files (no remote deletions)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check deployment configuration
+        shell: bash
+        env:
+          FTP_SERVER: ${{ secrets.MILESWEB_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.MILESWEB_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.MILESWEB_FTP_PASSWORD }}
+          FTP_PROTOCOL: ${{ vars.MILESWEB_FTP_PROTOCOL }}
+          FTP_SERVER_DIR: ${{ vars.MILESWEB_FTP_SERVER_DIR }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$FTP_SERVER_DIR" ]]; then
+            echo "::error::MILESWEB_FTP_SERVER_DIR is not configured. Set the verified FTP-restricted document-root path before deployment."
+            exit 1
+          fi
+          if [[ -z "$FTP_SERVER" || -z "$FTP_USERNAME" || -z "$FTP_PASSWORD" ]]; then
+            echo "::error::MilesWeb FTP server or credentials are missing from GitHub Actions secrets."
+            exit 1
+          fi
+          if [[ "$FTP_PROTOCOL" != "ftpes" && "$FTP_PROTOCOL" != "ftps" ]]; then
+            echo "::error::Set MILESWEB_FTP_PROTOCOL to ftpes (explicit TLS) or ftps (implicit TLS); unencrypted FTP is not allowed."
+            exit 1
+          fi
+          if [[ "$FTP_SERVER" == *"/"* || "$FTP_SERVER" == *"@"* || "$FTP_SERVER" == *"?"* || "$FTP_SERVER" == *"#"* ]]; then
+            echo "::error::MILESWEB_FTP_SERVER must contain only the FTP hostname (and optional port), without a scheme or path."
+            exit 1
+          fi
+          if [[ "$FTP_SERVER_DIR" == /* || "$FTP_SERVER_DIR" == *"\\"* || "/$FTP_SERVER_DIR/" == *"/../"* ]]; then
+            echo "::error::MILESWEB_FTP_SERVER_DIR must be a verified relative path within the FTP account, without parent-directory segments."
+            exit 1
+          fi
+
+      - name: Check out frontend repository
+        uses: actions/checkout@v4
+
+      - name: Upload tracked website files without deleting remote files
+        shell: bash
+        env:
+          FTP_SERVER: ${{ secrets.MILESWEB_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.MILESWEB_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.MILESWEB_FTP_PASSWORD }}
+          FTP_PROTOCOL: ${{ vars.MILESWEB_FTP_PROTOCOL }}
+          FTP_SERVER_DIR: ${{ vars.MILESWEB_FTP_SERVER_DIR }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          import subprocess
+          from urllib.parse import quote
+
+          protocol = os.environ["FTP_PROTOCOL"]
+          server = os.environ["FTP_SERVER"]
+          remote_dir = os.environ["FTP_SERVER_DIR"].strip("/")
+          if remote_dir == ".":
+              remote_dir = ""
+          encoded_remote_dir = "/".join(quote(part, safe="") for part in remote_dir.split("/") if part)
+
+          tracked = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+          excluded_dirs = (".github/", "uploads/", "node_modules/", "dist/", "build/", "coverage/")
+          archive_suffixes = (".zip", ".tar", ".tar.gz", ".7z")
+
+          for path in filter(None, tracked):
+              normalized = path.replace("\\", "/")
+              lower = normalized.lower()
+              name = lower.rsplit("/", 1)[-1]
+              if normalized == ".gitignore" or normalized.startswith(excluded_dirs):
+                  continue
+              if name == ".env" or name.startswith(".env.") or name.endswith(".env"):
+                  continue
+              if lower.endswith(archive_suffixes) or lower.endswith((".pdf", ".log")):
+                  continue
+
+              relative = quote(normalized, safe="/")
+              encoded_parent = os.path.dirname(relative)
+              target_dir = "/".join(part for part in (encoded_remote_dir, encoded_parent) if part)
+              scheme = "ftps" if protocol == "ftps" else "ftp"
+              target = f"{scheme}://{server}/{target_dir + '/' if target_dir else ''}{os.path.basename(relative)}"
+              curl_options = ["curl", "--fail", "--silent", "--show-error", "--ftp-create-dirs"]
+              if protocol == "ftpes":
+                  curl_options.append("--ssl-reqd")
+              subprocess.run(
+                  curl_options + [
+                      "--user",
+                      f"{os.environ['FTP_USERNAME']}:{os.environ['FTP_PASSWORD']}",
+                      "--upload-file", path, target,
+                  ],
+                  check=True,
+              )
+
+          print("Upload-only deployment completed; no remote listing or deletion command was issued.")
+          PY
