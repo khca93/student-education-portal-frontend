@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy frontend to MilesWeb
+    name: Deploy frontend to /exampaper
     runs-on: ubuntu-latest
 
     if: github.ref == 'refs/heads/main'
@@ -22,73 +22,101 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate FTP configuration
+      - name: Validate SFTP configuration
         shell: bash
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          SFTP_HOST: ${{ secrets.FTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
           set -euo pipefail
 
-          if [[ -z "$FTP_SERVER" || -z "$FTP_USERNAME" || -z "$FTP_PASSWORD" ]]; then
-            echo "::error::FTP credentials are missing."
+          [[ -n "$SFTP_HOST" ]] || {
+            echo "::error::FTP_SERVER is missing"
+            exit 1
+          }
+
+          [[ -n "$SFTP_USERNAME" ]] || {
+            echo "::error::FTP_USERNAME is missing"
+            exit 1
+          }
+
+          [[ -n "$SFTP_PASSWORD" ]] || {
+            echo "::error::FTP_PASSWORD is missing"
+            exit 1
+          }
+
+          [[ -n "$REMOTE_DIR" ]] || {
+            echo "::error::FTP_SERVER_DIR is missing"
+            exit 1
+          }
+
+          if [[ "$REMOTE_DIR" == /* ||
+                "$REMOTE_DIR" == *\\* ||
+                "/$REMOTE_DIR/" == *"/../"* ]]; then
+            echo "::error::Remote directory must be a safe relative path"
             exit 1
           fi
 
-          if [[ "$FTP_SERVER" == *"/"* ]]; then
-            echo "::error::FTP_SERVER must contain hostname only."
-            exit 1
-          fi
+          echo "SFTP configuration validated."
 
-          echo "FTP configuration validated."
+      - name: Install SFTP dependency
+        run: |
+          python3 -m pip install --disable-pip-version-check paramiko
 
-      - name: Upload frontend files
+      - name: Upload frontend using SFTP
         shell: bash
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          SFTP_HOST: ${{ secrets.FTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
-          set -euo pipefail
-
           python3 - <<'PY'
           import os
+          import stat
+          import posixpath
+          import paramiko
           import subprocess
-          from urllib.parse import quote
 
-          server = os.environ["FTP_SERVER"]
-          username = os.environ["FTP_USERNAME"]
-          password = os.environ["FTP_PASSWORD"]
+          host = os.environ["SFTP_HOST"]
+          username = os.environ["SFTP_USERNAME"]
+          password = os.environ["SFTP_PASSWORD"]
+          remote_root = os.environ["REMOTE_DIR"].strip("/")
 
-          # FTP account root is assumed to be /exampaper
-          remote_dir = "."
+          if not remote_root:
+              raise ValueError("Remote directory cannot be empty")
 
           tracked = subprocess.check_output(
               ["git", "ls-files", "-z"]
           ).decode().split("\0")
 
           excluded_dirs = (
+              ".git/",
               ".github/",
-              "uploads/",
               "node_modules/",
               "dist/",
               "build/",
               "coverage/",
+              "uploads/",
           )
 
           excluded_suffixes = (
-              ".zip", ".tar", ".tar.gz",
-              ".7z", ".pdf", ".log"
+              ".zip",
+              ".tar",
+              ".tar.gz",
+              ".7z",
+              ".pdf",
+              ".log",
           )
 
-          uploaded = 0
+          files = []
 
           for path in filter(None, tracked):
-
               normalized = path.replace("\\", "/")
               lower = normalized.lower()
-              filename = lower.rsplit("/", 1)[-1]
+              name = lower.rsplit("/", 1)[-1]
 
               if normalized == ".gitignore":
                   continue
@@ -96,41 +124,77 @@ jobs:
               if normalized.startswith(excluded_dirs):
                   continue
 
-              if (filename == ".env"
-                  or filename.startswith(".env.")
-                  or filename.endswith(".env")):
+              if name == ".env" or name.startswith(".env.") or name.endswith(".env"):
                   continue
 
               if lower.endswith(excluded_suffixes):
                   continue
 
-              encoded_path = quote(normalized, safe="/")
+              if os.path.islink(path):
+                  continue
 
-              target = (
-                  f"ftp://{server}/"
-                  f"{encoded_path}"
+              if os.path.isfile(path):
+                  files.append(normalized)
+
+          transport = None
+          sftp = None
+
+          try:
+              transport = paramiko.Transport((host, 22))
+              transport.connect(
+                  username=username,
+                  password=password
               )
 
-              command = [
-                  "curl",
-                  "--fail",
-                  "--silent",
-                  "--show-error",
-                  "--ssl-reqd",
-                  "--ftp-create-dirs",
-                  "--user",
-                  f"{username}:{password}",
-                  "--upload-file",
-                  path,
-                  target,
-              ]
+              sftp = paramiko.SFTPClient.from_transport(transport)
 
-              print(f"Uploading: {normalized}")
+              def ensure_remote_dir(path):
+                  current = ""
 
-              subprocess.run(command, check=True)
+                  for part in path.split("/"):
+                      if not part or part == ".":
+                          continue
 
-              uploaded += 1
+                      if part == "..":
+                          raise ValueError("Unsafe remote path")
 
-          print(f"Deployment successful. Files uploaded: {uploaded}")
-          print("No remote files were deleted.")
+                      current = posixpath.join(current, part)
+
+                      try:
+                          sftp.stat(current)
+                      except FileNotFoundError:
+                          sftp.mkdir(current)
+
+              ensure_remote_dir(remote_root)
+
+              uploaded = 0
+
+              for local_path in files:
+                  remote_path = posixpath.join(
+                      remote_root,
+                      local_path
+                  )
+
+                  remote_parent = posixpath.dirname(remote_path)
+
+                  ensure_remote_dir(remote_parent)
+
+                  sftp.put(local_path, remote_path)
+
+                  uploaded += 1
+                  print(f"Uploaded: {local_path}")
+
+              print("--------------------------------")
+              print("SFTP deployment completed.")
+              print(f"Destination: {remote_root}")
+              print(f"Files uploaded: {uploaded}")
+              print("No remote files were deleted.")
+              print("--------------------------------")
+
+          finally:
+              if sftp:
+                  sftp.close()
+
+              if transport:
+                  transport.close()
           PY
