@@ -17,7 +17,7 @@
 
     const FIELD_IDS = ['blogTitle', 'blogSubtitle', 'blogCategory', 'blogTags', 'blogAuthor', 'blogPublishedAt', 'blogExcerpt', 'blogImageUrl', 'blogImageAlt', 'blogImageCaption', 'blogSlug', 'blogMetaTitle', 'blogMetaDescription', 'blogFocusKeyword', 'blogCanonicalUrl', 'blogSocialTitle', 'blogSocialDescription', 'blogSocialImage'];
     // Same block styles as css/blog.css, so the editor looks like the public page.
-    const BLOCK_CSS = '.blog-callout{margin:1.4em 0;padding:14px 18px;border-left:4px solid #3b6fc4;border-radius:6px;background:#eef4ff}.blog-callout p{margin:.3em 0}.blog-callout-tip{border-left-color:#1f9d63;background:#eaf8f1}.blog-callout-warning{border-left-color:#d08a12;background:#fff6e5}.blog-faq{margin:1.5em 0;border:1px solid #dfe5ee;border-radius:8px}.blog-faq-item{padding:12px 16px;border-top:1px solid #e7ecf2}.blog-faq-item:first-child{border-top:0}.blog-faq-item p{margin:.3em 0}.blog-btn{display:inline-block;padding:10px 22px;border-radius:6px;background:#2458a6;color:#fff!important;font-family:Arial,sans-serif;font-weight:600;text-decoration:none}.blog-toc{margin:1.5em 0;padding:14px 20px;border:1px solid #dfe5ee;border-radius:8px;background:#f7f9fc}.blog-toc p{margin:0}.blog-toc ul{margin:.5em 0 0;padding-left:1.2em}.blog-toc .blog-toc-sub{margin-left:1.2em}';
+    const BLOCK_CSS = '.blog-callout{margin:1.4em 0;padding:14px 18px;border-left:4px solid #3b6fc4;border-radius:6px;background:#eef4ff}.blog-callout p{margin:.3em 0}.blog-callout-tip{border-left-color:#1f9d63;background:#eaf8f1}.blog-callout-warning{border-left-color:#d08a12;background:#fff6e5}.blog-faq{margin:1.5em 0;border:1px solid #dfe5ee;border-radius:8px}.blog-faq-item{padding:12px 16px;border-top:1px solid #e7ecf2}.blog-faq-item:first-child{border-top:0}.blog-faq-item p{margin:.3em 0}.blog-btn{display:inline-block;padding:12px 24px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff!important;font-family:Arial,sans-serif;font-weight:600;text-decoration:none}.blog-toc{margin:1.5em 0;padding:14px 20px;border:1px solid #dfe5ee;border-radius:8px;background:#f7f9fc}.blog-toc p{margin:0}.blog-toc ul{margin:.5em 0 0;padding-left:1.2em}.blog-toc .blog-toc-sub{margin-left:1.2em}';
 
     const byId = (id) => document.getElementById(id);
     const token = () => localStorage.getItem('adminToken');
@@ -258,6 +258,13 @@
             updateHeading();
             const scheduled = currentStatus === 'published' && data.blog.publishedAt && new Date(data.blog.publishedAt) > new Date();
             byId('blogMessage').textContent = automatic ? 'Draft auto-saved.' : (scheduled ? `Scheduled. It goes live on ${new Date(data.blog.publishedAt).toLocaleString('en-IN')}.` : (currentStatus === 'published' ? 'Published successfully.' : 'Draft saved.'));
+            if (!automatic && currentStatus === 'published' && !scheduled) {
+                const live = document.createElement('a');
+                live.href = '../blog.html?slug=' + encodeURIComponent(data.blog.slug);
+                live.target = '_blank'; live.rel = 'noopener';
+                live.textContent = 'View live article ↗';
+                byId('blogMessage').append(' ', live);
+            }
             if (dirty) setStatus('Changes made while saving', 'dirty');
             else setStatus(automatic ? 'Draft auto-saved' : (scheduled ? 'Scheduled' : (currentStatus === 'published' ? 'Published' : 'Draft saved')), 'saved');
         } catch (error) {
@@ -272,7 +279,7 @@
 
     function previewDocument({ title, subtitle = '', excerpt = '', image = '', alt = '', caption = '', content }) {
         const safeImage = /^(https?:\/\/|blob:)/i.test(image) ? `<figure><img src="${escape(image)}" alt="${escape(alt)}">${caption ? `<figcaption>${escape(caption)}</figcaption>` : ''}</figure>` : '';
-        const blogCss = new URL('../css/blog.css', window.location.href).href;
+        const blogCss = new URL('../css/blog.css?v=20261105', window.location.href).href;
         return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="stylesheet" href="${escape(blogCss)}"><style>body{font:17px/1.8 Georgia,serif;color:#243044;max-width:760px;margin:40px auto;padding:0 24px;background:#fff}h1{font:700 42px/1.15 Arial,sans-serif;color:#14233d;margin:0}h2,h3,h4{font:600 25px/1.35 Arial,sans-serif;color:#182840}header{border-bottom:1px solid #e5eaf0;padding-bottom:25px;margin-bottom:28px}.sub{font:22px/1.5 Arial;color:#65738a}.excerpt{font:18px/1.6 Arial;color:#53647a}article{line-height:1.8}a{color:#2458a6}ul,ol{padding-left:2em}figure{margin:30px 0}img{max-width:100%;height:auto}figcaption{font:14px Arial;color:#68758a;text-align:center}table{border-collapse:collapse;width:100%;margin:20px 0}td,th{border:1px solid #d9e0e8;padding:8px}blockquote{border-left:4px solid #7890ba;padding-left:18px;color:#54647a}pre{overflow:auto;background:#eef2f7;padding:14px}iframe{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0}@media(max-width:500px){body{margin:20px auto;padding:0 16px}h1{font-size:30px}}</style></head><body><header><h1>${escape(title)}</h1>${subtitle ? `<p class="sub">${escape(subtitle)}</p>` : ''}${excerpt ? `<p class="excerpt">${escape(excerpt)}</p>` : ''}</header>${safeImage}<article class="blog-content">${content}</article></body></html>`;
     }
 

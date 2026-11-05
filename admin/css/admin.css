@@ -1247,6 +1247,7 @@ textarea.form-control {
 .blog-document .tox .tox-edit-area iframe { min-height: 560px; }
 .blog-writing-stats { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; color: #778397; font-size: 12px; }
 .blog-editor-message { min-height: 20px; max-width: 1000px; margin: 0 auto 8px; color: #52637b; font-size: 13px; }
+.blog-editor-message a { color: #4f46e5; font-weight: 600; }
 .blog-settings-column { position: sticky; top: 76px; display: grid; gap: 14px; max-height: calc(100vh - 96px); overflow: auto; }
 .blog-settings-card { padding: 17px; border: 1px solid #e1e6ed; border-radius: 7px; background: #fff; }
 .blog-settings-card h3, .blog-settings-card summary { margin: 0 0 13px; color: #263750; font-size: 14px; font-weight: 750; }

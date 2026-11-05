@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const basePath = getBasePath(); // 🔥 auto detect path
 
   // ---------- HEADER ----------
-  fetch(basePath + "components/header.html")
+  fetch(basePath + "components/header.html?v=20261105")
     .then(res => {
       if (!res.ok) throw new Error("Header not found");
       return res.text();
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(err => console.error("Header load error:", err.message));
 
   // ---------- FOOTER ----------
-  fetch(basePath + "components/footer.html")
+  fetch(basePath + "components/footer.html?v=20261105")
     .then(res => {
       if (!res.ok) throw new Error("Footer not found");
       return res.text();

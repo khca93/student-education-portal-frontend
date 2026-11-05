@@ -160,3 +160,12 @@ body {
 .dropdown:hover .dropdown-menu {
   display: block;
 }
+
+/* main.css .btn (big hero buttons) loads later and made the header wider than phones. */
+.auth-buttons .btn { padding: 7px 14px; }
+@media (max-width: 480px) {
+  .nav-container { gap: 8px; padding: 12px 16px; }
+  .nav-logo span { display: none; }
+  .auth-buttons { gap: 6px; }
+  .auth-buttons .btn { padding: 6px 10px; font-size: 13px; }
+}

@@ -26,101 +26,125 @@
   <meta name="twitter:description" id="twitterDescription" content="">
   <meta name="twitter:image" id="twitterImage" content="">
 
+  <script>
+    // No slug: nothing to show, go to the list.
+    if (!new URLSearchParams(location.search).get('slug')) location.replace('blogs.html');
+  </script>
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="css/header.css" rel="stylesheet">
-  <link href="css/footer.css" rel="stylesheet">
-  <link href="css/main.css" rel="stylesheet">
-  <link href="css/blog.css" rel="stylesheet">
-
-  <style>
-    body { background: #f1f5f9; }
-    .blog-page { padding: 40px 20px 60px; }
-    .blog-container { overflow: hidden; }
-    .back-link { display: inline-block; margin-bottom: 18px; color: #4f46e5; text-decoration: none; font-weight: 500; }
-    .blog-category {
-      display: inline-block; font-size: 12px; font-weight: 600; color: #4f46e5; background: #eef2ff;
-      padding: 4px 12px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px;
-    }
-    .blog-category:empty { display: none; }
-    #blogTitle { font-family: 'Poppins', sans-serif; font-size: 2rem; line-height: 1.3; color: #1e293b; }
-    .meta { display: flex; flex-wrap: wrap; gap: 16px; }
-    .meta i { margin-right: 5px; color: #94a3b8; }
-    .main-blog-image { margin: 0; max-height: 480px; object-fit: cover; }
-    .blog-content::after { content: ''; display: block; clear: both; }
-    .like-section { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 30px 0; padding: 18px 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
-    .like-section button {
-      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px;
-      border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font: inherit; font-size: 14px;
-    }
-    .like-section button:hover { background: #eef2ff; border-color: #c7d2fe; }
-    #likeCount { color: #64748b; font-size: 14px; margin-right: auto; }
-    .section-heading { font-size: 1.3rem; color: #1e293b; margin: 30px 0 14px; }
-    .single-comment { background: #f8fafc; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
-    .single-comment small { color: #64748b; margin-left: 8px; }
-    .single-comment p { margin: 6px 0 0; color: #334155; white-space: pre-line; }
-    .related-card { color: inherit; text-decoration: none; display: block; }
-    .related-card h4, .related-card p { padding: 0 15px; }
-    .related-card h4 { margin: 12px 0 6px; color: #1e293b; }
-    .related-card p { color: #64748b; font-size: 14px; margin-bottom: 15px; }
-    .blog-error { text-align: center; padding: 40px 0; color: #64748b; }
-
-    @media (max-width: 600px) {
-      .blog-page { padding: 20px 12px 40px; }
-      .blog-container { padding: 20px; }
-      #blogTitle { font-size: 1.5rem; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="css/header.css?v=20261105" rel="stylesheet">
+  <link href="css/footer.css?v=20261105" rel="stylesheet">
+  <link href="css/main.css?v=20261105" rel="stylesheet">
+  <link href="css/blog.css?v=20261105" rel="stylesheet">
 </head>
 
-<body>
+<body class="article-page">
+  <div class="read-progress" aria-hidden="true"><span id="readProgress"></span></div>
   <div id="header-container"></div>
 
-  <main class="blog-page">
-    <article class="blog-container" id="blogArticle">
-      <a href="blogs.html" class="back-link"><i class="fas fa-arrow-left"></i> All Blogs</a>
-      <div><span class="blog-category" id="blogCategory"></span></div>
-      <h1 id="blogTitle">Loading…</h1>
-      <p id="blogSubtitle" class="blog-subtitle" hidden></p>
-      <div class="meta" id="blogMeta"></div>
-      <div id="blogTags" class="blog-tag-list" aria-label="Article tags"></div>
+  <main class="container article-wrap">
+    <div class="article-layout">
+      <article class="article-card" id="blogArticle">
+        <div class="article-col">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol>
+              <li><a href="/">Home</a></li>
+              <li><a href="blogs.html">Blog</a></li>
+              <li><a href="blogs.html" id="crumbCategory">Article</a></li>
+            </ol>
+          </nav>
 
-      <!-- Blog Main Image -->
-      <div id="blogImageContainer"></div>
+          <span class="bc-tag" id="blogCategory" hidden></span>
+          <h1 class="article-title" id="blogTitle">Loading…</h1>
+          <p id="blogSubtitle" class="article-subtitle" hidden></p>
+          <div class="article-meta" id="blogMeta"></div>
+          <div id="blogTags" class="article-tags" aria-label="Article tags"></div>
 
-      <!-- Blog Content -->
-      <div class="content blog-content" id="blogContent"></div>
+          <!-- Blog Main Image -->
+          <div id="blogImageContainer"></div>
 
-      <div class="like-section">
-        <button type="button" id="likeButton" onclick="likeBlog()"><i class="far fa-thumbs-up"></i> Like</button>
-        <span id="likeCount"></span>
-        <button type="button" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-        <button type="button" onclick="shareFacebook()"><i class="fab fa-facebook"></i> Facebook</button>
-        <button type="button" onclick="copyLink()"><i class="fas fa-link"></i> Copy Link</button>
-      </div>
+          <details class="toc-mobile" id="tocMobile">
+            <summary>Table of contents</summary>
+            <ol class="toc-list"></ol>
+          </details>
 
-      <h3 class="section-heading">Comments</h3>
-      <div id="commentsContainer"></div>
+          <!-- Blog Content -->
+          <div class="content blog-content" id="blogContent">
+            <div class="article-loading" aria-hidden="true">
+              <span class="sk sk-line"></span><span class="sk sk-line"></span><span class="sk sk-line short"></span>
+              <span class="sk sk-text"></span><span class="sk sk-line"></span><span class="sk sk-line short"></span>
+            </div>
+          </div>
 
-      <div class="comment-form">
-        <input type="text" id="commentName" placeholder="Your Name" aria-label="Your name">
-        <textarea id="commentMessage" placeholder="Write your comment..." aria-label="Comment"></textarea>
-        <button type="button" onclick="submitComment()">Post Comment</button>
-      </div>
+          <div class="article-actions">
+            <div class="share-group">
+              <span class="share-label">Share</span>
+              <button type="button" class="act-btn icon" onclick="shareWhatsApp()" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></button>
+              <button type="button" class="act-btn icon" onclick="shareFacebook()" aria-label="Share on Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></button>
+              <button type="button" class="act-btn icon" onclick="shareTelegram()" aria-label="Share on Telegram"><i class="fab fa-telegram-plane" aria-hidden="true"></i></button>
+              <button type="button" class="act-btn" id="copyButton" onclick="copyLink()" aria-label="Copy article link"><i class="fas fa-link" aria-hidden="true"></i> <span>Copy link</span></button>
+            </div>
+            <div class="share-group">
+              <button type="button" class="act-btn like-btn" id="likeButton" onclick="likeBlog()" aria-label="Like this article"><i class="far fa-thumbs-up" aria-hidden="true"></i> Like</button>
+              <span id="likeCount" class="share-label" aria-live="polite"></span>
+            </div>
+          </div>
 
-      <h3 class="section-heading">Related Articles</h3>
-      <div id="relatedBlogs"></div>
-    </article>
+          <section class="author-box" aria-label="About the author">
+            <div class="author-avatar" aria-hidden="true">KH</div>
+            <div>
+              <h3 id="authorName">Knowledge Hunt Team</h3>
+              <p>We share exam updates, study plans and career guidance to help students across Maharashtra and India prepare smarter.</p>
+            </div>
+          </section>
+
+          <section class="article-section article-related" id="relatedSection" hidden aria-labelledby="relatedHeading">
+            <h2 class="article-section-title" id="relatedHeading">Related articles</h2>
+            <div id="relatedBlogs"></div>
+          </section>
+
+          <section class="article-section" aria-labelledby="commentsHeading">
+            <h2 class="article-section-title" id="commentsHeading">Comments</h2>
+            <div id="commentsContainer" class="comment-list"></div>
+
+            <form class="comment-form" id="commentForm" novalidate>
+              <h3>Leave a comment</h3>
+              <label>Your name
+                <input type="text" id="commentName" maxlength="80" autocomplete="name" required>
+              </label>
+              <label>Message
+                <textarea id="commentMessage" maxlength="1000" required></textarea>
+              </label>
+              <div class="form-foot">
+                <button type="submit" class="bl-btn" id="commentSubmit">Post comment</button>
+                <span class="form-note">Comments appear after approval.</span>
+              </div>
+              <p id="commentStatus" class="comment-status" role="status"></p>
+            </form>
+          </section>
+        </div>
+      </article>
+
+      <aside class="toc-aside" id="tocAside" aria-label="Table of contents">
+        <p class="toc-title">On this page</p>
+        <ol class="toc-list"></ol>
+      </aside>
+    </div>
   </main>
 
   <div id="footer-container"></div>
 
+  <script src="js/blog-cards.js?v=20261105"></script>
   <script>
 
     const API_BASE = location.hostname === "localhost"
       ? "http://localhost:5000"
       : "https://student-education-portal-backend.onrender.com";
+    const { el } = BlogCards;
     let currentBlogId = null;
+    let currentTitle = '';
+    let tocHeadings = [];
 
     function getSlug() {
       const params = new URLSearchParams(window.location.search);
@@ -129,23 +153,18 @@
 
     // Show errors inside the article only, so header/footer stay.
     function showError(text) {
-      const msg = document.createElement('p');
-      msg.className = 'blog-error';
-      msg.textContent = text + ' ';
-      const back = document.createElement('a');
+      const msg = el('p', 'article-error', text + ' ');
+      const back = el('a', '', 'See all blogs');
       back.href = 'blogs.html';
-      back.textContent = 'See all blogs';
       msg.appendChild(back);
       document.getElementById('blogArticle').replaceChildren(msg);
+      document.body.classList.add('no-toc');
     }
 
     async function loadBlog() {
 
       const slug = getSlug();
-      if (!slug) {
-        showError("Blog not found.");
-        return;
-      }
+      if (!slug) return; // the head script already redirected
 
       try {
 
@@ -161,6 +180,7 @@
 
         // SAVE ID FOR LIKE & COMMENT
         currentBlogId = blog._id;
+        currentTitle = blog.title || '';
 
         // ===== SEO =====
         const plainText = blog.content.replace(/<[^>]*>/g, '');
@@ -187,45 +207,58 @@
         }
 
         if (blog.image) {
-          const figure = document.createElement('figure');
-          const image = document.createElement('img');
-          image.src = blog.image; image.alt = blog.imageAlt || blog.title || ''; image.className = 'main-blog-image';
+          const figure = el('figure', 'article-figure');
+          const image = el('img');
+          image.src = blog.image; image.alt = blog.imageAlt || blog.title || '';
+          image.fetchPriority = 'high';
           figure.appendChild(image);
-          if (blog.imageCaption) { const caption = document.createElement('figcaption'); caption.textContent = blog.imageCaption; figure.appendChild(caption); }
+          if (blog.imageCaption) figure.appendChild(el('figcaption', '', blog.imageCaption));
           document.getElementById('blogImageContainer').replaceChildren(figure);
         }
 
-        document.getElementById('blogCategory').textContent = blog.category || 'General';
+        const category = blog.category || 'General';
+        const categoryTag = document.getElementById('blogCategory');
+        categoryTag.textContent = category;
+        categoryTag.hidden = false;
+        const crumb = document.getElementById('crumbCategory');
+        crumb.textContent = category;
+        crumb.href = 'blogs.html?category=' + encodeURIComponent(category);
         document.getElementById('blogTitle').textContent = blog.title;
 
+        const words = plainText.trim().split(/\s+/).filter(Boolean).length;
         const meta = document.getElementById('blogMeta');
-        const metaItem = (icon, text) => {
-          const span = document.createElement('span');
-          const i = document.createElement('i'); i.className = icon;
-          span.append(i, text);
-          return span;
-        };
-        meta.replaceChildren(
-          ...(blog.authorName ? [metaItem('far fa-user', blog.authorName)] : []),
-          metaItem('far fa-calendar', new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })),
-          metaItem('far fa-eye', (blog.views || 0) + ' views')
-        );
+        meta.replaceChildren();
+        if (blog.authorName) meta.appendChild(el('strong', '', blog.authorName));
+        [
+          BlogCards.formatDate(blog, 'long'),
+          (blog.readTime || Math.max(1, Math.ceil(words / 200))) + ' min read',
+          (blog.views || 0) + ' views'
+        ].forEach(text => {
+          if (meta.childNodes.length) meta.appendChild(el('span', 'bc-dot', '·')).setAttribute('aria-hidden', 'true');
+          meta.appendChild(el('span', '', text));
+        });
+        document.getElementById('authorName').textContent = blog.authorName || 'Knowledge Hunt Team';
+
         const subtitle = document.getElementById('blogSubtitle');
         subtitle.textContent = blog.subtitle || '';
         subtitle.hidden = !blog.subtitle;
-        const tags = document.getElementById('blogTags');
-        tags.replaceChildren();
-        (blog.tags || []).forEach(tag => { const chip = document.createElement('span'); chip.className = 'blog-tag'; chip.textContent = tag; tags.appendChild(chip); });
+        document.getElementById('blogTags').replaceChildren(...(blog.tags || []).map(tag => el('span', '', tag)));
 
         // LIKE COUNT SHOW
         document.getElementById('likeCount').textContent = (blog.likes || 0) + " Likes";
-        if (localStorage.getItem('liked:' + currentBlogId)) document.getElementById('likeButton').disabled = true;
+        if (localStorage.getItem('liked:' + currentBlogId)) markLiked();
 
         // Admin-written HTML, sanitized by the API (includes allow-listed YouTube embeds).
-        document.getElementById('blogContent').innerHTML = blog.content;
+        const content = document.getElementById('blogContent');
+        content.innerHTML = blog.content;
+        enhanceContent(content);
 
         renderComments(blog.comments);
         loadRelatedBlogs(blog.slug);
+        onScroll();
+
+        // Opened with #section in the URL: jump there now that the headings exist.
+        if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
 
       } catch (err) {
         console.error("Blog load error", err);
@@ -234,7 +267,95 @@
     }
 
 
+    // ================= CONTENT: tables, heading anchors, TOC =================
+
+    const slugify = (text) => String(text || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+
+    function enhanceContent(content) {
+      content.querySelectorAll('table').forEach(table => {
+        const wrap = el('div', 'table-wrap');
+        wrap.tabIndex = 0; // scrollable region must be keyboard reachable
+        wrap.setAttribute('role', 'region');
+        wrap.setAttribute('aria-label', 'Table');
+        table.replaceWith(wrap);
+        wrap.appendChild(table);
+      });
+
+      tocHeadings = [...content.querySelectorAll('h2, h3')].filter(h => !h.closest('.blog-toc') && h.textContent.trim());
+      const labels = tocHeadings.map(h => h.textContent.trim());
+      tocHeadings.forEach((heading, index) => {
+        // Editor already gives toc- ids; others get one here (Devanagari titles fall back to a number).
+        if (!heading.id) {
+          let id = 'toc-' + (slugify(labels[index]) || 'section-' + (index + 1));
+          while (document.getElementById(id)) id += '-' + (index + 1);
+          heading.id = id;
+        }
+        const anchor = el('a', 'heading-anchor', '#');
+        anchor.href = '#' + heading.id;
+        anchor.setAttribute('aria-label', 'Link to section: ' + labels[index]);
+        heading.appendChild(anchor);
+      });
+
+      const hasToc = tocHeadings.length >= 2;
+      document.body.classList.toggle('has-toc', hasToc);
+      document.body.classList.toggle('no-toc', !hasToc);
+      if (!hasToc) return;
+
+      document.querySelectorAll('.toc-list').forEach(list => {
+        list.replaceChildren(...tocHeadings.map((heading, index) => {
+          const item = el('li', heading.tagName === 'H3' ? 'toc-sub' : '');
+          const link = el('a', '', labels[index]);
+          link.href = '#' + heading.id;
+          link.dataset.target = heading.id;
+          item.appendChild(link);
+          return item;
+        }));
+      });
+      document.querySelectorAll('#tocMobile a').forEach(a => a.addEventListener('click', () => { document.getElementById('tocMobile').open = false; }));
+    }
+
+    // Reading progress + active TOC entry, updated once per frame.
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const rect = document.getElementById('blogContent').getBoundingClientRect();
+        const total = rect.height - window.innerHeight * 0.6;
+        const progress = total > 0 ? Math.min(1, Math.max(0, (120 - rect.top) / total)) : 0;
+        document.getElementById('readProgress').style.transform = `scaleX(${progress})`;
+
+        let active = null;
+        for (const heading of tocHeadings) {
+          if (heading.getBoundingClientRect().top < 130) active = heading.id; else break;
+        }
+        document.querySelectorAll('.toc-list a').forEach(a => {
+          const on = a.dataset.target === active;
+          a.classList.toggle('active', on);
+          if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
+        });
+        // Long TOC: keep the active entry visible inside the sticky sidebar (without moving the page).
+        const aside = document.getElementById('tocAside');
+        const current = aside.querySelector('a.active');
+        if (current && (current.offsetTop < aside.scrollTop || current.offsetTop > aside.scrollTop + aside.clientHeight - 40)) {
+          aside.scrollTop = current.offsetTop - aside.clientHeight / 3;
+        }
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+
+
     // ================= LIKE =================
+
+    function markLiked() {
+      const button = document.getElementById('likeButton');
+      button.disabled = true;
+      button.querySelector('i').className = 'fas fa-thumbs-up';
+      button.lastChild.textContent = ' Liked';
+      button.setAttribute('aria-label', 'You liked this article');
+    }
 
     async function likeBlog() {
 
@@ -253,6 +374,7 @@
         if (data.success) {
           document.getElementById('likeCount').textContent = data.likes + " Likes";
           localStorage.setItem('liked:' + currentBlogId, '1');
+          markLiked();
         } else button.disabled = false;
 
       } catch (err) {
@@ -268,22 +390,28 @@
     function renderComments(comments) {
 
       const container = document.getElementById('commentsContainer');
+      const list = comments || [];
+      document.getElementById('commentsHeading').textContent = list.length ? `Comments (${list.length})` : 'Comments';
 
-      if (!comments || comments.length === 0) {
-        const empty = document.createElement('p');
-        empty.textContent = 'No comments yet.';
-        container.replaceChildren(empty);
+      if (list.length === 0) {
+        container.replaceChildren(el('p', 'comment-empty', 'No comments yet. Be the first to share your thoughts.'));
         return;
       }
 
-      container.replaceChildren();
-      comments.forEach(c => {
-        const item = document.createElement('div'); item.className = 'single-comment';
-        const name = document.createElement('strong'); name.textContent = c.name || 'Reader';
-        const date = document.createElement('small'); date.textContent = new Date(c.createdAt).toLocaleDateString('en-IN');
-        const message = document.createElement('p'); message.textContent = c.message || '';
-        item.append(name, date, message); container.appendChild(item);
-      });
+      container.replaceChildren(...list.map(c => {
+        const name = c.name || 'Reader';
+        const item = el('div', 'comment-card');
+        const avatar = el('div', 'comment-avatar', name.trim().charAt(0).toUpperCase() || 'R');
+        avatar.setAttribute('aria-hidden', 'true');
+        const body = el('div');
+        const head = el('header');
+        const date = el('time', '', new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }));
+        if (c.createdAt) date.dateTime = c.createdAt;
+        head.append(el('strong', '', name), date);
+        body.append(head, el('p', '', c.message || ''));
+        item.append(avatar, body);
+        return item;
+      }));
     }
 
 
@@ -291,42 +419,41 @@
 
     async function loadRelatedBlogs(slug) {
 
-      const container = document.getElementById('relatedBlogs');
-      const none = () => { const p = document.createElement('p'); p.textContent = 'No related articles found.'; container.replaceChildren(p); };
-
       try {
         const res = await fetch(API_BASE + '/api/blogs/related/' + encodeURIComponent(slug));
         const data = await res.json();
 
-        if (!data.success || data.blogs.length === 0) return none();
+        if (!data.success || data.blogs.length === 0) return;
 
-        const grid = document.createElement('div'); grid.className = 'related-grid';
-        data.blogs.forEach(blog => {
-          const card = document.createElement('a'); card.className = 'related-card'; card.href = `blog.html?slug=${encodeURIComponent(blog.slug)}`;
-          if (blog.image) { const image = document.createElement('img'); image.src = blog.image; image.alt = blog.imageAlt || ''; image.className = 'related-image'; image.loading = 'lazy'; card.appendChild(image); }
-          const heading = document.createElement('h4'); heading.textContent = blog.title || '';
-          const text = new DOMParser().parseFromString(blog.excerpt || '', 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
-          const preview = document.createElement('p'); preview.textContent = text.substring(0, 100) + '…';
-          card.append(heading, preview); grid.appendChild(card);
-        });
-        container.replaceChildren(grid);
+        const grid = el('div', 'bc-grid');
+        grid.append(...data.blogs.slice(0, 3).map(BlogCards.card));
+        document.getElementById('relatedBlogs').replaceChildren(grid);
+        document.getElementById('relatedSection').hidden = false;
       } catch (err) {
         console.error("Related error", err);
-        none();
       }
     }
 
     loadBlog();
+
+    function commentStatus(text, isError) {
+      const status = document.getElementById('commentStatus');
+      status.textContent = text;
+      status.classList.toggle('error', !!isError);
+    }
+
     async function submitComment() {
 
       const name = document.getElementById('commentName').value.trim();
       const message = document.getElementById('commentMessage').value.trim();
 
       if (!name || !message) {
-        alert("Name and message required");
+        commentStatus("Name and message required", true);
         return;
       }
       if (!currentBlogId) return;
+      const button = document.getElementById('commentSubmit');
+      button.disabled = true;
 
       try {
 
@@ -345,12 +472,15 @@
           document.getElementById('commentName').value = '';
           document.getElementById('commentMessage').value = '';
         }
-        alert(data.message || (data.success ? "Comment sent" : "Failed to post comment"));
+        commentStatus(data.message || (data.success ? "Comment sent" : "Failed to post comment"), !data.success);
 
       } catch (err) {
-        alert("Failed to post comment");
+        commentStatus("Failed to post comment", true);
+      } finally {
+        button.disabled = false;
       }
     }
+    document.getElementById('commentForm').addEventListener('submit', e => { e.preventDefault(); submitComment(); });
 
     // Backend page with real OG tags; it redirects visitors back to this page.
     const shareUrl = () => API_BASE + '/share/' + encodeURIComponent(getSlug() || '');
@@ -363,13 +493,23 @@
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl())}`, '_blank');
     }
 
-    function copyLink() {
-      navigator.clipboard.writeText(shareUrl());
-      alert("Link copied!");
+    function shareTelegram() {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl())}&text=${encodeURIComponent(currentTitle)}`, '_blank');
+    }
+
+    async function copyLink() {
+      const label = document.querySelector('#copyButton span');
+      try {
+        await navigator.clipboard.writeText(shareUrl());
+        label.textContent = 'Copied!';
+        setTimeout(() => { label.textContent = 'Copy link'; }, 2000);
+      } catch {
+        window.prompt('Copy this link:', shareUrl());
+      }
     }
 
   </script>
-  <script src="js/load-components.js"></script>
+  <script src="js/load-components.js?v=20261105"></script>
 </body>
 
 </html>

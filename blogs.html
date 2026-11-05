@@ -11,131 +11,107 @@
     <meta name="description" content="Study tips, exam updates and career guidance articles from Knowledge Hunt.">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="css/header.css" rel="stylesheet">
-    <link href="css/footer.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
-
-    <style>
-        body { background: #f1f5f9; }
-        .blogs-hero { padding: 60px 0 90px; text-align: center; }
-        .blogs-hero .container { position: relative; z-index: 1; }
-
-        .filters {
-            display: flex; gap: 12px; flex-wrap: wrap;
-            background: #fff; border-radius: 14px; padding: 16px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
-            margin: -50px auto 30px; position: relative; z-index: 2;
-        }
-        .search-box { flex: 1 1 260px; position: relative; }
-        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-        .filters input, .filters select {
-            width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 10px;
-            font: inherit; font-size: 15px; background: #fff;
-        }
-        .filters input { padding-left: 40px; }
-        .filters select { flex: 0 1 220px; }
-        .filters input:focus, .filters select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-        .card {
-            background: #fff; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); color: inherit; text-decoration: none;
-            transition: transform 0.25s, box-shadow 0.25s;
-        }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12); }
-        .card:focus-visible { outline: 3px solid #4f46e5; outline-offset: 3px; }
-        .card-image, .blog-image-placeholder { width: 100%; height: 190px; object-fit: cover; }
-        .blog-image-placeholder {
-            display: grid; place-items: center; color: #fff; font-weight: 700;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-        }
-        .card-content { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
-        .card-category {
-            align-self: flex-start; font-size: 12px; font-weight: 600; color: #4f46e5; background: #eef2ff;
-            padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase;
-        }
-        .card-title { font-size: 18px; font-weight: 700; color: #1e293b; line-height: 1.4; margin-bottom: 8px; }
-        .card-excerpt { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 16px; flex: 1; }
-        .card-meta { display: flex; gap: 16px; font-size: 13px; color: #64748b; }
-        .card-meta i { margin-right: 4px; }
-
-        .pagination { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 40px 0 60px; }
-        .pagination button {
-            min-width: 40px; padding: 8px 14px; border: 1px solid #e2e8f0; background: #fff;
-            border-radius: 8px; cursor: pointer; font: inherit;
-        }
-        .pagination button:hover:not(:disabled) { background: #eef2ff; }
-        .pagination button.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-        .empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #64748b; }
-
-        @media (max-width: 600px) {
-            .blogs-hero { padding: 40px 0 80px; }
-            .filters select { flex-basis: 100%; }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="css/header.css?v=20261105" rel="stylesheet">
+    <link href="css/footer.css?v=20261105" rel="stylesheet">
+    <link href="css/main.css?v=20261105" rel="stylesheet">
+    <link href="css/blog.css?v=20261105" rel="stylesheet">
 </head>
 
-<body>
+<body class="blogs-page">
     <div id="header-container"></div>
 
     <section class="hero-section blogs-hero">
         <div class="container">
-            <h1 class="hero-title"><i class="fas fa-blog"></i> Latest Blogs</h1>
-            <p class="hero-description">Study tips, exam updates and career guidance for students.</p>
+            <h1 class="hero-title">Knowledge Hunt Blog</h1>
+            <p class="hero-description">Study tips, exam updates and career guidance to help students prepare smarter.</p>
+            <div class="blog-search" role="search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="searchInput" placeholder="Search articles..." aria-label="Search blogs" autocomplete="off">
+            </div>
         </div>
     </section>
 
-    <main class="container">
-        <div class="filters">
-            <div class="search-box">
-                <i class="fas fa-search" aria-hidden="true"></i>
-                <input type="search" id="searchInput" placeholder="Search blogs..." aria-label="Search blogs">
-            </div>
-            <select id="categoryFilter" aria-label="Filter by category">
-                <option value="all">All Categories</option>
-            </select>
-        </div>
+    <main class="container blogs-main">
+        <section id="featuredBlog" class="blogs-featured" aria-label="Featured article"></section>
 
-        <div class="grid" id="blogGrid">
-            <div class="empty">Loading blogs...</div>
-        </div>
+        <div class="blog-chips" id="categoryChips" role="group" aria-label="Filter by category"></div>
 
-        <nav class="pagination" id="pagination" aria-label="Blog pages"></nav>
+        <div class="bc-grid" id="blogGrid" aria-live="polite" aria-busy="true"></div>
+
+        <nav class="blog-pagination" id="pagination" aria-label="Blog pages"></nav>
     </main>
 
     <div id="footer-container"></div>
 
+    <script src="js/blog-cards.js?v=20261105"></script>
     <script>
         const API_BASE = location.hostname === "localhost"
             ? "http://localhost:5000"
             : "https://student-education-portal-backend.onrender.com";
+        const { el } = BlogCards;
         let currentPage = 1;
         let totalPages = 1;
-        let currentCategory = "all";
+        let currentCategory = new URLSearchParams(location.search).get('category') || "all";
         let currentSearch = "";
+        let featuredSlug = null;
+        let requestId = 0;
 
-        function el(tag, className, text) {
-            const node = document.createElement(tag);
-            if (className) node.className = className;
-            if (text !== undefined) node.textContent = text; // textContent escapes API text
-            return node;
+        const filtered = () => currentCategory !== 'all' || currentSearch !== '';
+
+        function stateBox(icon, title, text, action) {
+            const box = el('div', 'blog-state');
+            const i = el('i', 'fas ' + icon);
+            i.setAttribute('aria-hidden', 'true');
+            box.append(i, el('h3', '', title), el('p', '', text));
+            if (action) box.appendChild(action);
+            return box;
         }
 
-        // DOMParser does not run scripts; it turns HTML + entities (&nbsp;) into plain text.
-        function plainText(html) {
-            return new DOMParser().parseFromString(html || '', 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+        function actionButton(label, onClick) {
+            const btn = el('button', 'bl-btn', label);
+            btn.type = 'button';
+            btn.onclick = onClick;
+            return btn;
+        }
+
+        function clearFilters() {
+            currentSearch = '';
+            document.getElementById('searchInput').value = '';
+            setCategory('all');
+        }
+
+        async function loadFeatured() {
+            const box = document.getElementById('featuredBlog');
+            box.replaceChildren(...BlogCards.skeleton(1, 'bc-featured'));
+            try {
+                const res = await fetch(API_BASE + '/api/blogs/featured');
+                const data = await res.json();
+                if (!data.success || !data.blog) { box.replaceChildren(); return; }
+                featuredSlug = data.blog.slug;
+                box.replaceChildren(BlogCards.featured(data.blog));
+            } catch (err) {
+                console.error("Featured error:", err);
+                box.replaceChildren();
+            }
         }
 
         async function loadBlogs(page = 1) {
             const grid = document.getElementById('blogGrid');
+            const id = ++requestId; // ignore answers that arrive after a newer search
+            grid.setAttribute('aria-busy', 'true');
+            grid.replaceChildren(...BlogCards.skeleton(6));
+            document.getElementById('featuredBlog').hidden = filtered();
             const params = new URLSearchParams({ page, category: currentCategory, search: currentSearch });
             try {
                 const res = await fetch(API_BASE + '/api/blogs?' + params);
                 const data = await res.json();
+                if (id !== requestId) return;
 
                 if (!data.success || !data.blogs || data.blogs.length === 0) {
-                    grid.replaceChildren(el('div', 'empty', 'No blogs found. Check back later!'));
+                    grid.replaceChildren(stateBox('fa-search', 'No articles found',
+                        filtered() ? 'Try another word or category.' : 'New articles are on the way. Check back soon!',
+                        filtered() ? actionButton('Clear filters', clearFilters) : null));
                     document.getElementById('pagination').replaceChildren();
                     return;
                 }
@@ -143,55 +119,46 @@
                 currentPage = data.currentPage;
                 totalPages = data.totalPages;
 
-                grid.replaceChildren(...data.blogs.map(blog => {
-                    const card = el('a', 'card');
-                    card.href = 'blog.html?slug=' + encodeURIComponent(blog.slug);
-                    if (blog.image) {
-                        const image = el('img', 'card-image');
-                        image.src = blog.image;
-                        image.alt = blog.imageAlt || '';
-                        image.loading = 'lazy';
-                        card.appendChild(image);
-                    } else {
-                        card.appendChild(el('div', 'blog-image-placeholder', 'Knowledge Hunt'));
-                    }
-                    const date = new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const excerpt = plainText(blog.excerpt);
-                    const meta = el('div', 'card-meta');
-                    const dateEl = el('span', '', ' ' + date);
-                    dateEl.prepend(el('i', 'far fa-calendar'));
-                    const viewsEl = el('span', '', ' ' + (blog.views || 0) + ' views');
-                    viewsEl.prepend(el('i', 'far fa-eye'));
-                    meta.append(dateEl, viewsEl);
-
-                    const content = el('div', 'card-content');
-                    content.append(
-                        el('span', 'card-category', blog.category || 'General'),
-                        el('h3', 'card-title', blog.title || ''),
-                        el('p', 'card-excerpt', excerpt),
-                        meta
-                    );
-                    card.appendChild(content);
-                    return card;
-                }));
+                // The featured article is already shown big above the grid on the unfiltered first page.
+                const featuredShown = !filtered() && currentPage === 1 && featuredSlug;
+                const blogs = featuredShown ? data.blogs.filter(b => b.slug !== featuredSlug) : data.blogs;
+                grid.replaceChildren(...blogs.map(BlogCards.card));
                 renderPagination();
             } catch (err) {
+                if (id !== requestId) return;
                 console.error("Load error:", err);
-                grid.replaceChildren(el('div', 'empty', 'Failed to load blogs. Please try again.'));
+                grid.replaceChildren(stateBox('fa-wifi', "Couldn't load articles", 'Please check your connection and try again.',
+                    actionButton('Try again', () => loadBlogs(currentPage))));
+                document.getElementById('pagination').replaceChildren();
+            } finally {
+                if (id === requestId) grid.setAttribute('aria-busy', 'false');
             }
         }
 
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.blog-chip').forEach(chip => chip.setAttribute('aria-pressed', String(chip.dataset.cat === cat)));
+            loadBlogs(1);
+        }
+
+        function renderChips(categories) {
+            const chips = ['all', ...categories].map(cat => {
+                const chip = el('button', 'blog-chip', cat === 'all' ? 'All' : cat);
+                chip.type = 'button';
+                chip.dataset.cat = cat;
+                chip.setAttribute('aria-pressed', String(cat === currentCategory));
+                chip.onclick = () => setCategory(cat);
+                return chip;
+            });
+            document.getElementById('categoryChips').replaceChildren(...chips);
+        }
+
         async function loadCategories() {
+            renderChips([]);
             try {
                 const res = await fetch(API_BASE + '/api/blogs/categories');
                 const data = await res.json();
-                if (!data.success) return;
-                const select = document.getElementById('categoryFilter');
-                data.categories.forEach(cat => {
-                    const option = el('option', '', cat);
-                    option.value = cat;
-                    select.appendChild(option);
-                });
+                if (data.success) renderChips(data.categories);
             } catch (err) {
                 console.error("Categories error:", err);
             }
@@ -206,35 +173,36 @@
             }, 400);
         });
 
-        document.getElementById('categoryFilter').addEventListener('change', e => {
-            currentCategory = e.target.value;
-            loadBlogs(1);
-        });
-
-        function pageButton(label, page, active) {
+        function pageButton(label, page, active, ariaLabel) {
             const btn = el('button', active ? 'active' : '', label);
             btn.type = 'button';
-            if (page) btn.onclick = () => { loadBlogs(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-            else btn.disabled = true;
+            if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
+            if (page && !active) btn.onclick = () => {
+                loadBlogs(page);
+                document.getElementById('categoryChips').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+            else btn.disabled = !active;
             if (active) btn.setAttribute('aria-current', 'page');
             return btn;
         }
 
         function renderPagination() {
             const buttons = [];
-            if (currentPage > 1) buttons.push(pageButton('← Previous', currentPage - 1));
+            if (currentPage > 1) buttons.push(pageButton('← Previous', currentPage - 1, false, 'Previous page'));
             for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) buttons.push(pageButton(String(i), i, i === currentPage));
+                if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) buttons.push(pageButton(String(i), i, i === currentPage, 'Page ' + i));
                 else if (Math.abs(i - currentPage) === 3) buttons.push(pageButton('…'));
             }
-            if (currentPage < totalPages) buttons.push(pageButton('Next →', currentPage + 1));
+            if (currentPage < totalPages) buttons.push(pageButton('Next →', currentPage + 1, false, 'Next page'));
             document.getElementById('pagination').replaceChildren(...(totalPages > 1 ? buttons : []));
         }
 
         loadCategories();
-        loadBlogs();
+        document.getElementById('blogGrid').replaceChildren(...BlogCards.skeleton(6));
+        // Grid waits for the featured slug so the same article is not shown twice.
+        loadFeatured().finally(() => loadBlogs());
     </script>
-    <script src="js/load-components.js"></script>
+    <script src="js/load-components.js?v=20261105"></script>
 </body>
 
 </html>
