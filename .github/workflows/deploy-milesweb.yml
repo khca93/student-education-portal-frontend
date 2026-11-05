@@ -1,4 +1,4 @@
-
+```yaml
 name: Deploy frontend to MilesWeb
 
 on:
@@ -144,24 +144,24 @@ jobs:
 
               ftp.cwd(remote_root)
 
-             def ensure_remote_dir(relative_dir):
-                ftp.cwd(".")
-            
-                if not relative_dir or relative_dir == ".":
-                    return
-            
-                for part in relative_dir.split("/"):
-                    if not part or part == ".":
-                        continue
-            
-                    if part == "..":
-                        raise ValueError("Unsafe remote path")
-            
-                    try:
-                        ftp.cwd(part)
-                    except ftplib.error_perm:
-                        ftp.mkd(part)
-                        ftp.cwd(part)
+              def ensure_remote_dir(relative_dir):
+                  ftp.cwd(".")
+
+                  if not relative_dir or relative_dir == ".":
+                      return
+
+                  for part in relative_dir.split("/"):
+                      if not part or part == ".":
+                          continue
+
+                      if part == "..":
+                          raise ValueError("Unsafe remote path")
+
+                      try:
+                          ftp.cwd(part)
+                      except ftplib.error_perm:
+                          ftp.mkd(part)
+                          ftp.cwd(part)
 
               uploaded = 0
 
@@ -171,10 +171,11 @@ jobs:
 
                   ensure_remote_dir(remote_parent)
 
-                  ftp.storbinary(
-                      f"STOR {filename}",
-                      open(local_path, "rb")
-                  )
+                  with open(local_path, "rb") as file_handle:
+                      ftp.storbinary(
+                          f"STOR {filename}",
+                          file_handle
+                      )
 
                   uploaded += 1
                   print(f"Uploaded: {local_path}")
@@ -192,3 +193,4 @@ jobs:
               except Exception:
                   ftp.close()
           PY
+```
