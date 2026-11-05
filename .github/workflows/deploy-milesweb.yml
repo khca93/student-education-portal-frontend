@@ -13,23 +13,21 @@ concurrency:
 
 jobs:
   deploy:
-    name: Upload frontend files
+    name: Deploy frontend to MilesWeb
     runs-on: ubuntu-latest
 
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Checkout frontend repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Validate FTP configuration
         shell: bash
         env:
-         FTP_SERVER: ${{ secrets.FTP_SERVER }}
-         FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-         FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-         FTP_PROTOCOL: ${{ secrets.MILESWEB_FTP_PROTOCOL }}
-         FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           set -euo pipefail
 
@@ -38,35 +36,19 @@ jobs:
             exit 1
           fi
 
-          if [[ "$FTP_PROTOCOL" != "ftpes" ]]; then
-            echo "::error::Set MILESWEB_FTP_PROTOCOL to ftpes for port 21."
-            exit 1
-          fi
-
-          if [[ -z "$FTP_SERVER_DIR" ]]; then
-            echo "::error::FTP directory is missing."
-            exit 1
-          fi
-
-          if [[ "$FTP_SERVER_DIR" == /* || "$FTP_SERVER_DIR" == *"\\"* ]]; then
-            echo "::error::FTP directory must be relative."
-            exit 1
-          fi
-
-          if [[ "/$FTP_SERVER_DIR/" == *"/../"* ]]; then
-            echo "::error::Parent directory segments are not allowed."
+          if [[ "$FTP_SERVER" == *"/"* ]]; then
+            echo "::error::FTP_SERVER must contain hostname only."
             exit 1
           fi
 
           echo "FTP configuration validated."
 
-      - name: Upload frontend files to MilesWeb
+      - name: Upload frontend files
         shell: bash
         env:
-           FTP_SERVER: ${{ secrets.FTP_SERVER }}
-           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-           FTP_SERVER_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           set -euo pipefail
 
@@ -79,16 +61,8 @@ jobs:
           username = os.environ["FTP_USERNAME"]
           password = os.environ["FTP_PASSWORD"]
 
-          remote_dir = os.environ["FTP_SERVER_DIR"].strip("/")
-
-          if remote_dir == ".":
-              remote_dir = ""
-
-          encoded_dir = "/".join(
-              quote(part, safe="")
-              for part in remote_dir.split("/")
-              if part
-          )
+          # FTP account root is assumed to be /exampaper
+          remote_dir = "."
 
           tracked = subprocess.check_output(
               ["git", "ls-files", "-z"]
@@ -104,12 +78,8 @@ jobs:
           )
 
           excluded_suffixes = (
-              ".zip",
-              ".tar",
-              ".tar.gz",
-              ".7z",
-              ".pdf",
-              ".log",
+              ".zip", ".tar", ".tar.gz",
+              ".7z", ".pdf", ".log"
           )
 
           uploaded = 0
@@ -126,7 +96,9 @@ jobs:
               if normalized.startswith(excluded_dirs):
                   continue
 
-              if filename == ".env" or filename.startswith(".env.") or filename.endswith(".env"):
+              if (filename == ".env"
+                  or filename.startswith(".env.")
+                  or filename.endswith(".env")):
                   continue
 
               if lower.endswith(excluded_suffixes):
@@ -134,12 +106,10 @@ jobs:
 
               encoded_path = quote(normalized, safe="/")
 
-              target_path = "/".join(
-                  part for part in (encoded_dir, encoded_path)
-                  if part
+              target = (
+                  f"ftp://{server}/"
+                  f"{encoded_path}"
               )
-
-              target = f"ftp://{server}/{target_path}"
 
               command = [
                   "curl",
@@ -155,10 +125,12 @@ jobs:
                   target,
               ]
 
+              print(f"Uploading: {normalized}")
+
               subprocess.run(command, check=True)
 
               uploaded += 1
 
-          print(f"Successfully uploaded {uploaded} files.")
-          print("Remote files were not deleted.")
+          print(f"Deployment successful. Files uploaded: {uploaded}")
+          print("No remote files were deleted.")
           PY
