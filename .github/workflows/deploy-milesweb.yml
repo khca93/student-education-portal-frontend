@@ -15,7 +15,6 @@ jobs:
   deploy:
     name: Deploy frontend to /exampaper
     runs-on: ubuntu-latest
-
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -28,7 +27,7 @@ jobs:
           SFTP_HOST: ${{ secrets.FTP_SERVER }}
           SFTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          REMOTE_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          REMOTE_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
         run: |
           set -euo pipefail
 
@@ -48,13 +47,14 @@ jobs:
           }
 
           [[ -n "$REMOTE_DIR" ]] || {
-            echo "::error::FTP_SERVER_DIR is missing"
+            echo "::error::MILESWEB_FTP_SERVER_DIR is missing"
             exit 1
           }
 
           if [[ "$REMOTE_DIR" == /* ||
                 "$REMOTE_DIR" == *\\* ||
-                "/$REMOTE_DIR/" == *"/../"* ]]; then
+                "/$REMOTE_DIR/" == *"/../"* ||
+                "$REMOTE_DIR" == *".."* ]]; then
             echo "::error::Remote directory must be a safe relative path"
             exit 1
           fi
@@ -62,6 +62,7 @@ jobs:
           echo "SFTP configuration validated."
 
       - name: Install SFTP dependency
+        shell: bash
         run: |
           python3 -m pip install --disable-pip-version-check paramiko
 
@@ -71,12 +72,12 @@ jobs:
           SFTP_HOST: ${{ secrets.FTP_SERVER }}
           SFTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          REMOTE_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          REMOTE_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
         run: |
           python3 - <<'PY'
           import os
-          import stat
           import posixpath
+          import stat
           import paramiko
           import subprocess
 
@@ -86,7 +87,12 @@ jobs:
           remote_root = os.environ["REMOTE_DIR"].strip("/")
 
           if not remote_root:
-              raise ValueError("Remote directory cannot be empty")
+              raise ValueError("Remote directory is empty")
+
+          parts = remote_root.split("/")
+
+          if any(part in ("", ".", "..") for part in parts):
+              raise ValueError("Unsafe remote directory")
 
           tracked = subprocess.check_output(
               ["git", "ls-files", "-z"]
@@ -124,7 +130,11 @@ jobs:
               if normalized.startswith(excluded_dirs):
                   continue
 
-              if name == ".env" or name.startswith(".env.") or name.endswith(".env"):
+              if (
+                  name == ".env"
+                  or name.startswith(".env.")
+                  or name.endswith(".env")
+              ):
                   continue
 
               if lower.endswith(excluded_suffixes):
@@ -148,6 +158,9 @@ jobs:
 
               sftp = paramiko.SFTPClient.from_transport(transport)
 
+              if sftp is None:
+                  raise RuntimeError("SFTP connection failed")
+
               def ensure_remote_dir(path):
                   current = ""
 
@@ -161,7 +174,11 @@ jobs:
                       current = posixpath.join(current, part)
 
                       try:
-                          sftp.stat(current)
+                          info = sftp.stat(current)
+
+                          if not stat.S_ISDIR(info.st_mode):
+                              raise NotADirectoryError(current)
+
                       except FileNotFoundError:
                           sftp.mkdir(current)
 
