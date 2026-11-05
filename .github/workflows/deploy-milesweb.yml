@@ -15,84 +15,66 @@ jobs:
   deploy:
     name: Deploy frontend to /exampaper
     runs-on: ubuntu-latest
+
     if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate SFTP configuration
+      - name: Validate FTP configuration
         shell: bash
         env:
-          SFTP_HOST: ${{ secrets.FTP_SERVER }}
-          SFTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          REMOTE_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+          FTP_HOST: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
           set -euo pipefail
 
-          [[ -n "$SFTP_HOST" ]] || {
+          [[ -n "$FTP_HOST" ]] || {
             echo "::error::FTP_SERVER is missing"
             exit 1
           }
 
-          [[ -n "$SFTP_USERNAME" ]] || {
+          [[ -n "$FTP_USERNAME" ]] || {
             echo "::error::FTP_USERNAME is missing"
             exit 1
           }
 
-          [[ -n "$SFTP_PASSWORD" ]] || {
+          [[ -n "$FTP_PASSWORD" ]] || {
             echo "::error::FTP_PASSWORD is missing"
             exit 1
           }
 
-          [[ -n "$REMOTE_DIR" ]] || {
-            echo "::error::MILESWEB_FTP_SERVER_DIR is missing"
+          [[ "$REMOTE_DIR" == "." ]] || {
+            echo "::error::FTP_SERVER_DIR must be ."
             exit 1
           }
 
-          if [[ "$REMOTE_DIR" == /* ||
-                "$REMOTE_DIR" == *\\* ||
-                "/$REMOTE_DIR/" == *"/../"* ||
-                "$REMOTE_DIR" == *".."* ]]; then
-            echo "::error::Remote directory must be a safe relative path"
-            exit 1
-          fi
+          echo "FTP configuration validated."
 
-          echo "SFTP configuration validated."
-
-      - name: Install SFTP dependency
-        shell: bash
-        run: |
-          python3 -m pip install --disable-pip-version-check paramiko
-
-      - name: Upload frontend using SFTP
+      - name: Upload frontend using FTP
         shell: bash
         env:
-          SFTP_HOST: ${{ secrets.FTP_SERVER }}
-          SFTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          REMOTE_DIR: ${{ secrets.MILESWEB_FTP_SERVER_DIR }}
+          FTP_HOST: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
           python3 - <<'PY'
           import os
-          import posixpath
-          import stat
-          import paramiko
+          import ftplib
           import subprocess
+          import posixpath
 
-          host = os.environ["SFTP_HOST"]
-          username = os.environ["SFTP_USERNAME"]
-          password = os.environ["SFTP_PASSWORD"]
-          remote_root = os.environ["REMOTE_DIR"].strip("/")
+          host = os.environ["FTP_HOST"]
+          username = os.environ["FTP_USERNAME"]
+          password = os.environ["FTP_PASSWORD"]
+          remote_root = os.environ["REMOTE_DIR"]
 
-          if not remote_root:
-              raise ValueError("Remote directory is empty")
-
-          parts = remote_root.split("/")
-
-          if any(part in ("", ".", "..") for part in parts):
-              raise ValueError("Unsafe remote directory")
+          if remote_root != ".":
+              raise ValueError("Remote directory must be .")
 
           tracked = subprocess.check_output(
               ["git", "ls-files", "-z"]
@@ -122,7 +104,7 @@ jobs:
           for path in filter(None, tracked):
               normalized = path.replace("\\", "/")
               lower = normalized.lower()
-              name = lower.rsplit("/", 1)[-1]
+              filename = lower.rsplit("/", 1)[-1]
 
               if normalized == ".gitignore":
                   continue
@@ -131,9 +113,9 @@ jobs:
                   continue
 
               if (
-                  name == ".env"
-                  or name.startswith(".env.")
-                  or name.endswith(".env")
+                  filename == ".env"
+                  or filename.startswith(".env.")
+                  or filename.endswith(".env")
               ):
                   continue
 
@@ -146,72 +128,69 @@ jobs:
               if os.path.isfile(path):
                   files.append(normalized)
 
-          transport = None
-          sftp = None
+          if not files:
+              raise RuntimeError("No tracked frontend files found.")
+
+          ftp = ftplib.FTP()
 
           try:
-              transport = paramiko.Transport((host, 22))
-              transport.connect(
-                  username=username,
-                  password=password
-              )
+              print(f"Connecting to FTP host: {host}")
 
-              sftp = paramiko.SFTPClient.from_transport(transport)
+              ftp.connect(host, 21, timeout=60)
+              ftp.login(username, password)
+              ftp.set_pasv(True)
 
-              if sftp is None:
-                  raise RuntimeError("SFTP connection failed")
+              print("FTP login successful.")
 
-              def ensure_remote_dir(path):
-                  current = ""
+              ftp.cwd(remote_root)
 
-                  for part in path.split("/"):
+              def ensure_remote_dir(relative_dir):
+                  if not relative_dir or relative_dir == ".":
+                      return
+
+                  ftp.cwd(remote_root)
+
+                  parts = relative_dir.split("/")
+
+                  for part in parts:
                       if not part or part == ".":
                           continue
 
                       if part == "..":
                           raise ValueError("Unsafe remote path")
 
-                      current = posixpath.join(current, part)
-
                       try:
-                          info = sftp.stat(current)
-
-                          if not stat.S_ISDIR(info.st_mode):
-                              raise NotADirectoryError(current)
-
-                      except FileNotFoundError:
-                          sftp.mkdir(current)
-
-              ensure_remote_dir(remote_root)
+                          ftp.cwd(part)
+                      except ftplib.error_perm:
+                          ftp.mkd(part)
+                          ftp.cwd(part)
 
               uploaded = 0
 
               for local_path in files:
-                  remote_path = posixpath.join(
-                      remote_root,
-                      local_path
-                  )
-
-                  remote_parent = posixpath.dirname(remote_path)
+                  remote_parent = posixpath.dirname(local_path)
+                  filename = posixpath.basename(local_path)
 
                   ensure_remote_dir(remote_parent)
 
-                  sftp.put(local_path, remote_path)
+                  ftp.storbinary(
+                      f"STOR {filename}",
+                      open(local_path, "rb")
+                  )
 
                   uploaded += 1
                   print(f"Uploaded: {local_path}")
 
               print("--------------------------------")
-              print("SFTP deployment completed.")
-              print(f"Destination: {remote_root}")
+              print("FTP deployment completed.")
+              print("Destination: /exampaper")
               print(f"Files uploaded: {uploaded}")
-              print("No remote files were deleted.")
+              print("Remote files were not deleted.")
               print("--------------------------------")
 
           finally:
-              if sftp:
-                  sftp.close()
-
-              if transport:
-                  transport.close()
+              try:
+                  ftp.quit()
+              except Exception:
+                  ftp.close()
           PY
